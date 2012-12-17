@@ -1,0 +1,6 @@
+Plot Lines 
+Experiment ?rate [ two = 2, three = 3, four = 4 ]
+          Cdf
+          Passage ModelProbe (PDE1::pde_int_cont_req:start, pde_user_interface:stop)
+                  ModelRate [ number_pdes = ?rate ] ModelFile "ICC2009_T.pepa"
+

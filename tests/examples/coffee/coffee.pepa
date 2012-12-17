@@ -1,0 +1,18 @@
+r        = 1.0 ;
+r_thirst = 1.0 ;
+
+Boiler     = (cool, r)     . CoolBoiler
+           + (pour, infty) . (refill, r) . CoolBoiler
+           ;
+CoolBoiler = (boil, r)     . Boiler ;
+
+
+TeaDrinker = (thirst, r_thirst)
+           . (pour, r)
+           . (add_milk, r)
+           . (stir, r)
+           . TeaDrinking
+           ;
+TeaDrinking = (drink, r) . TeaDrinker ;
+
+TeaDrinker <pour> Boiler

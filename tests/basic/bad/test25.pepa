@@ -1,0 +1,5 @@
+% File: tests/bad/test25.pepa
+% Illegal rate identifier (rates should begin with a lowercase letter)
+R = 1.0;
+P = (a, R).P;
+(P <> P)

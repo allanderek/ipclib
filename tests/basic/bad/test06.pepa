@@ -1,0 +1,5 @@
+% File: tests/bad/test06.pepa
+% Illegal alias for a component (P2 aliases P)
+P = (a, r).P;
+P2 = P;
+(P <> P2)

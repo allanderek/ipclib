@@ -1,0 +1,7 @@
+Data // DataFilter [ "r_ctrl_res_pass" = "100"
+          //        "r_app_trans"     = "100"
+            //      "r_app_upd_mdl"   = "0.01"
+              //    "r_qf_res_to_dlg" = "10"
+                //  "r_qf_res_to_mdl" = "10"
+     //           ]
+DataBaseFile "anat.generated.database" [ Against [ xlogscale ylogscale ] "r_user_1" ]

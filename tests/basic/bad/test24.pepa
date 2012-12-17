@@ -1,0 +1,4 @@
+% File: tests/bad/test24.pepa
+% Illegal component identifier (should begin with an uppercase letter)
+p = (a, r).p;
+(p <> p)

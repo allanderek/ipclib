@@ -1,0 +1,14 @@
+Steady
+ModelTranslate BioPepaFile 
+               [ step-size = 50
+                 rate-params = [ k1  = 0.01
+                                 km1 = 0.01
+                                 k2  = 0.01
+                                 km2 = 0.001
+                               ] 
+                 max-concentrations = [ E_high = 100
+                                        S_high = 100
+                                      ]
+                 rate-calc   = full
+               ]
+               "MMR.biopepa"

@@ -1,0 +1,26 @@
+% This file is a test model describing an unreliable machine.
+% This is the core pepa version of the file
+% unreliable_machine.fr.pepa which uses functional rates to achieve
+% the same idea.
+
+computeRate = 0.5 ;
+crashRate   = 1 - computeRate ;
+
+paperworkRate = 0.5 ;
+rebootRate    = 1 - paperworkRate ;
+
+% The unreliable machine, this is the same in both versions.
+MachineUp   = (compute, computeRate).MachineUp + 
+	      (crash, crashRate).MachineDown ;
+MachineDown = (reboot, infty).MachineUp ;
+
+
+% Now the user
+User        = (compute, infty).User +
+              (crash, infty).AngryUser ;
+AngryUser   = (paperwork, paperworkRate).AngryUser +
+	      (reboot, rebootRate).User ;
+
+
+% The final composition is straightforward
+User <compute, crash, reboot> MachineUp

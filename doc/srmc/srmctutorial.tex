@@ -1,0 +1,227 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage{amssymb,amsbsy,verbatim,fancybox,ifpdf}
+\usepackage{graphicx}
+\usepackage[usenames]{color}
+
+\input{../ipc/macros.tex}
+\usepackage{srmc}
+
+
+%% We must define this for the manual to operate correctly.
+\newcommand{\showcommandline}[1]{
+\begin{commandline}
+\$ smc #1
+\end{commandline}
+}
+
+\newcommand{\commandNameIpcSmc}{\smc}
+
+%
+
+\title{The \srmc\ Tutorial}
+\author{
+Allan Clark, Stephen Gilmore and Mirco Tribastone
+}
+
+
+\begin{document}
+\maketitle
+
+
+\newcommand{\esyntaxlabel}[1]{
+( #1 )
+}
+
+\newcommand{\esyntaxtopline}[3]{
+$ #1 $ & $ := $ & $ #2 $ & \esyntaxlabel{ #3 }
+}
+\newcommand{\esyntaxline}[2]{
+& $ \mid $ & $ #1 $ &  \esyntaxlabel{ #2 }
+}
+
+\section*{About this document \ldots}
+
+This document is a tutorial on the use of the
+\srmc\ modelling language and associated \smc\ compiler.
+This tutorial explains how to use \pepa\ for stochastic modelling
+and how to use \srmc\ to describe the uncertainty in the 
+underlying \pepa\ model.
+No previous knowledge is assumed beyond elementary probability
+theory and basic familiarity with running command-line based
+applications. Experienced users of stochastic modelling tools
+may wish to skim through this document if they are unfamiliar
+with the \srmc\ language. For users familiar with \srmc\ there
+is the separate document ``The \srmc\ Manual'' which describes
+how the compiler operates and in particular the options for
+controlling the behaviour of the compiler.
+
+\section{Introduction}
+When modelling a system we may be concerned with several kinds of
+measurements. These measurements we understand in natural language
+but they may be translated into the modelling formalism as queries.
+The kinds of queries which the currently described toolchain is capable
+of are:
+\begin{description}
+\item [Steady-state] in which we measure the long-term probability
+of the system being in any of a number of given states at any given time.
+\item [Transient] in which we measure the probability of being in a given
+set of states a given time after the initial configuration.
+\item [Passage-Time] in which we describe a sequence of observations and
+compute the probability that a given time after the start of the sequence
+the sequence has completed. 
+\item [Rate-Measure] in which we compute the average rate at which we
+may make a given observation -- such as the occurence of a particular
+activity.
+\end{description}
+
+The measurements which we understand in natural language which we interpret
+into the above formal queries include the following:
+
+\begin{description}
+\item[Utilisation:] A typical utilisation question is ``What
+percentage of time is the server busy?''.  This is computed by summing
+the relevant states of the steady-state probability distribution.
+
+\item[Throughput:] An example here would be ``How many HTTP
+requests get processed each second?''.  Here we select the relevant
+states from the steady-state probability distribution and multiply by
+the arrival rate.
+
+\item[Latency:] Latency refers to the delay between the sender sending
+a message and the recipient receiving it.  This is a time-dependent
+property: it cannot be seen from the steady-state probability
+distribution and requires transient analysis.
+
+\item[Mean time to failure:] In reliability engineering modellers are
+often concerned with the mean of the elapsed time between system
+startup and system failure.  This too, is a time-dependent property
+and requires transient analysis for its computation.  
+
+\item[Service-level agreements:] An increasingly important contract in
+system provisioning is the service-level agreement (SLA)\@.  A typical
+SLA relates probability, time and a path through the system behaviour.
+For example, the statement ``At least 95\% of requests will receive a
+reply within~10 seconds'' is a typical SLA\@.
+
+\end{description} 
+
+
+\subsection{Introducing An Example}
+To conclude this introduction we describe an example scenario which
+one may like to model and then analyse the performance of.
+This example will be expanded upon throughout this tutorial.
+
+
+\begin{figure}
+\begin{picture}(10,10)
+% \unitlength{1cm}
+\put(10.0, 120.0){\line(1,0){60.0}}    % lounge top
+\put(10.0, 30.0){\line(0,1){90.0}}     % lounge left
+\put(70.0, 30.0){\line(0,1){90.0}}     % lounge right
+\put(40.0, 30.0){\oval(60.0, 20.0)[b]} % lounge bottom
+%
+\put(70.0, 120.0){\line(1,0){30.0}}    % actual bar top
+\put(70.0, 80.0){\line(1,0){30.0}}     % actual bar bottom
+%
+\put(100.0, 120.0){\line(0,-1){70.0}}    % barroom left
+\put(100.0, 120.0){\line(1,0){50.0}}     % barroom top
+\put(150.0, 120.0){\line(0,-1){70.0}}    % barroom right
+\put(125.0, 50.0){\oval(50.0, 20.0)[b]}  % barroom bottom
+%
+\put(24.0, 100.0){Lounge}                 % lounge label
+\put(75.0, 100.0){Bar}                    % actual bar label
+\put(105.0, 100.0){Barroom}               % barroom label
+\end{picture}
+\caption{
+\label{figure:bar-lounge-format}
+The format of the bar and lounge.
+}
+\end{figure}
+
+Out scenario is that of a joint barroom and lounge.
+The server is -- to begin with -- a single person who can serve
+at either side, the bar or the lounge.
+The lounge and bar customers occasionally order drinks.
+We could measure customers individually or we could measure the barroom
+customers and the lounge customers collectively.
+Here is our first model, we save this to a \texttt{.srmc} file, though
+at this stage it is also a simple \pepa\ model. 
+That is none of the additional features offered by the \srmc\ language
+are utilised.
+The geography of the scenario is depicted in Figure
+\ref{figure:bar-lounge-format}.
+
+Our first model uses the approach of collectively measuring the customers
+in either portion of the bar and is shown in Figure
+\ref{figure:model:barroom1}.
+
+% \begin{figure}
+% \verbatiminput{models/barroom1.pepa}
+% \caption{
+% \label{figure:model:barroom1}
+% The first model of our bar and lounge
+% }
+% \end{figure}
+
+
+\begin{figure}
+\srmcModel{
+\srmcTopline{r1}
+            {0.1 ;}
+\\
+\srmcTopline{r2}
+            {0.2 ;}
+\\
+\srmcTopline{r3}
+            {1.0 ;}
+\\
+\srmcTopline{Lounge}
+            {(order, r1) . (serve, \srmcPassive) . Lounge ;}
+\\
+\srmcTopline{Barroom}
+            {(order, r2) . (serve, \srmcPassive) . Barroom ;}
+\\
+\srmcTopline{Server}
+            {(order, \srmcPassive) . (serve, r3) . Server ;}
+\\
+}
+{
+\texttt{(Lounge <> Barroom) < order, serve > Server}
+}
+\caption{
+\label{figure:model:barroom1}
+The first model of our bar and lounge
+}
+\end{figure}
+
+
+
+
+
+\subsection{What's going on here}
+\adcTodo
+\adcComment{Explain, prefix, cooperation, passive activities and the main system equation}
+
+\section{Analysing Our Model}
+\subsection{Steady-State Analysis}
+\subsection{Transient Analysis}
+\subsection{Passage-Time Analysis}
+\subsection{Mean-Rate Analysis}
+
+\section{Building in Uncertainty - Rates}
+\section{Building in Uncertainty - Processes}
+
+\section{Using Namespaces}
+
+\appendix
+\section{Appendix -- Building and Installing \smc\ Compiler}
+\subsection{Binary distribution}
+\subsection{Source distribution}
+\subsection{Darcs repository}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\bibliographystyle{unsrt}
+%\bibliography{../common/pepa}
+
+\end{document}
+

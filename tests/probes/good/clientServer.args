@@ -1,0 +1,7 @@
+--probe 
+"ClientIdle request:clientReq, response:clientResp"
+--probe
+"ServerIdle break:serverBreak, repair:serverRepair"
+--probe
+"(serverBreak, clientReq:start)/serverRepair, clientResp:stop"
+tests/probes/good/clientServer.pepa

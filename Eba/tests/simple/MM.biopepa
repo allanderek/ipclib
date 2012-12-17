@@ -1,0 +1,36 @@
+% Bio-PEPA model of Michaelis-Menten kinetics
+
+%        k1      k2
+% E + S <--> E:S --> E + P
+%        km1
+
+% ODEs:
+%
+% dE/dt   = -k1 E S + km1 E:S + k2 E:S
+% dS/dt   = -K1 E S + km1 E:S
+% dE:S/dt =  k1 E S - km1 E:S - k2 E:S
+% dP/dt   =                     k2 E:S
+%
+% r1  = k1 E S
+% r1m = k1m E:S
+% r2  = k2 E:S
+
+
+%k1  = [ 1 ] ;
+%km1 = [ 1 ] ;
+%k2  = [ 1 ] ;
+
+r1 = [k1 * E * S];
+rm1 = [km1 * E:S];
+r2 = [k2 * E:S];
+
+
+
+E = r1<<  +  rm1>>  +  r2>> ;
+S = r1<<  +  rm1>> ;
+E:S = r1>>  +  rm1<<  +  r2<< ;
+P = r2>> ;
+
+% (E <> (S <> (E:S <> P)))
+E <> S
+

@@ -1,0 +1,11 @@
+// File: tests/good/test15.pepa
+// Using scientific notation negative exponent real number constants for rates
+
+r1 = 0.0015  ;
+r2 = 0.00000325 ; 
+
+P1 = (a, r1).P2;
+P2 = (b, r2).P1;
+
+P1 <> P1
+

@@ -1,0 +1,10 @@
+// File: tests/good/test14.pepa
+// Using scientific notation positive exponent real number constants for rates
+
+r1 = 15000.0      ; 
+r2 = 3325000000.0 ;
+
+P1 = (a, r1).P2;
+P2 = (b, r2).P1;
+
+P1 <> P1

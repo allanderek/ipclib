@@ -1,0 +1,14 @@
+// File: tests/good/test03.pepa
+// A pre-uniqued model, which performs a passive observation
+
+r  = 1.0 ;
+s1 = 5.0 ;
+
+P1_1 = (a, r).P2_1;
+P2_1 = (b, s1).P1_1;
+
+P1_2 = (a, r).P2_2;
+P2_2 = (b, infty).P1_2; 
+
+P1_1 <b> P2_2
+

@@ -1,0 +1,26 @@
+rthink   = { 1.0, 2.0, 3.0 } ;
+rrespond = 1.3 ;
+
+HARRY::{
+  rwork = { 0.5, 1.0, 1.5, 2.0 } ;
+  rreq  = { 1.0, 2.0, 3.0 } ;
+  Working = (work, rwork) . (req, rreq) . (respond, infty) . Working ;
+} ;
+
+SALLY::{
+  rwork   = { 0.5, 1.0, 1.5, 2.0 } ;
+  rreq    = { 1.0, 2.0, 3.0 } ;
+  rbreak  = 0.01 ;
+  rrepair = 0.1  ;
+  Working = (work, rwork) . (req, rreq) . (respond, infty) . Working
+          + (break, rbreak) . (repair, rrepair) . Working
+          ;
+} ;
+
+Client = { HARRY::Working, SALLY::Working } ;
+
+Server = (req, infty) . (think, rthink) . (respond, rrespond) . Server ;
+
+
+// The main system equation.
+Server <req, respond> Client[2]

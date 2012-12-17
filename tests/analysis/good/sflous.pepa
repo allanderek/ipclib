@@ -1,0 +1,17 @@
+% Tests whether or not our detector for unrequired
+% actions within a cooperation works.
+% Very simple test.
+% This should *not* raise an error because P1 does in fact
+% perform an 'a' action
+
+r1 = 1.0;
+r2 = 2.0;
+r3 = 3.0;
+
+% Note that P1 skips over P2 and goes to P3, which goes back to P1
+P1 = (a, r1).P3;
+P2 = (b, r2).P2;
+P3 = (b, r3).P1;
+
+% This one should of course not
+( (P1 <a> P1) <b> P2 ) 

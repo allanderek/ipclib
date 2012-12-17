@@ -1,0 +1,5 @@
+% File: tests/bad/test57.pepa
+% Syntax error, duplicated plus symbol in choice
+P = (a, r).P + 
+  + (a, r).P;
+(P <> P)

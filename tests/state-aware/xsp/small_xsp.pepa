@@ -1,0 +1,14 @@
+% We could ask things like: --probe "{P1 < 2}a : start, b : stop"
+% which would be what is the passage-time results when the a occurs and the other
+% process is already in state P2.
+% We could do the complement of that too.
+
+r = 1.0;
+
+P1 = (a, r).P2 ;
+P2 = (c, r).P1 ;
+
+Q1 = (b, r).Q2 ;
+Q2 = (c, r).Q1 ;
+
+P1 <c> Q1

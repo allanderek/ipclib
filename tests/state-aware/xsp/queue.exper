@@ -1,0 +1,46 @@
+( "queue.pdf"
+, "Comparison of passage-time results based on start conditions"
+, [ [ ( "model file"      , "queue.pepa" )
+    , ( "probe definition", "Client::work:start, send:stop" )
+    , ( "title"           , "whenever" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "queue.pepa" )
+    , ( "probe definition", "Client::{Queue0 == 1}work:start, send:stop" )
+    , ( "title"           , "Empty" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "queue.pepa" )
+    , ( "probe definition", "Client::{Queue1 == 1}work:start, send:stop" )
+    , ( "title"           , "Queue1" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "queue.pepa" )
+    , ( "probe definition", "Client::{Queue2 == 1}work:start, send:stop" )
+    , ( "title"           , "Queue2" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "queue.pepa" )
+    , ( "probe definition", "Client::{Queue3 == 1}work:start, send:stop" )
+    , ( "title"           , "Queue3" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "queue.pepa" )
+    , ( "probe definition", "Client::{Queue4 == 1}work:start, send:stop" )
+    , ( "title"           , "Queue4" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  ]
+)

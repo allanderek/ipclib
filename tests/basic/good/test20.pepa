@@ -1,0 +1,7 @@
+// File: tests/good/test20.pepa
+// Binding names to integer constants for rates
+
+r = 1;
+P = (a, r).(a, r).P;
+
+P <> P

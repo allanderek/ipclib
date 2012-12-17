@@ -1,0 +1,20 @@
+work_rate    = 0.1 ;
+send_rate    = 1.0 ;
+pass_rate    = 1.0 ;
+
+
+Client = (work, work_rate) . Wait
+       + (pass, infty)     . Client
+       ;
+Wait   = (send, send_rate) . Client ;
+
+Token0 = (send, _) . Token4
+       + (pass, pass_rate) . Token4
+       ;
+
+Token4 = (delay, send_rate) . Token3 ;
+Token3 = (delay, send_rate) . Token2 ;
+Token2 = (delay, send_rate) . Token1 ;
+Token1 = (delay, send_rate) . Token0 ;
+
+(Client <send, pass> Token0)

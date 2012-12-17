@@ -1,0 +1,46 @@
+( "busy.pdf"
+, "Comparison of passage-time results based on start conditions"
+, [ [ ( "model file"      , "busy.pepa" )
+    , ( "probe definition", "Client::work:start, send:stop" )
+    , ( "title"           , "whenever" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "busy.pepa" )
+    , ( "probe definition", "Client::{Token0 == 1}work:start, send:stop" )
+    , ( "title"           , "Token0" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "busy.pepa" )
+    , ( "probe definition", "Client::{Token1 == 1}work:start, send:stop" )
+    , ( "title"           , "Token1" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "busy.pepa" )
+    , ( "probe definition", "Client::{Token2 == 1}work:start, send:stop" )
+    , ( "title"           , "Token2" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "busy.pepa" )
+    , ( "probe definition", "Client::{Token3 == 1}work:start, send:stop" )
+    , ( "title"           , "Token3" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "busy.pepa" )
+    , ( "probe definition", "Client::{Token4 == 1}work:start, send:stop" )
+    , ( "title"           , "Token4" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  ]
+)

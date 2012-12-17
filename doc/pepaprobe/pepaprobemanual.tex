@@ -1,0 +1,304 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage{amssymb,amsbsy,verbatim,fancybox,ifpdf}
+\usepackage{../common/pepa}
+\usepackage{graphicx}
+
+
+\newcommand{\adcComment}[1]{\textbf{#1}}
+\newcommand{\adcCommentl}[1]{\textbf{#1}\\}
+\newcommand{\rewordthis}[1]{\textsl{#1}\\}
+
+\newcommand{\pepaprobe}{\textsf{pepaprobe}}
+\newcommand{\graphviz}{\textsf{graphviz}}
+\newcommand{\ipc}{\textsf{ipc}}
+\newcommand{\hydra}{\textrm{Hydra}}
+\newcommand{\Condor}{\textrm{Condor}}
+\newcommand{\hydrus}{\textsf{hydrus}}
+\newcommand{\collate}{\textsf{collate}}
+\newcommand{\puffball}{\textsf{puffball}}
+\newcommand{\gnuplot}{\textsf{gnuplot}}
+\newcommand{\pepa}{\textrm{PEPA}}
+\newcommand{\sectref}[1]{Sect.~\ref{#1}}
+\newcommand{\figref}[1]{Fig.~\ref{#1}}
+%
+
+
+%% I can't quite get the graph files to display well when using plain tex
+\ifpdf
+\newcommand{\probepicture}[1]{\centerline{\scalebox{0.5}{\includegraphics{#1.pdf}}}}
+\else
+\newcommand{\probepicture}[1]{\centerline{\includegraphics[scale=0.5]{#1.eps}}}
+\fi
+
+
+\title{The \pepaprobe\ Manual}
+\author{
+Allan Clark
+}
+
+
+\begin{document}
+\maketitle
+
+
+\section{Introduction}
+\pepa\cite{pepa} is a popular stochastic process algebra.
+The \pepaprobe\ utility takes as input a \pepa\ model and a number of
+probes descriptions. 
+These probes are performance measurement specification probes 
+in the style of \cite{stochasticprobes} and describe,
+using a high-level regular-expression like language, additional components
+to be combined with the input model. Such probes are intended to
+be observational and therefore do not change the original behaviour of the
+given model. 
+The output is the input model transformed according to all of the
+given probes.
+
+The probe descriptions are translated into pepa components which then
+synchronise with the model (or a part of it).
+Information about the state at a given time $t$ can be derived by
+interogating the state of the probe at time $t$.
+
+\section{Basic Usage}
+Probe descriptions are given via the \texttt{--probe} option.
+Section \ref{probegrammarsection} describes the grammar in more detail,
+here a few examples are given.
+
+Labels may be attached to a probe to signify an immediate communication
+action of some important event. There are two specially regarded labels
+$start$ and $stop$. These labels indicate the entering and exiting of
+the state of interest. Either the start and end of a passage if a
+passage-time query is subsequently given to the output model or the
+entering and exiting of the state of interest in a steady-state computation.
+
+The following probe will 'start' on any of the actions $a$, $b$ or $c$ and,
+following that will 'stop' on any of the actions $x$, $y$ or $z$.
+Notice that all probes are cyclic and loop back to the start once they have
+completed.
+
+\begin{displaymath}
+(a \mid b \mid c) : start, (x \mid y \mid z) : stop
+\end{displaymath}
+
+The following probe waits until it has seen three $a$ actions without
+observing a $b$ action. Once this occurs the probe is 'started', to stop
+the probe it must observe the sequence $c, d$.
+
+\begin{displaymath}
+(a, a, a)/b : start, (c, d):stop
+\end{displaymath}
+
+Probes may be attached to a particular component within the model using
+the double colon syntax. The following probe may be use to ask what is the
+probability that the $Client$ component has performed three or more
+requests and has yet to see any responses.
+
+\begin{displaymath}
+Client::(request, request, request)/reponse : start, response : stop
+\end{displaymath}
+
+\section{Probe Grammar}
+\label{probegrammarsection}
+
+The full grammar for probe specification is given in Figure
+\ref{probesgrammarfigure}
+
+\newcommand{\probegrammartopline}[3]{
+$#1$ & $:=$ & $#2$ && #3
+}
+\newcommand{\probegrammarline}[2]{
+& $\mid$ & $#1$ && #2
+}
+
+\begin{figure}[t]
+\begin{center}
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lclrr}
+\probegrammartopline{ probe }
+                    { location :: R}
+                    { A local probe }
+\\
+\probegrammarline{ R }
+                 { A global probe }
+\\
+\probegrammartopline{ location }
+                    { processId }
+                    { Attach to a single process }
+\\
+\probegrammarline{ processId[n] }
+                 { Attach to an array of processes }
+\\
+\probegrammartopline{ R }
+                    { action }
+                    { Observe an action }
+\\
+\probegrammarline{ R : label }
+                 { Send a signal on matching $R$ }
+\\
+\probegrammarline{ R_1, R_2 }
+                 { $R_1$ followed by $R_2$ }
+\\
+\probegrammarline{ R_1 \mid R_2 }
+                 { $R_1$ or $R_2$ }
+\\
+\probegrammarline{ R* }
+                 { zero or more $R$ }
+\\
+\probegrammarline{ R+ }
+                 { one or more $R$ }
+\\
+\probegrammarline{ R\{n\} }
+                 { $n\ R$ sequences }
+\\
+\probegrammarline{ R\{m, n\} }
+                 { between $m$ and $n\ R$ sequences }
+\\
+\probegrammarline{ R? }
+                 { one or zero $R$ }
+\\
+\probegrammarline{ R / a }
+                 { R without observing an $a$ }
+\end{tabular}
+\caption{
+\label{probesgrammarfigure}
+The grammar for probe specification in \pepaprobe.
+}
+\end{center}
+\end{figure}
+
+
+\section{Inner workings}
+\label{innerworkingssection}
+
+To compile a probe specification the specification is first transformed
+into a non-deterministic finite state machine.
+
+This is then translated into a deterministic finite state machine.
+
+This is then minimised, by combining equivalent states.
+Minimising the dfa is not quite the same as a traditional dfa
+minimiser. Two states are considered equal they have equal
+move sets. That is, two states s1 and s2 are considered equal if
+every action which can be taken by s1 can be taken by s2 and results
+in the same state and vice versa. For the purposes of the comparison any
+move that results in state s1 or s2 is considered the same (provided
+it has the same label). So for example if s1 loops on action
+'a' that is equivalent to s2 looping on 'a' or performing 'a' and
+going to state s1. In fact if s1 performs 'a' and goes to s2, and s2
+performs 'a' and goes to s1 then the two moves are considered equal.
+
+If two states are considered equal (because they have equal move sets)
+we delete one of the states, remove all moves which originate from that
+state, and change all moves which target that state to target the
+equivalent state. We then recursively minimise the dfa as this
+coalascing of states may lead to further comparable states.
+
+As an example consider the probe:
+
+\begin{displaymath}
+(a, b)?, c:start, d:stop
+\end{displaymath}
+
+The following Figures:
+\ref{nfaprobefigure}
+\ref{dfaprobefigure}
+\ref{mindfaprobefigure}
+and
+\ref{finalprobefigure}
+denote the sequence of transformations done in \pepaprobe.
+Figure \ref{nfaprobefigure} shows the probe as a non-deterministic finite
+automata. Figure \ref{dfaprobefigure} shows that nfa without the non-determinism.
+Figure \ref{mindfaprobefigure} shows the same dfa minimised and finally
+in figure \ref{finalprobefigure} the dfa has the self-loops added such that the
+probe may perform any action in every state.
+
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics{graphics/nfaprobe.ps}
+\end{center}
+\caption{
+\label{nfaprobefigure}
+The probe translated into a non-deterministic finite automata
+}
+\end{figure}
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics{graphics/dfaprobe.ps}
+\end{center}
+\caption{
+\label{dfaprobefigure}
+The nfa translated into a deterministic finite automata
+}
+\end{figure}
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics{graphics/mindfaprobe.ps}
+\end{center}
+\caption{
+\label{mindfaprobefigure}
+The dfa minimised by removing equivalent states.
+}
+\end{figure}
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics{graphics/probe.ps}
+\end{center}
+\caption{
+\label{finalprobefigure}
+The final probe achieved by adding the self-loops
+}
+\end{figure}
+
+\section{Start, Stop and \texttt{--no-master}}
+
+\section{Outputting a dot file}
+
+The finite state machine produced from a probe specification may be
+output in 'dot' file format for use with the \graphviz\ program.
+% Should cite the graphviz program.
+This is done by citing the \texttt{--output-dot} option.
+
+\section{Controlling nfa operations}
+The options in this section are mostly for those interested in the
+inner workings of \pepaprobe.
+There are four options for controlling how the finite state machines
+are manipulated. Please note that if you are using \pepaprobe\ to
+generate a pepa model to be analysed you almost certainly do not want
+to give any of these options.
+
+\begin{description}
+\item[\texttt{--no-minimise} ] Do not minimise the deterministic finite automata
+\item[\texttt{--min-self-loops}] Add the self-loops before performing minimisation
+\item[\texttt{--no-min-self-loops}] Perform the minimisation before adding the
+self-loops. This means the self-loops do not contribute to the minimisation.
+\item[\texttt{--no-self-loops}]  Do not add the self-loops (useful mostly for debugging)
+\item[\texttt{--non-deterministic}] Leave the finite automata non-deterministic (again useful mostly for debugging)
+
+The graphics in the section \ref{innerworkingssection} were all produced using
+the \texttt{--output-dot} and the options given above.
+If you wish to just see the diagram of probe then a useful command to give is something such as
+
+\begin{verbatim}
+pepaprobe --output-dot <fa options> PEPAFILE | \ 
+   dot -Tpng -o <filename>.png && \ 
+   eog <filename.png>
+\end{verbatim}
+
+Note that some of these options cause others to have no effect.
+For example if the option \texttt{--no-self-loops} is given then
+the options \texttt{min-self-loops} and \texttt{no-min-self-loops} will
+have no effect. Similarly for the \texttt{no-minimise} option.
+
+\end{description}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{unsrt}
+\bibliography{../common/pepa}
+\end{document}
+

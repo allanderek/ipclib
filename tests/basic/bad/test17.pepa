@@ -1,0 +1,7 @@
+% File: tests/bad/test16.pepa
+% Rate r has an illegal value (of 0) caused by evaluation of r1 - r2
+r1 = 10;
+r2 = 10;
+r = r1 - r2;
+P = (a, r).P;
+(P <> P)

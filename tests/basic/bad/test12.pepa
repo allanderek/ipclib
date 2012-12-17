@@ -1,0 +1,4 @@
+% File: tests/bad/test11.pepa
+% Illegal hiding (of tau)
+P = (tau, r).P;
+(P <> (P / {tau}))

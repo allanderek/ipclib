@@ -1,0 +1,6 @@
+Plot Lines 
+Experiment ?rate [ pointfive = 0.5, one = 1.0, onepointfive = 1.5, two = 2.0, twopointfive = 2.5, three = 3.0, threepointfive = 3.5, four = 4.0, fourpointfive=4.5, five = 5.0 ]
+          Cdf
+          Passage ModelProbe (pde_int_cont_req:start, pde_user_interface:stop)
+                  ModelRate [ r_am_adaptation_decision = ?rate ] ModelFile "ICC2009_T.pepa"
+

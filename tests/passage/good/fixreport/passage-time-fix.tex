@@ -1,0 +1,149 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage{amssymb,amsbsy,verbatim,fancybox,pepa}
+\usepackage{graphicx}
+\usepackage{verbatim}
+
+\newcommand{\adcComment}[1]{\textbf{#1}}
+\newcommand{\adcCommentl}[1]{\textbf{#1}\\}
+\newcommand{\rewordthis}[1]{\textsl{#1}\\}
+
+\newcommand{\ipc}{\textsf{ipc}}
+\newcommand{\hydra}{\textrm{Hydra}}
+\newcommand{\Condor}{\textrm{Condor}}
+\newcommand{\hydrus}{\textsf{hydrus}}
+\newcommand{\collate}{\textsf{collate}}
+\newcommand{\puffball}{\textsf{puffball}}
+\newcommand{\gnuplot}{\textsf{gnuplot}}
+\newcommand{\pepa}{\textrm{PEPA}}
+\newcommand{\sectref}[1]{Sect.~\ref{#1}}
+\newcommand{\figref}[1]{Fig.~\ref{#1}}
+%
+
+\title{Fix for Passage-Time Probes}
+\author{
+Allan Clark
+}
+
+
+\begin{document}
+\maketitle
+
+
+\section{Introduction}
+This document is intended to describe the fix for a major bug that was found in
+the \ipc\cite{pepahydra} \pepa\cite{pepa} compiler.
+
+\subsection{The Bug}
+To compute performance measures in general \ipc\ attaches
+a performance measurement probe.
+A probe is defined by the user to be a sequence of activities.
+Some of the activies may be labelled. By default \ipc\ will measure between
+the two labels \texttt{start} and \texttt{stop}.
+
+When doing passage-time analysis the idea is that we wish to compute the
+probability of exiting the passage of interest (defined as being between
+observations of the labelled actions of the probe) a given time after
+entering. To do this a master probe was added in addition to the
+control probe. This master probe has two states, \texttt{running} and
+\texttt{stopped}.
+It is a very simple \pepa\ component which moves from the \texttt{stopped}
+to the \texttt{running} state whenever the \texttt{start} label is observed
+and moves from the \texttt{running} to the \texttt{stopped} state whenever
+the \texttt{stop} label is observed.
+
+The \hydra\ markov chain analyser accepts performance measurement specifications
+as conditions on the state of the model.
+For passage-time analysis one must provide a starting condition
+and an ending condition.
+
+This meant that the given performance measurement to \hydra\ was the probe
+being in the \texttt{running} state for the starting condition and the probe
+being in the \texttt{stopped} state for the terminating condition.
+
+The problem with this is that hydra accumulates the passage-time probabilities
+considering all the states of the model in which the probe is in the
+\texttt{running} state.
+In other words it sees them all the intermediate states
+between the start and end of the passage as also being start states.
+
+\section{The Solution}
+The solution is to add a further probe which we will call the passage-probe.
+This probe also has two states. We call these two states the \texttt{waiting}
+state and the \texttt{starting} state.
+The idea is that the probe is in the \texttt{starting} state only for all those
+states which are immediately after the start of the passage of interest.
+The cooperation set is all the activities in the model including the communication
+messages sent by any probes added by the user.
+
+To achieve this the probe must cooperate over the composition of the model
+and the normal master probe. When in the \texttt{waiting} state the passage-probe
+self-loops on all activities except those which being the passage of interest.
+By default this will be the single $start$ communication message performed by the
+master probe.
+
+\section{Disadvantages}
+I think it breaks wherever we have a diminishing state immediately after
+the the starting state of the model since in this case I think the passage-probe
+may never get into the starting state.
+This could perhaps be solved by self-looping on immediate actions within the
+\texttt{starting} state.
+
+Additionally every action in the model becomes a cooperation which may slow
+down compile times.
+
+
+\section{Results}
+I used the model shown in Figure
+\ref{figure:erlangpepa}.
+This is a simple straight-line model with no cooperation or choice
+so the results should be predictiable. In fact we use it to compute
+an erlang function over the number of actions performed in sequence
+(all at the same rate).
+
+\begin{figure}
+\verbatiminput{../erlang.pepa}
+\caption{
+\label{figure:erlangpepa}
+Input pepa model used for computing erlang graphs
+}
+\end{figure}
+
+\newcommand{\graphicfigure}[3]{
+\begin{figure}
+\includegraphics[scale=0.5]{#1}
+\caption{
+\label{#2}
+#3
+}
+\end{figure}
+}
+
+\graphicfigure{../pdfk.pdf}
+              {figure:erlangpdfk}
+              {The pdfs with increasing k values.}
+
+\graphicfigure{../cdfk.pdf}
+              {figure:erlangcdfk}
+              {The cdfs with increasing k values.}
+
+\graphicfigure{../ratepdf.pdf}
+              {figure:ratepdfs}
+              {The pdf of an erlang of length eight at varying lengths}
+
+\graphicfigure{../ratecdf.pdf}
+              {figure:ratecdfs}
+              {The cdf of an erlang of length eight at varying lengths}
+
+% \includegraphics[scale=0.5]{../pdfk.png}
+
+% \includegraphics[scale=0.5]{../cdfk.png}
+
+% \includegraphics[scale=0.5]{../ratepdf.png}
+
+% \includegraphics[scale=0.5]{../ratecdf.png}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{pepa}
+\end{document}
+

@@ -1,0 +1,15 @@
+join_r   = 0.5 ;
+serve_r  = 1.5 ;
+break_r  = 0.1 ;
+repair_r = 1.0 ;
+
+Server = (req, infty) . Server
+       + (service, serve_r) . Server
+       + (break, break_r) . Broken ;
+Broken = (repair, repair_r) . Server
+       + (req, infty) . Broken ;
+
+Client = (req, join_r) . Wait ;
+Wait   = (service, infty) . Client ;
+
+Server <req, service> Client

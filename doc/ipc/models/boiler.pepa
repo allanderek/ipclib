@@ -1,0 +1,20 @@
+r_thirst = 0.01 ; 
+r_milk   = 6.0 ; r_stir = 10.0  ; r_drink = 0.1   ;
+
+TeaDrinker = (thirst     , r_thirst) . PourWater  ;
+PourWater  = (pour       , infty )   . AddMilk    ;
+AddMilk    = (milk       , r_milk)   . Stir       ;
+Stir       = (stir       , r_stir)   . Enjoy      ;
+Enjoy      = (drink      , r_drink)  . TeaDrinker ;
+
+r_pour   = 10.0 ; r_cool   = 0.2 ;
+r_boil   =  1.0 ; r_refill = 10.0 ;
+
+Boiler       = (cool, r_cool) . CoolBoiler
+             + (pour, r_pour) . RefillBoiler
+             ;
+CoolBoiler   = (boil, r_boil)     . Boiler     ;
+RefillBoiler = (refill, r_refill) . CoolBoiler ;
+
+
+TeaDrinker < pour > Boiler

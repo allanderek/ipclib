@@ -1,0 +1,31 @@
+// The same as web2.pepa but with an absorbing probe, this one will actually
+// block the component. Plus all of the components will actually start in the
+// source state of the probe.
+
+r_browse     = 0.9 ;
+r_buy        = 0.1 ;
+r_getPage    = 5.0 ;
+r_getConfirm = 5.0 ;
+
+r_sendPage    = 35.0 ;
+r_sendConfirm = 3 ;
+
+users           = 1000 ;
+servers         = 10 ;
+
+ProbeUser   = (browse, r_browse) . RunningBrowsing
+            + (buy, r_buy) . ProbeBuying 
+            ;
+ProbeBuying      = (getConfirm, r_getConfirm) . ProbeUser ;
+RunningBrowsing    = (getPage, r_getPage) . RunningUser ;
+RunningUser   = (browse, r_browse) . RunningBrowsing
+            + (buy, r_buy) . RunningBuying
+            ;
+RunningBuying      = (getConfirm, r_getConfirm) . Absorbing ;
+Absorbing          = (blah, r_browse) . Absorbing ;
+
+Server      = (getPage, r_sendPage) . Server
+            + (getConfirm, r_sendConfirm) . Server
+            ;
+
+Server[servers] <getPage, getConfirm> (ProbeUser[users])

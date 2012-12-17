@@ -1,0 +1,61 @@
+p12 = 0.8 ;
+q12 = 0.2;
+p21 = 0.7;
+q21 = 0.3;
+r_timeout = 100;
+r_mac = 1000;
+
+//capacity is 1
+
+// Init0 = (req!, top). Init1
+// Init1 = (rep?,bot).Init0
+// index = state of process, number of items in the queue
+
+Init00 = tau.Init11;
+
+// Init00 =
+   // (tau, 1:immediate).Init11;// +
+   //(repB, infty). Init00;
+
+Init11 =
+   (repBA,infty).found.Init01+
+   (repBNA,infty).Init11+
+   (reqAB,r_mac*p12).Init10+
+   (reqANB,r_mac*q12).Init10+
+   (reqA,r_mac).Init10;
+
+Init01 =
+   (tau, r_timeout).Init11 +
+   (repB, infty). Init01+
+   (reqAB,r_mac*p12).Init00+
+   (reqANB,r_mac*q12).Init00+
+   (reqA,r_mac).Init00;
+
+Init10 =
+   (repBA,infty).found.Init00 +
+   (repBNA,infty).Init10;
+
+// Dest0 = (req?, bot).Dest1
+// Dest1 = (rep!, top).Dest0
+
+Dest00 =
+   (reqAB, infty). Dest10+
+   (reqANB, infty). Dest00;
+
+Dest10 =
+   tau.Dest01+
+   (reqA, infty). Dest10;
+
+Dest01 =
+   (reqAB, infty). Dest11+
+   (reqANB, infty). Dest01+
+   (repBA, r_mac*p21).Dest00+
+   (repBNA, r_mac*q21).Dest00+
+   (repB, r_mac).Dest00;
+
+Dest11 =
+   (repBA, r_mac*p21).Dest10+
+   (repBNA, r_mac*q21).Dest10+
+   (repB, r_mac).Dest10;
+
+Init00 <reqAB,reqANB,reqA,repBA,repBNA,repB> Dest00

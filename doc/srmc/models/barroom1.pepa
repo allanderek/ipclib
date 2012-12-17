@@ -1,0 +1,10 @@
+r1      = 0.1 ;
+r2      = 0.2 ;
+r3      = 1.0 ;
+
+Lounge  = (order, r1) . (serve, _) . Lounge ;
+Barroom = (order, r2) . (serve, _) . Barroom ;
+
+Server  = (order, _) . (serve, r3) . Server ;
+
+(Lounge <> Barroom) < order, serve > Server

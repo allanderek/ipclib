@@ -1,0 +1,12 @@
+( "small.pdf"
+, "Comparison of passage-time results based on start conditions"
+, [ [ ( "model file"      , "small.pepa" )
+    , ( "probe definition", "a:start, c:stop" )
+    , ( "title"           , "a-c" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  ]
+)
+

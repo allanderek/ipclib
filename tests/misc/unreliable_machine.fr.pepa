@@ -1,0 +1,27 @@
+% This file describes the operation of an unreliable machine using
+% functional rates. There is a sister file
+% unreliable_machine.core.pepa
+% which describes the same thing but without the use of functional rates.
+
+computeRate = 0.5 ;
+crashRate   = 1 - computeRate ;
+
+paperworkRate = 0.5 ;
+rebootRate    = 1 - paperworkRate ;
+
+% The unreliable machine, this is the same in both versions.
+MachineUp   = (compute, computeRate).MachineUp + 
+	      (crash, crashRate).MachineDown ;
+MachineDown = (reboot, infty).MachineUp ;
+
+
+% Now the user
+User        = (compute, infty).User +
+              (paperwork, paperworkRate).User +
+	      (reboot, if MachineDown then rebootRate else 0.0).User ;
+
+	     
+
+
+% The final composition is straightforward
+User <compute, reboot> MachineUp

@@ -1,0 +1,25 @@
+r = 1;
+
+LeftHandedWorker0 = (get_hammer, r).LeftHandedWorker1;
+LeftHandedWorker1 = (get_chisel, r).LeftHandedWorker2;
+LeftHandedWorker2 = (work, r).LeftHandedWorker3;
+LeftHandedWorker3 = (release_chisel, r).LeftHandedWorker4;
+LeftHandedWorker4 = (release_hammer, r).LeftHandedWorker0;
+
+RightHandedWorker0 = (get_chisel, r).RightHandedWorker1;
+RightHandedWorker1 = (get_hammer, r).RightHandedWorker2;
+RightHandedWorker2 = (work, r).RightHandedWorker3;
+RightHandedWorker3 = (release_hammer, r).RightHandedWorker4;
+RightHandedWorker4 = (release_chisel, r).RightHandedWorker0;
+
+Hammer_free = (get_hammer, infty).Hammer_taken;
+Hammer_taken = (release_hammer, infty).Hammer_free;
+
+Chisel_free = (get_chisel, infty).Chisel_taken;
+Chisel_taken = (release_chisel, infty).Chisel_free;
+
+(((LeftHandedWorker0  <> LeftHandedWorker0  <> LeftHandedWorker0  <> LeftHandedWorker0) <>
+  (RightHandedWorker0 <> RightHandedWorker0 <> RightHandedWorker0 <> RightHandedWorker0)) 
+     <get_hammer, release_hammer, get_chisel, release_chisel>
+ ((Hammer_free <> Hammer_free <> Hammer_free <> Hammer_free <> Hammer_free) <> 
+  (Chisel_free <> Chisel_free <> Chisel_free <> Chisel_free)))

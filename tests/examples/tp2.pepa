@@ -1,0 +1,46 @@
+// PEPA MODEL
+a = 1.0;b = 1.0;
+c = 1.0;
+d = 10.0;
+t2 = 1.0;
+
+yy=0.9;
+
+IdleCPU = (submit,t2).CPU;
+CPU =     (start_normal,a).(return,d).IdleCPU +
+        (start_normal,a).(compute,a).(return,d).IdleCPU +
+        (start_normal,a).(compute,a).(compute,a).(return,d).IdleCPU +
+        (start_particle,a).(return,d).IdleCPU +
+        (start_particle,a).(compute,a).(return,d).IdleCPU +
+        (start_particle,a).(compute,a).(compute,a).(return,d).IdleCPU;
+
+IdleGPU = (submit,t2).GPU;
+GPU  =     (start_normal,a).GPU2 +
+    (start_normal,a).GPU3 +
+    (start_normal,a).GPU4 +
+    (start_particle,a).GPU2 +
+    (start_particle,a).GPU3 +
+    (start_particle,a).GPU4;
+GPU2 =  (return,d).IdleGPU;
+GPU3 =    (compute,a).GPU2;
+GPU4 =  (compute,a).GPU3;
+
+
+IdlePPU = (submit,t2).PPU;
+PPU =     (start_normal,b).(return,d).IdlePPU +
+    (start_normal,b).(compute,b).(return,d).IdlePPU +
+    (start_normal,b).(compute,b).(compute,b).(return,d).IdlePPU +
+    (start_particle,c).(return,d).IdlePPU +
+    (start_particle,c).(compute,c).(return,d).IdlePPU +
+    (start_particle,c).(compute,c).(compute,c).(return,d).IdlePPU;
+       
+Job = (submit,0.1*0.4).NJob + (submit,0.1*0.6).PJob;
+NJob = (start_normal,t2).(return,t2).Job;
+PJob = (start_particle,t2).(return,t2).Job;
+
+//(IdleGPU[2]) <submit,start_normal,start_particle,return> Job[10]
+(IdleGPU <> IdleGPU <> IdlePPU<>IdlePPU) <submit,start_normal,start_particle,return> (Job <> Job <> Job)
+//(IdleCPU <> IdleCPU <> IdlePPU<>IdlePPU) <submit,start_normal,start_particle,return> (Job <> Job <> Job)
+//IdleCPU
+//(IdlePPU) <submit,start_normal,start_particle,return> (Job)
+

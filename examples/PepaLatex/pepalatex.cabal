@@ -1,0 +1,14 @@
+Name:            pepalatex
+Version:         0.01
+License:         GPL
+Author:          Allan Clark
+Homepage:        http://homepages.inf.ed.ac.uk/s9810217/software
+Build-depends:   base, parsec, ipclib, hatexlib
+Synopsis:        A library for handling pepa models
+Exposed-modules: Language.Pepa.Latex
+Ghc-options:     -Wall
+
+
+Executable:      pepalatex
+Main-is:         PepaLatex.hs
+Ghc-options:     -Wall

@@ -1,0 +1,25 @@
+transmit_prob = 0.5 ;
+interact_rate = 1.0 ;
+recover_rate  = 0.2 ;
+infect_rate   = transmit_prob * interact_rate ;
+% contact_rate  = (1 - transmit_prob) * interact_rate ;
+
+Susceptible   = % (interact, contact_rate) . Susceptible
+% + 
+              (interact, infect_rate) . Infected
+              % Of course I don't really wish to have this rate
+              % but without it I require to implement starting
+              % concentrations
+              + (external_infect, 0.1) . Infected
+              ;
+Infected      = (interact, interact_rate) . Infected2
+              + (recover, recover_rate)   . Recovered
+              ;
+Infected2     = (interact, interact_rate) . Infected
+              + (recover, recover_rate)   . Recovered
+              ;
+Recovered     = (interact, interact_rate) . Recovered2 ;
+Recovered2    = (interact, interact_rate) . Recovered  ;
+
+% Susceptible[10][interact[2]]
+Susceptible[10][interact]

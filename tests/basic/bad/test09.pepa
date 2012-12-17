@@ -1,0 +1,12 @@
+% File: tests/bad/test09.pepa
+% Dead code (on c)
+r = 1.0;
+
+P1 = (a, r).P2;
+P2 = (a, r).P3 + (b, r).P1;
+P3 = (c, r).P1;
+
+Q1 = (a, infty).Q2;
+Q2 = (b, infty).Q1;
+
+(P1 <a,b> Q1)

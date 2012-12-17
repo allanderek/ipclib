@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel=StyleSheet HREF="style.css" TYPE="text/css">
+<link rel=StyleSheet HREF="pepa2html.css" TYPE="text/css">
+<title>ipc: Imperial PEPA Compiler</title>
+</head>
+
+<body>
+<h1>ipc: Imperial PEPA Compiler</h1>
+
+
+<table>
+<tr><td>
+
+<div class="title">What is ipc?</div>
+<div class="frame">
+
+<p>
+Over the last 10 years, <a href="http://www.dcs.ed.ac.uk/pepa/">the PEPA paradigm</a> has become a popular choice among performance engineers for analysing quantities such as utilisation and throughput in their software and hardware designs.</p> <p><strong>ipc</strong> is a tool that aims to extend PEPA's modelling capability by allowing engineers to extract a larger number of <i>performability</i> measures (i.e. performance and reliability metrics) from their PEPA models.</p>
+
+<p><strong>ipc</strong> compiles PEPA models (in the form of .pepa) files to <a href="http://www.doc.ic.ac.uk/~wjk/">Will Knottenbelt's</a> DNAmaca format (in the form of .mod) files. 
+DNAmaca is well suited to this as it specialises disk-based (out-of-core) storage and analysis of very large systems. In particular, DNAmaca is adept at:
+<ol>
+<li>analysing very large Markov models</li>
+<li>producing passage-time distributions and reliability quantiles or bounds</li>
+</ol>
+</p> 
+</div>
+
+<div class="title">Example Passage-time Specification</div>
+<div class="frame">
+<div class="subtitle">How to run ipc</div>
+<p>From an example file, test.pepa:
+
+<div class="pepaBox"><p class="code">
+%% test.pepa<br>
+<span class="pepaRt">r1</span> = 1.0;<br>
+<span class="pepaRt">r2</span> = 1.0;<br>
+<span class="pepaRt">r3</span> = 1.0;<br>
+<span class="pepaRt">s1</span> = 1.0;<br>
+<span class="pepaRt">s2</span> = 1.0;<br>
+<span class="pepaCpt">A</span> = (<span class="pepaAct">a</span>,<span class="pepaRt">r1</span>).<span class="pepaCpt">A'</span> + (<span class="pepaAct">b</span>,<span class="pepaRt">r2</span>).<span class="pepaCpt">A''</span>;<br>
+<span class="pepaCpt">A'</span> = (<span class="pepaAct">a</span>,<span class="pepaRt">r3</span>).<span class="pepaCpt">A</span>;<br>
+<span class="pepaCpt">A''</span> = (<span class="pepaAct">b</span>,<span class="pepaRt">r1</span>).<span class="pepaCpt">A'</span>;<br>
+<span class="pepaCpt">B</span> = (<span class="pepaAct">a</span>,<span class="pepaRt">s1</span>).<span class="pepaCpt">B</span> + (<span class="pepaAct">c</span>,<span class="pepaRt">s2</span>).<span class="pepaCpt">B</span>;<br>
+<span class="pepaCpt">Sys</span> = <span class="pepaCpt">A</span> &lt;a&gt; <span class="pepaCpt">B</span>;<br>
+%% System component<br>
+<span class="pepaCpt">Sys</span>
+</p></div>
+</p>
+
+<p>The following command will generate a .mod file that can be run in DNAmaca. In turn DNAmaca will return the passage-time density function, representing the time between an 'a' action first occurring and a subsequent 'b' action:
+<div class="whitebox"><pre>
+ipc test.pepa -s "a" -t "b"
+</pre></div></p>
+<div class="subtitle">What does this do?</div>
+<p>In fact, ipc is adding a <i>stochastic probe</i> to the model, equivalent to the following PEPA code:
+<div class="pepaBox"><p class="code">
+%% test.pepa<br>
+...<br>
+<span class="pepaCpt">Probe</span> = (<span class="pepaAct">a</span>,<span class="pepaRt">infty</span>).<span class="pepaCpt">Probe_running</span> + (<span class="pepaAct">b</span>,<span class="pepaRt">infty</span>).<span class="pepaCpt">Probe</span>;<br>
+<span class="pepaCpt">Probe_running</span> = (<span class="pepaAct">a</span>,<span class="pepaRt">infty</span>).<span class="pepaCpt">Probe_running</span> + (<span class="pepaAct">b</span>,<span class="pepaRt">infty</span>).<span class="pepaCpt">Probe</span>;<br>
+%% System component<br>
+<span class="pepaCpt">Sys</span> &lt;<span class="pepaAct">a</span>,<span class="pepaAct">b</span>&gt; <span class="pepaCpt">Probe</span>
+</p></div>
+</p>
+<p>In the resulting output .mod file, DNAmaca is configured to look for the change in state over the system between 'Probe' and 'Probe_running'. The moment that 'Probe_running' is entered, the passage-time measurement starts: i.e. an 'a' action has been observed. When a further 'b' action is then seen the clock is stopped (the system goes back to state 'Probe' in fact) and DNAmaca outputs the appropriate distribution (in the form of a data file that can be piped into a graphing tool such as gnuplot).</p>
+
+<div class="subtitle">Using many start or end actions to define the passage</div>
+<p>Multiple start and end actions can be specified in creating the PEPA probe using a comma-separated list, for example:
+<div class="whitebox"><pre>
+ipc test.pepa -s "a,c" -t "b"
+</pre></div>
+This means the passage-time clock will be started if the model performs EITHER an 'a' or a 'c' action (and stops on seeing a 'b' action).</p>
+</div>
+
+<div class="title">Other Features</div>
+<div class="frame">
+We also now support
+<ol>
+<li>Immediate Actions</li>
+<li>Rate parameter overriding</li>
+<li>Full probe specification using a regular-expression-like syntax</li>
+<li>Local probe placement</li>
+<li>Probe communication</li>
+<li>Functional Rates</li>
+<li>Static analysis of pepa models</li>
+<li>Support for other analyses, Transient, Steady-state and Count Measures</li>
+</ol>
+
+In addition the core of the functionality of ipc is now offered as a Haskell
+library to aid the creation of further pepa software tools.
+</p> 
+</div?
+
+<div class="title">Example PEPA files</div>
+<div class="frame">
+<p>Some <a href="examples/">example PEPA models</a> are available for trialling ipc on.</p>
+</div>
+
+<div class="title">ipc Related Publications</div>
+<div class="frame">
+<div class="subtitle">UKPEW'2003</div>
+<div class="papertitle"><a href="http://www.doc.ic.ac.uk/~jb/reports/">Extracting Passage Times from PEPA models with the HYDRA Tool: a Case Study</a></div>
+<div class="paperauthors">Jeremy T. Bradley, Nicholas J. Dingle, Stephen T. Gilmore, William J. Knottenbelt</div>
+
+<div class="subtitle">NSMC'2003</div>
+<div class="papertitle"><a href="http://www.doc.ic.ac.uk/~jb/reports/">Hypergraph-based Parallel Computation of Passage Time Densities in Large Semi-Markov Models</a></div>
+<div class="paperauthors">Jeremy T. Bradley, Nicholas J. Dingle, William J. Knottenbelt, Helen J. Wilson</div>
+
+<div class="subtitle">PNPM'2003</div>
+<div class="papertitle"><a href="http://www.doc.ic.ac.uk/~jb/reports/">Performance Queries on Semi-Markov Stochastic Petri Nets with an Extended Continuous Stochastic Logic</a></div>
+<div class="paperauthors">Jeremy T. Bradley, Nicholas J. Dingle, Peter G. Harrison, William J. Knottenbelt</div>
+
+<div class="subtitle">PMEO'2003</div>
+<div class="papertitle"><a href="http://www.doc.ic.ac.uk/~jb/reports/">Distributed Computation of Passage Time Quantiles
+and Transient State Distributions in Large Semi-Markov Models</a></div>
+<div class="paperauthors">Jeremy T. Bradley, Nicholas J. Dingle, Peter G. Harrison, William J. Knottenbelt</div>
+
+</div>
+
+
+
+<div class="title">ipc: Features and Future development</div>
+<div class="frame">
+
+<div class="subtitle">James Clerk Maxwell release</div>
+<p>The full JCM release will support specification of the following features. The version
+number from which a feature was incorporated is shown.
+<div class="whitebox">
+<table>
+<tr><th>Feature</th><th>ipc Version</th></tr>
+<tr><td>passage-time distribution from PEPA actions</td><td>[0.9a]</td>
+<tr><td>steady-state quantities from PEPA actions</td><td>-</td>
+<tr><td>transient distributions from PEPA actions</td><td>-</td>
+<tr><td>alternative specification of above from PMLmu formulae</td><td>-</td>
+</td></tr>
+</table>
+</div></p>
+
+<div class="subtitle">2G release</div>
+<p>The 2G release of ipc will support analysis of a <i>semi-Markov</i> version of PEPA (i.e. allow analysis of models with more general distributions). Preliminary support for PEPAnets, an extension of PEPA for modelling mobile and distributed systems, is also planned.</p>
+
+</div>
+
+
+</td><td valign=top width=30%>
+
+<div class="title">Download ipc</div>
+<div class="frame">
+<div class="subtitle">John Daly release</div>
+[0.99] Source code: [<a href="download/ipclib.0.99.tar.gz">ghc version</a>]
+<div class="subtitle">James Clerk Maxwell release</div>
+[0.93a] Source code: [<a href="download/ipc-jcm.tar.gz">ghc version</a> | <a href="download/ipc-jcm-hugs.tar.gz">hugs version</a>]
+</div>
+
+
+
+<div class="title">Documentation (for ipclib)</div>
+<div class="frame">
+<ul>
+<li> A manual for ipc <a href="doc/ipc/ipcmanual.pdf">pdf</a></li>
+<li> A developer manual for ipc <a href="doc/ipc/ipcdevmanual.pdf">pdf</a></li>
+<li> An incomplete tutorial for ipc <a href="doc/ipc/ipctutorial.pdf">pdf</a></li>
+<li> A manual for the pepa probe utility <a href="doc/pepaprobe/pepaprobemanual.pdf">
+pdf</a></li>
+<li> Haddock generated documentation for the ipclib
+<a href="http://homepages.inf.ed.ac.uk/s9810217/software/ipclib/dist/doc/html/index.html">
+API</a></li>
+<li> A small <a href="http://homepages.inf.ed.ac.uk/s9810217/papers/qest2007acsg.pdf">
+paper</a> relating to ipclib</li>
+</ul>
+</div>
+
+
+<div class="title">Required Tools</div>
+<div class="frame">
+DNAmaca/HYDRA
+<a href="download/hydra-quiet.tar.gz"> (quiet version)</a>
+<br>
+
+[<a href="http://haskell.cs.yale.edu/ghc/">ghc compiler</a> | <a
+href="http://www.haskell.org/hugs/">hugs interpreter</a>]<br>
+</div>
+
+<div class="title">Related Links</div>
+<div class="frame">
+<a href="examples/">Example PEPA models</a><br>
+<a href="http://www.dcs.ed.ac.uk/pepa/tools.html">PEPA workbench</a><br>
+<a href="http://www.dcs.ed.ac.uk/pepa/tools.html">UML to PEPA tool</a><br>
+<a href="http://www.cs.bham.ac.uk/~dxp/prism/">MTBDD-based PRISM tool</a>
+</div>
+
+<div class="title">Credits</div>
+<div class="frame">
+<b>Enormous thanks for help, advice, code and bug finding go to:</b><br>
+<a href="http://www.doc.ic.ac.uk/~abkk97/">Ashok Argent-Katwala</a><br>
+Neil Davies<br>
+<a href="http://www.doc.ic.ac.uk/~jb/">Jeremy Bradley</a><br>
+<a href="http://homepages.inf.ed.ac.uk/s9810217/">Allan Clark</a><br>
+<a href="http://www.doc.ic.ac.uk/~njd200/">Nick Dingle</a><br>
+<a href="http://www.doc.ic.ac.uk/~ajf/">Tony Field</a><br>
+<a href="http://homepages.inf.ed.ac.uk/stg/">Stephen Gilmore</a><br>
+<a href="http://www.doc.ic.ac.uk/~pgh/">Peter Harrison</a><br>
+<a href="http://homepages.inf.ed.ac.uk/jeh/">Jane Hillston</a><br>
+<a href="http://www.doc.ic.ac.uk/~wjk/">Will Knottenbelt</a>
+
+</td></tr>
+</table>
+
+<hr noshade>
+<div align=right>
+Last updated by <a href="http://homepages.inf.ed.ac.uk/s9810217/">Allan Clark</a>:Tuesday 16th October 2007
+</div>
+
+</body>
+</html>

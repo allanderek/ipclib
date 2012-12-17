@@ -1,0 +1,14 @@
+r = 1.0 ;
+
+User = (req, r) . Wait ;
+Wait = (cached, infty) . User
+     + (network, infty) . User
+     ;
+Service = (req, infty) . InCache
+        + (req, infty ) . Fetch
+        ;
+InCache = (cached, r) . Service ;
+Fetch   = (fetch, r/2) . (network, r/5) . (delay, r) . Service ;
+
+User <req, cached, network> Service
+

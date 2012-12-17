@@ -1,0 +1,18 @@
+% This is a small example Pepa model to demonstrate
+% stochastic probe measurements.
+
+r_serve    = 1.0 ;
+r_restock  = 1.0 ;
+r_life     = 1.0 ;
+r_thirst   = 1.0 ;
+r_drink    = 1.0 ;
+r_resume   = 1.0 ;
+
+Bartender = (serve, r_serve).Bartender +
+	    (restock, r_restock).Bartender ;
+Person    = (life, r_life).Person + (thirst, r_thirst).Thirsty ;
+Thirsty   = (serve, infty).Drinking ;
+Drinking  = (drink, r_drink).(resume, r_resume).Person +
+	    (drink, r_drink).Thirsty ;
+
+Bartender <serve> Person // Person[3]

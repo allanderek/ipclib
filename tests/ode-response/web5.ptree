@@ -1,0 +1,9 @@
+OdeResponse [ stop-time       = 100
+            , time-step       = 0.1
+            , RanUser         = 300.00
+            , RanBuying       = 0
+            , RunningBuying   = 645.98
+            , RunningBrowsing = 54.00
+            , DummyUser       = 0
+            ] 
+            ModelFile "web5.pepa"

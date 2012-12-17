@@ -1,0 +1,11 @@
+
+birth     = [ k1 * People ] ;
+death     = [ k2 * (People - Resources) ] ;
+use       = [ k3 * People * Resources ] ;
+replenish = [ k4 * People ] ;
+immigrate = [ k5 ] ;
+
+People    = birth>> + death<< + immigrate>> ;
+Resources = use<< + replenish>> ;
+
+People || Resources

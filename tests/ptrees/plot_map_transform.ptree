@@ -1,0 +1,17 @@
+Plot Lines Map Cdf
+           Experiment ?trule [ Transform (P[?m] <?a> Q[?n] ==> P[?m] <?a> Q[?n])
+                             , Transform (P[?m] <?a> Q[?n] ==> P[?m - 1] <?a> Q[?n + 1])
+                             , Transform (P[?m] <?a> Q[?n] ==> P[?m - 2] <?a> Q[?n + 2])
+                             ]
+                             Passage 
+                             ModelProbe (P::b:start, a:stop)
+                             ModelTransform ?trule Model ( r = 1.0 ;
+                                                           m = 4   ;
+                                                           n = 4   ;
+
+                                                           P = (a, r) . (b, r) . P ;
+
+                                                           Q = (a, r) . (d ,r) . Q ;
+
+                                                           P[m] <a> Q[n]  
+                                                         )

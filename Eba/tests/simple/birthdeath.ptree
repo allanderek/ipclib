@@ -1,0 +1,19 @@
+Steady
+// Plot Lines [ names  = People_high, Resources_high
+//           ]
+// Transient [ start-time = 0.0
+//             stop-time  = 10.0
+//             time-step  = 0.1 
+//           ] 
+ ModelTranslate [ step-size = 100
+                  rate-params = [ k1 = 1.0
+                                  k2 = 1.0
+                                  k3 = 1.0
+                                  k4 = 1.0
+                                  k5 = 0.1
+                                ] 
+                  max-concentrations = [ People_high = 100
+                                         Resources_high = 100
+                                       ]
+                ]
+                BioPepaFile "birthdeath.biopepa"

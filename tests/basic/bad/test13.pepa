@@ -1,0 +1,4 @@
+% File: tests/bad/test13.pepa
+% Tau cannot be synchronised on, so cannot be passive
+P = (tau, infty).P;
+(P <> P)

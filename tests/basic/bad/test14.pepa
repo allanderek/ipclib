@@ -1,0 +1,5 @@
+% File: tests/bad/test14.pepa
+% Unused component (Q)
+P = (a, r).P;
+Q = (a, infty).Q;
+(P <> P)

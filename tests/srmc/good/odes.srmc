@@ -1,0 +1,157 @@
+// A simple ode example, we'll use odes to solve the model
+
+servers      = { 3, 4, 5} ; // {2, 3, 4, 5, 6} ;
+threads      = 20 ;
+clients      = 100000 ; // {1000, 2000, 3000, 4000} ;
+
+availability = 0.6 ; // { 0.6, 0.7, 0.8, 0.9, 1.0 } ;
+client_connect = 0.01 ;
+
+// Slower but less likely to break down.
+Edinburgh::{
+   lambda = 1.65   ;
+   mu     = 0.0001  ; // { 0.001, 0.002, 0.003 } ;
+   gamma  = 0.125  ;
+   avail  = { 0.6, 0.7, 0.8, 0.9, 1.0 } ;
+   http   = 10.0   ;
+   ftp    = 7.0    ;
+   
+   Http::{
+      Idle   = (download, avail * http) . Idle
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+   Ftp::{
+      Idle   = (upload, avail * ftp) . Idle
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+
+} ; 
+
+// Faster but more likely to break down
+Imperial::{
+   lambda = 1.65   ;
+   mu     = 0.006 ; // { 0.06, 0.07, 0.08 } ;
+   gamma  = 0.125  ;
+   avail  = { 0.6, 0.7, 0.8, 0.9, 1.0 } ;
+   http   = 20.0   ;
+   ftp    = 15.0   ;
+
+   Http::{
+      Idle   = (download, avail * http) . Idle
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+
+   Ftp::{
+     Idle   = (upload, avail * ftp) . Idle
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+
+} ; 
+
+// The same rate of upload as download
+Fairyo::{
+   lambda = 1.65   ;
+   mu     = 0.006 ; // { 0.06, 0.07, 0.08 } ;
+   gamma  = 0.125  ;
+   avail  = { 0.6, 0.7, 0.8, 0.9, 1.0 } ;
+   transfer = 20.0 ;
+
+   Http::{
+      Idle   = (download, avail * transfer) . Idle
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+
+   Ftp::{
+      Idle   = (upload, avail * transfer) . Idle
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+
+} ; 
+
+
+///////////////////////////////////////////////////////////
+// The clients
+Harry::{
+   connect_rate    = { 0.01, 0.02, 0.03 } ; // client_connect ;
+   disconnect_rate = 1.0 ;
+   download_rate   = { 0.01, 0.02, 0.03 } ;
+   upload_rate     = 1.0 ;
+
+   Idle        = (begin, connect_rate / 2) . Upload
+               + (begin, connect_rate / 2) . Download
+               ;
+   Upload      = (upload, upload_rate) . Disconnect ;
+   Download    = (download, download_rate) . Disconnect ;
+   Disconnect  = (finish, disconnect_rate) . Idle ;
+   Uploading   = [ Upload ] ;
+   Downloading = [ Download ] ;
+   Inservice   = [ Uploading + Downloading ] ;
+
+} ;
+
+Sally::{
+   connect_rate    = { 0.009, 0.0095, 0.01 } ; // client_connect ;
+   disconnect_rate = 0.5 ;
+   download_rate   = { 0.01, 0.02, 0.03 } ;
+   upload_rate     = 0.2 ;
+
+   Idle        = (begin, connect_rate / 3) . Upload
+               + (begin, connect_rate / 3) . Download1
+               + (begin, connect_rate / 3) . Download2 
+               ;
+   Upload      = (upload, upload_rate) . Disconnect ;
+   Download1   = (download, download_rate) . Download2 ;
+   Download2   = (download, download_rate) . Disconnect ;
+   Disconnect  = (finish, disconnect_rate) . Idle ;
+
+   Uploading   = [ Upload ] ;
+   Downloading = [ Download1 + Download2 ] ;
+   Inservice   = [ Uploading + Downloading ] ;
+} ;
+
+Sophie::{
+   connect_rate    = { 0.01, 0.02, 0.03 } ;// client_connect ;
+   disconnect_rate = 0.5 ;
+   download_rate   = { 0.05, 0.06, 0.07 } ;
+   upload_rate     = 0.2 ;
+
+   Idle        = (begin, connect_rate / 2) . Upload1
+               + (begin, connect_rate / 2) . Upload2
+               + (begin, connect_rate / 3) . Download1
+               + (begin, connect_rate / 3) . Download2 
+               ;
+   Upload1     = (upload, upload_rate) . Upload2 ;
+   Upload2     = (upload, upload_rate) . Disconnect ;
+   Download1   = (download, download_rate) . Download2 ;
+   Download2   = (download, download_rate) . Disconnect ;
+   Disconnect  = (finish, disconnect_rate) . Idle ;
+
+   Uploading   = [ Upload1 + Upload2 ] ;
+   Downloading = [ Download1 + Download2 ] ;
+   Inservice   = [ Uploading + Downloading ] ;
+} ;
+
+Client::= { Harry, Sally, Sophie } ;
+
+Clients  = Client::Idle[clients] ;
+
+Http::= {Edinburgh::Http, Imperial::Http, Fairyo::Http} ;
+Ftp ::= {Edinburgh::Ftp,  Imperial::Ftp,  Fairyo::Ftp } ;
+// Servers = Http::Idle[servers] || Ftp::Idle[servers] ;
+
+Clients
+  <download, upload>
+(Http::Idle[servers * threads] || Ftp::Idle[servers * threads])
+// Servers

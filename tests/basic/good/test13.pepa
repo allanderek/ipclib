@@ -1,0 +1,10 @@
+// File: tests/good/test13.pepa
+// Using scientific notation real number constants for rates
+
+r1 = 1500      ;
+r2 = 3325000   ;
+
+P1 = (a, r1).P2;
+P2 = (b, r2).P1;
+
+P1 <> P1

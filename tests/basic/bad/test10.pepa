@@ -1,0 +1,4 @@
+% File: tests/bad/test10.pepa
+% Unbounded growth (of P)
+P = (a, r).(P <> P);
+(P <> P)

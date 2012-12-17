@@ -1,0 +1,22 @@
+OdeResponse [ stop-time       = 100
+            , time-step       = 0.1
+            , BL              = 503.55
+            , BL4             = 25.767
+            , BLtrans        = 386.02
+            , BLwait         = 84.662
+            , BR              = 408.58
+            , BR1             = 47.48
+            , BR2             = 496.45
+            , BR3             = 47.48
+            , CB              = 368.1
+            , CB1             = 20.24
+            , CB2             = 591.4
+            , CB3             = 20.25
+            , CRreadyrunning = 184.05
+            , CRcompleteddone = 0
+            , CRdone           = 184.04
+            , CRreadydone     = 631.9
+            , LE                = 15.34
+            , LE1               = 84.7
+            ]
+            ModelFile "get-loan.pepa"

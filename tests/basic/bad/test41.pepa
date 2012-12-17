@@ -1,0 +1,6 @@
+% File: tests/bad/test41.pepa
+% Island of components (P and Q) not statically reachable from the roots
+P = (b, s).Q;
+Q = (c, t).P;
+R = (a, r).R;
+(R <> R)

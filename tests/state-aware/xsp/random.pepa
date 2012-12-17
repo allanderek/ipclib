@@ -1,0 +1,24 @@
+work_rate    = 0.1 ;
+send_rate    = 1.0 ;
+
+// The suffix on the queue represents how many
+// clients are waiting within the queue.
+
+Client = (work, work_rate) . (send, _) . Client ;
+
+Queue0 = (work, _) . Queue1 ;
+Queue1 = (work, _) . Queue2 
+       + (send, send_rate) . Queue0
+       ;
+Queue2 = (work, _) . Queue3
+       + (send, send_rate) . Queue1
+       ;
+Queue3 = (work, _) . Queue4
+       + (send, send_rate) . Queue2
+       ;
+Queue4 = (send, send_rate) . Queue3
+       + (work, _)         . Queue5
+       ;
+Queue5 = (send, send_rate) . Queue4 ;
+
+(Client[5] <work, send> Queue0)

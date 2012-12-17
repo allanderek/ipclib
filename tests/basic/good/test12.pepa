@@ -1,0 +1,11 @@
+// File: tests/good/test12.pepa
+// Using real number value for rates
+
+r1 = 1.75;
+r2 = 3.325;
+
+P1 = (a, r1).P2;
+P2 = (b, r2).P1;
+
+P1 <> P2
+

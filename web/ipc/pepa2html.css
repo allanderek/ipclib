@@ -1,0 +1,18 @@
+p.code {color: #000000;font-family: "courier new", courier, monospace;font-size: 12pt;}
+
+span.pepaCpt { color: #B22222; }
+span.pepaRt  { color: #556B2F; }
+span.pepaAct { color: #6959CD; }
+
+
+div.pepaBox {
+	color: #000000;
+	font-size: 10pt;
+	background-color: #efefef; 
+	margin: 6px; 
+	padding: 5px;
+	border-style: solid;
+	border-width: 1px; 
+	border-color: #00000; 
+}
+b

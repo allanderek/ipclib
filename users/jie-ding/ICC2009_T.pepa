@@ -1,0 +1,90 @@
+// ICC2009
+//July 9th
+// Jie Ding, version 1.0
+
+
+
+
+//================================= parameters =======================
+//----------PDE--------------
+r_pde_ext_cont_req=1;
+r_pde_int_cont_req=16.7;
+r_pde_user_interface=12;
+
+//-------------- AM ---------
+
+r_am_adaptation_decision=3;
+r_am_assimilation=3;
+r_am_cont_req=16.7;
+r_am_adaptation_plan=16.7;
+
+//------------ CA -------------
+r_ca_states_req=16.7;
+r_ca_states_res=16.7;
+r_ca_adaptation=1;
+r_ca_to_pde=6.7;
+
+//----------- Content/Service Provider------
+
+r_csp_cc_req=25;  
+r_csp_cc_res=25;
+r_csp_call_ca_adapt=6.7;
+r_csp_to_pde=6.7;
+
+
+
+
+
+//======================== PDE============
+PDE1=(pde_ext_cont_req, r_pde_ext_cont_req).PDE2;              
+PDE2=(pde_int_cont_req, r_pde_int_cont_req).PDE3;  
+PDE3=(csp_to_pde, T).PDE4+(ca_to_pde, T).PDE4;
+PDE4=(pde_user_interface, r_pde_user_interface).PDE1;
+
+
+//======================= AM ====================
+AM1=(pde_int_cont_req, T).AM2;
+AM2=(csp_cc_req, r_csp_cc_req).AM3;
+AM3=(csp_cc_res, T).AM4;
+AM4=(am_assimilation, r_am_assimilation/2).AM5+(am_assimilation, r_am_assimilation/2).AM9;
+AM5=(ca_states_req, r_ca_states_req).AM6;
+AM6=(ca_states_res, T).AM7; 
+AM7=(am_adaptation_decision, r_am_adaptation_decision).AM8;
+AM8=(am_adaptation_plan, r_am_adaptation_plan).AM1;
+AM9=(am_cont_req, r_am_cont_req).AM1;
+
+
+
+//=============================CA=============================
+CA1=(ca_states_req, T).CA2;
+CA2=(ca_states_res, r_ca_states_res).CA3;
+CA3=(csp_call_ca_adapt, T).CA4;
+CA4=(ca_adaptation, r_ca_adaptation).CA5;
+CA5=(ca_to_pde, r_ca_to_pde).CA1;
+
+
+
+
+//=============================CSP=============================
+
+CSP1=(csp_cc_req, T).CSP2;
+CSP2=(csp_cc_res, r_csp_cc_res).CSP3;
+CSP3=(am_cont_req, T).CSP4+(am_adaptation_plan, T).CSP5;
+CSP4=(csp_to_pde, r_csp_to_pde).CSP1;
+CSP5=(csp_call_ca_adapt, r_csp_call_ca_adapt).CSP1;
+
+       
+
+
+ //========================== system=========================
+
+number_pdes=1 ;
+PDE1[number_pdes]<pde_int_cont_req, ca_to_pde, csp_to_pde>
+((AM1[1]<ca_states_req, ca_states_res>CA1[1])
+<csp_cc_req, csp_cc_res, am_cont_req, csp_call_ca_adapt, am_adaptation_plan>CSP1[1])
+
+
+
+
+
+

@@ -1,0 +1,10 @@
+% This model should fail because it contains a self loop on P
+
+r1 = 1.0 ;
+
+P  = (a, r1) . P + (b, r1).Q ;
+//S  = P ;
+Q  = (a, r1) . Q2 ;
+Q2 = (b, r1) . Q ;
+
+( P <> Q )

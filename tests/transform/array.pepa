@@ -1,0 +1,14 @@
+// We begin with a very simple example. This one starts
+// with two 'P' components and transforms one of them
+// into a 'Q' component, we should have different throughputs
+// of the associated actions afterwards.
+
+r = 1.0 ;
+m = 4   ;
+n = 4   ;
+
+P = (a, r) . (b, r) . P ;
+
+Q = (c, r) . (d ,r) . Q ;
+
+P[m] || Q[n]

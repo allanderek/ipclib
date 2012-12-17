@@ -1,0 +1,9 @@
+OdeResponse [ stop-time = 20.0
+            , time-step = 0.5
+            , P1 = 88.25
+            , P2 = 0
+            , R1 = 73.54
+            , R2 = 46.45
+            , Waiting = 111.73
+            ]
+            ModelFile "procres.pepa"

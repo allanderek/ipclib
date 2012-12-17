@@ -1,0 +1,4 @@
+% File: tests/bad/test51.pepa
+% Syntax error, missing full stop in prefix
+P = (a, r)P;
+(P <> P)

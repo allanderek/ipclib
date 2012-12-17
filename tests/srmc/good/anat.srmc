@@ -1,0 +1,221 @@
+r_passive = 1000000 ;
+
+//modifiable rates:
+r_user_1 = { 0.0001, 0.001, 0.01 } ;// { 0.0001 , 0.001, 0.01, 0.1, 1} ; // number of gestures per second (the user makes a gesture every 1/r_user_1 seconds)
+				// affected by DECISION_PACE, INTERDEPENDENCE_ACTIVITY
+r_ctrl_res_pass = { 10, 100, 1000} ; // affected by DATA_VOLUME_COMPLEXITY
+r_app_trans = 100 ; // { 10, 100, 1000} ; // r_app_6 affected by DATA_VOLUME_COMPLEXITY
+r_app_upd_mdl = 10 ; // 0.01 ; // {0.01, 0.001} ; // r_app_8 affected by INTERDEPENDENCE_LEVEL
+r_qf_res_to_dlg = 10 ; // {10, 100,  1000} ; //r_qf_3 // affected by DATA_VOLUME_COMPLEXITY
+r_qf_res_to_mdl = 10 ; // {10, 100,  1000} ; //r_qf_4 // affected by DATA_VOLUME_COMPLEXITY
+r_DBMS_qry  = 1000; //r_DBMS_1 // affected by QUERY_COMPLEXITY
+r_DBMS_upd = 1000; //r_DBMS_2 // affected by QUERY_COMPLEXITY
+r_DBMS_cre = 1000; //r_DBMS_3 // affected by QUERY_COMPLEXITY
+r_DBMS_del = 1000; //r_DBMS_4 // affected by QUERY_COMPLEXITY
+r_DBMS_res_to_qf = 1000; //r_DBMS_5 // affected by DATA_VOLUME_COMPLEXITY
+r_CmdProc_res_to_dlg = 100; //r_CmdProc_2 // affected by DATA_VOLUME_COMPLEXITY, INTERDEPENDENCE_LEVEL
+r_MdlExc_mdl_exc = 100; //r_MdlExc_4 //  affected by COMPUTATION_COMPLEXIY, INTERDEPENDENCE_TYPE
+
+// unmodifiable rates:
+r_ui_translation = 20; // number of UI to dlgCtrl translations per second 
+r_ui_trans_back = 20; // number of back-translations per second
+r_ui_err_dsp = 200;
+r_ctrl_mdl_upd = 10;
+r_ui_upd_trans = 100;
+r_ctrl_validate = 20;
+r_ctrl_prep = 100;
+r_ctrl_err_res = 100;
+r_app_data_trans = 20; // r_app_1
+r_app_mdl_trans = 20; // r_app_2
+r_app_data_req = 100; // r_app_3
+r_app_mdl_prep = 40; // r_app_4
+r_app_mdl_req = 100; // r_app_5
+r_qf_interpret = 100; //r_qf_1
+r_qf_dbms_req = 1000; //r_qf_2
+r_CmdProc_mdlExc_req = 1000; //r_CmdProc_1
+r_MdlExc_mbms_req = 1000; //r_MdlExc_1
+r_MdlExc_get_data = 100; //r_MdlExc_2
+r_MdlExc_enrich_mdl = 100; //r_MdlExc_3
+r_MdlExc_res_to_cmdProc = 1000; //r_MdlExc_5
+r_MBMS_mdl_rtrv = 100; 		// r_MBMS_1
+r_DBIfc_data_rtrv  = 100; //r_DBIfc_1
+r_DBIfc_res_to_mdlExc = 100; //r_DBIfc_2
+
+//PROBABILITIES:
+p1 = 0.95; //the probablity that the request made in the UI is OK
+p2 = 0.6; // the probability that the model requires data retrival
+wQuery = 0.60;
+wUpdate = 0.20;
+wCreate = 0.10;
+wDelete = 0.10;
+
+
+//------------------------------------------------
+// 				User component
+//------------------------------------------------
+
+UserIdle = (gesture, r_user_1).UserWaiting + (updateMdlDlg, 100000).UserWaiting;
+UserWaiting = (getResult, 100000).UserIdle + (displayErrUi, 100000).UserIdle + (updTransDisp, 100000).UserIdle;
+
+//------------------------------------------------
+// 				Dialouge component
+//------------------------------------------------
+
+
+  // recieves a gesture from user or recieve update 
+  // from a model caused by another user:
+  Dlg_Idle = (gesture, 100000).Dlg_UiTranslation 
+           + (updateMdlDlg, r_app_upd_mdl).Dlg_CtrlUpdPrep; 
+  // translate the gesture to valid masseges to be sent to the controller:
+  Dlg_UiTranslation = (translateCtrl, r_ui_translation).Dlg_CtrlValidation; 
+  // checks if valid: if valid -- preperes the request or else -- returen an error:
+  Dlg_CtrlValidation = (validate, p1*r_ctrl_validate).Dlg_CtrlPrep 
+                     + (validate, (1-p1)*r_ctrl_validate).Dlg_CtrlErrResponse;  
+  //prepares the requests and pass it to the AppProc:
+  Dlg_CtrlPrep = (prepare, r_ctrl_prep).Dlg_AppProcTranslation; 
+  //translate the request and accordingly pass it to the data 
+  // management component or to the model management component:
+  Dlg_AppProcTranslation = (translateData, p2*r_app_data_trans).Dlg_AppProcDataSend 
+                         + (translateMdl, (1-p2)*r_app_mdl_trans).Dlg_AppProcMdlSend;
+  // send data request to the Data management components:
+  Dlg_AppProcDataSend = (requestDataDlg, r_app_data_req).Dlg_AppProcDataWait; 
+  // wait for data management component response:
+  Dlg_AppProcDataWait = (responseDataDlg, 100000).Dlg_AppProcMdlPrep; 
+  // prepares the request with the retireved data:
+  Dlg_AppProcMdlPrep = (prepareMdl, r_app_mdl_prep).Dlg_AppProcMdlSend;  
+  // sends the model to the model management component:
+  Dlg_AppProcMdlSend = (requestMdlDlg, r_app_mdl_req).Dlg_AppProcMdlWait; 
+  // wait for the model response:
+  Dlg_AppProcMdlWait = (responseMdlDlg, 100000).Dlg_AppProcTranslateApp; 
+  // translates the response to "local" language:
+  Dlg_AppProcTranslateApp = (translateApp, r_app_trans).Dlg_CtrlResponsePrep; 
+  // prepares the response for the ui:
+  Dlg_CtrlResponsePrep = (responseApp, r_ctrl_res_pass).Dlg_UiBackTranslation; 
+  // translating the result to the ui language:
+  Dlg_UiBackTranslation = (getResult, r_ui_trans_back).Dlg_Idle; 
+  // pass the error response to the UI:
+  Dlg_CtrlErrResponse = (responseCtrlErr, r_ctrl_err_res).Dlg_UiErrDsp;
+  // translates the error to ui display:
+  Dlg_UiErrDsp = (displayErrUi, r_ui_err_dsp).Dlg_Idle; 
+  // prepare the update for the UI:
+  Dlg_CtrlUpdPrep = (mdlMdlPrep, r_ctrl_mdl_upd).Dlg_UiUpdTranslation; 
+  // translate the update to display for the user:
+  Dlg_UiUpdTranslation = (updTransDisp, r_ui_upd_trans).Dlg_Idle;
+
+
+//------------------------------------------------
+// 				Data Management
+//------------------------------------------------
+
+
+// get request from the dialogue  or from the model management:
+DM_Idle = (requestDataDlg, 100000).DM_QfInterpretation 
+        + (requestDataMdl, 100000).DM_QfInterpretation; 
+//recieve request for data from the dialouge or from the model 
+// interprets the request to local terms:
+DM_QfInterpretation = (interpret, r_qf_interpret).DM_QfSendingDBMS;
+// send the DB to perform Query / Update / Create / Delete:
+DM_QfSendingDBMS =  (requestDBMS, wQuery*r_qf_dbms_req).DM_DbmsQuery 
+                 +  (requestDBMS, wUpdate*r_qf_dbms_req).DM_DbmsUpdate 
+                 +  (requestDBMS, wCreate*r_qf_dbms_req).DM_DbmsCreation 
+                 +  (requestDBMS, wDelete*r_qf_dbms_req).DM_DbmsDeletion;
+//perform query:
+DM_DbmsQuery = (query, r_DBMS_qry).DM_DbmsSendingQF;
+// perform update:
+DM_DbmsUpdate = (update, r_DBMS_upd).DM_DbmsSendingQF;
+// perform creation:
+DM_DbmsCreation = (create, r_DBMS_cre).DM_DbmsSendingQF;
+// perform deletion: 
+DM_DbmsDeletion = (delete, r_DBMS_del).DM_DbmsSendingQF;
+// send the response back to the QF:
+DM_DbmsSendingQF = (responseDBMS, r_DBMS_res_to_qf).DM_QfSendingBack;
+// send the response to the Dialouge or to the model management:
+DM_QfSendingBack  = (responseDataDlg, r_qf_res_to_dlg).DM_Idle 
+                  + (responseDataMdl, r_qf_res_to_mdl).DM_Idle;
+
+
+// ----------------------------------------------------
+//				Model Management
+//-----------------------------------------------------
+
+  // get request for model execution:
+  Mdl_Idle = (requestMdlDlg, r_passive).Mdl_CmdProcSendMdlExc; 
+  // pass the request to te mdlExc:
+  Mdl_CmdProcSendMdlExc = (requestMdlExc, r_CmdProc_mdlExc_req).Mdl_MdlExcMdlRetrieval; 
+  // request the model from the MBMS:
+  Mdl_MdlExcMdlRetrieval = (requestMBMS, r_MdlExc_mbms_req).Mdl_MbmsMdlRetrieval; 
+  // the MBMS retrieves the model which may requires data or can be executed as is:
+  Mdl_MbmsMdlRetrieval = (retrieve, r_MBMS_mdl_rtrv).Mdl_MdlExcDataRetrieval 
+                       + (retrieve, r_MBMS_mdl_rtrv).Mdl_MdlExcMdlExecute; 
+ // pass request for data to the DB interface:
+ Mdl_MdlExcDataRetrieval = (requestDB, r_MdlExc_get_data).Mdl_DbIfcDataRetrieval; 
+ // request for Data from the DM:
+ Mdl_DbIfcDataRetrieval = (requestDataMdl, r_DBIfc_data_rtrv).Mdl_DbIfcDataWait;
+ // recieve data results:
+ Mdl_DbIfcDataWait = (responseDataMdl, r_passive).Mdl_DbIfcDataToMdlExc;
+ // pass the data to the MdlExc:
+ Mdl_DbIfcDataToMdlExc = (responseDB, r_DBIfc_res_to_mdlExc).Mdl_MdlExcMdlEnrich;
+ // enriching the model with the retrieved data:
+ Mdl_MdlExcMdlEnrich = (enrichMdl, r_MdlExc_enrich_mdl).Mdl_MdlExcMdlExecute;
+ // executing the model:
+ Mdl_MdlExcMdlExecute = (executeMdl, r_MdlExc_mdl_exc).Mdl_MdlExcToCmdProc;
+ // send the results to the CmdProc:
+ Mdl_MdlExcToCmdProc = (responseMdlExc, r_MdlExc_res_to_cmdProc).Mdl_CmdProcSendDlg;
+ //here we send the response back to the dialogue. 
+ // if there is high interdependence degree then updates are sent to a number of dialouge components 
+ // which cause the response rate, r_CmdProc_res_to_dlg, to be lower
+ Mdl_CmdProcSendDlg = (responseMdlDlg, r_CmdProc_res_to_dlg).Mdl_Idle; 
+
+Dbms_Init = Dlg_Idle[1000] 
+              <requestDataDlg, responseDataDlg> 
+            DM_Idle[1] 
+              <requestMdlDlg, responseMdlDlg, 
+               requestDataMdl, responseDataMdl > 
+            Mdl_Idle[1] ;
+
+
+// -------------- Command Processor --------------------------
+
+//CmdProcIdle = (requestMdlDlg, 100000).CmdProcSendMdlExc;
+//CmdProcSendMdlExc = (requestMdlExc, r_CmdProc_mdlExc_req).CmdProcWait;
+//CmdProcWait = (responseMdlExc, 100000).CmdProcSendDlg;
+//CmdProcSendDlg = (responseMdlDlg, r_CmdProc_res_to_dlg).CmdProcIdle; //here we send the response back to the dialogue. 
+					// if there is high interdependence degree than updates are sent to a number of dialouge components 
+					// which cause the response rate, r_CmdProc_2, to be lower
+
+
+//---------------- Model Execution --------------------------- 
+
+//MdlExcIdle = (requestMdlExc, 100000).MdlExcMdlRetrieval;
+//MdlExcMdlRetrieval = (requestMBMS, r_MdlExc_mbms_req).MdlExcWait;
+//MdlExcWait = (responseMBMS, 12*100000).MdlExcDataRetrieval + (responseMBMS, 12*100000).MdlExcMdlExecute;
+//MdlExcDataRetrieval = (requestDB, r_MdlExc_get_data).MdlExcDataWait;
+//MdlExcDataWait = (responseDB, 100000).MdlExcMdlEnrich;
+//MdlExcMdlEnrich = (enrichMdl, r_MdlExc_enrich_mdl).MdlExcMdlExecute;
+//MdlExcMdlExecute = (executeMdl, r_MdlExc_mdl_exc).MdlExcSendCmdProc;
+//MdlExcSendCmdProc = (responseMdlExc, r_MdlExc_res_to_cmdProc).MdlExcIdle;
+
+// ------------------- Model Base Management System -----------------
+
+//MbmsIdle = (requestMBMS, 100000).MbmsMdlRetrieval;
+//MbmsMdlRetrieval = (retrieve, r_MBMS_mdl_rtrv).MbmsMdlSend;
+//MbmsMdlSend = (responseMBMS, r_MBMS_res_to_mdlExc).MbmsIdle;
+
+// ------------------ DB Interface ----------------------------------
+
+//DbIfcIdle = (requestDB, 100000).DbIfcDataRetrieval;
+//DbIfcDataRetrieval = (requestDataMdl, r_DBIfc_data_rtrv).DbIfcDataWait;
+//DbIfcDataWait = (responseDataMdl, 100000).DbIfcDataSend;
+//DbIfcDataSend = (responseDB, r_DBIfc_res_to_mdlExc).DbIfcIdle;
+
+// -----------------------------------------------------------------
+// 					SYSTEM DEFINITION
+// -----------------------------------------------------------------
+
+// We assume that there is one instance of each component
+
+//GeneralDss = 
+
+UserIdle[1000]
+  <gesture, getResult, displayErrUi, updateMdlDlg, updTransDisp>
+Dbms_Init

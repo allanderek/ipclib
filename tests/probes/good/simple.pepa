@@ -1,0 +1,27 @@
+// This is a simple test to see if we can localise
+// the probe to one component.
+
+
+// Both P and Q may cooperate with a Server to perform an "a,b"
+// sequence of actions. Now we want to measure the expected
+// response time from a, b, for either P or Q, but not both.
+// The simple global model, will incorrectly measure the
+// passage of time between the whole model performing an  'a'
+// and the whole model performing a 'b'.
+// So we therefore have to be more clever about it.
+
+
+r = 1.0 ;
+
+P = (a, r). P1 ;
+P1 = (b, infty).P ;
+
+Q = (a, r). Q1 ;
+Q1 = (b, infty).Q ;
+
+Server = (a, infty). Server1 ;
+Server1 = (b, r * 2). Server ;
+
+AllClients = P <> Q ;
+
+AllClients < a, b > Server[2]

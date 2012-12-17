@@ -1,0 +1,25 @@
+r_join  = 0.1 ;
+r_serve = 1.0 ;
+
+clients = 10 ;
+
+Client = (join, r_join) . Wait ;
+Wait   = (response, infty) . Client ;
+
+Queue_0 = (join, infty) . Queue_1 ;
+Queue_1 = (join, infty) . Queue_2
+        + (response, r_serve) . Queue_0
+        ;
+Queue_2 = (join, infty) . Queue_3
+        + (response, r_serve) . Queue_1
+        ;
+Queue_3 = (join, infty) . Queue_4
+        + (response, r_serve) . Queue_2
+        ;
+Queue_4 = (join, infty) . Queue_5
+        + (response, r_serve) . Queue_3
+        ;
+Queue_5 = (response, r_serve) . Queue_4 ;
+
+
+Queue_0 <join, response> Client[clients]

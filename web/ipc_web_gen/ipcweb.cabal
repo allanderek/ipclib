@@ -1,0 +1,17 @@
+Name:            ipcwebgen
+Version:         0.1
+License:         GPL
+Author:          Allan Clark
+Build-depends:   base, hxt
+Synopsis:        Creates the ipc web site
+Build-Type:      Simple
+
+Executable:      ipcwebgen
+Main-is:         IpcWeb.hs
+Other-modules:   
+Include-dirs:
+C-sources:
+Extra-libraries:
+Extensions:
+Ghc-options:     -Wall
+

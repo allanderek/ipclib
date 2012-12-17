@@ -1,0 +1,39 @@
+work_rate    = 0.1 ;
+send_rate    = 1.0 ;
+
+
+Client = (work, work_rate) . ClientQ
+       + (delay, _) . Client
+       ;
+
+ClientQ = (delay, _) . ClientQ
+        + place0 . Client1
+        + place1 . Client2
+        + place2 . Client3
+        + place3 . Client4
+        ;
+
+Client1 = (delay, _) . send . Client ;
+Client2 = (delay, _) . Client1 ;
+Client3 = (delay, _) . Client2 ;
+Client4 = (delay, _) . Client3 ;
+
+
+Queue0 = (join, work_rate * 4) . Queue1
+       + place0 . Queue1
+       ;
+Queue1 = (join, work_rate * 3) . Queue2
+       + place1 . Queue2
+       + (delay, send_rate)   . Queue0
+       ;
+Queue2 = (join, work_rate * 2) . Queue3
+       + place2 . Queue3
+       + (delay, send_rate) . Queue1
+       ;
+Queue3 = (join, work_rate) . Queue4
+       + place3 . Queue4
+       + (delay, send_rate) . Queue2
+       ;
+Queue4 = (delay, send_rate) . Queue3 ;
+
+(Client <delay, place0, place1, place2, place3> Queue0)

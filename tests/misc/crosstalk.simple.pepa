@@ -1,0 +1,12 @@
+%% ** The Imperial PEPA compiler:
+%% ipc v1.01-rc1 June 22, 2006 ("Patrick McGoohan" Release)
+%% DNAmaca generator: Jeremy Bradley;
+%% PEPA parser: Stephen Gilmore and Allan Clark
+%% Produced on location in/between Edinburgh, Leeds, London and Ludlow, 2002-6
+%% Queries or problems: jb@doc.ic.ac.uk, stg@inf.ed.ac.uk or a.d.clark@ed.ac.uk
+PEPA_r = 0.24 ;
+PEPA_r2 = 0.24 ;
+P1_0_0 = ( request, PEPA_r2 ). P3_0_0 ;
+P3_0_0 = ( response, PEPA_r ). P1_0_0 ;
+
+P1_0_0

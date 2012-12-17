@@ -1,0 +1,107 @@
+// The Secure WebService example from Hillston's ``Fluid Flow
+// Approximation'' QEST 2007 paper coded as an SRMC model
+
+// A second party client cycles through a lifetime of composing service 
+// requests, encrypting these and sending them to its broker.  It then 
+// waits for a response from the broker.  The rate at which the first 
+// three activities happen is under the control of the client.  The rate
+// at which responses are produced is determined by the interaction of the 
+// broker and the service endpoint.  As happens with PEPA models this component
+// contains some individual activities which it itself performs (the composition
+// and encryption) and some activities which are performed in co-operation with
+// another component (the request and response are in co-operation with the 
+// broker).
+
+SecondPartyClient::{
+  // Rates
+  cmp = 1.233;
+  encb = 0.2378;
+  req = 0.3402;
+  decb = 2.56;
+
+  Idle = (compose_sp, cmp).Encoding;
+  Encoding = (encrypt_b, encb).Sending;
+  Sending = (request_b, req).Waiting;
+  Waiting = (response_b, _).Decoding;
+  Decoding = (decrypt_b, decb).Idle;
+} ;
+
+// The broker is inactive until it receives a request.  It then decrypts the 
+// request before re-encrypting it for the Web service (to ensure end-to-end
+// security).  It forwards the request to the Web service and then waits for
+// a response.  The corresponding decryption and re-encrytion are performed 
+// before returning the response to the client.
+
+Broker::{
+  // Rates
+  dec_sp = 7.9246;
+  encws = 2.4007;
+  req = 1.9783;
+  dec_ws = 1.3409;
+  enc_sp = 0.8314;
+  resp = 0.9234;
+
+  Idle = (request_b, _).Decoding_Input;
+  Decoding_Input = (decrypt_sp, dec_sp).Encoding_Input;
+  Encoding_Input = (encrypt_ws, encws).Sending;
+  Sending = (request_ws, req).Waiting;
+  Waiting = (response_ws, _).Decoding_Response;
+  Decoding_Response = (decrypt_ws, dec_ws).Encoding_Response;
+  Encoding_Response = (encrypt_sp, enc_sp).Replying;
+  Replying = (response_b, resp).Idle;
+} ;
+
+// The lifetime of a first party client mirrors that of a second party client
+// except that encryption need not be used when all of the communication is 
+// conducted across a secure intranet.  The method of invoking the Web service
+// may also be different because the service may  be invoked by a remote
+// method invocation to the host machine instead of via an HTTP request.  Thus
+// the first party client experiences the Web service as a blocking remote method
+// invocation.
+
+FirstPartyClient::{
+  // Rates
+  cmp = 2.890476 ;
+  inv = 2.468903 ;
+
+  Idle = (compose_fp, cmp).Calling;
+  Calling = (invoke_ws, inv).Blocked;
+  Blocked = (result_ws, _).Idle;
+} ;
+
+// We model a thread of execution on the Web service.  There are two ways in 
+// which the service is executed, leading to a choice in the process algebra
+// model taking the service process into one or other of its two modes of
+// execution.  In either case, the duration of the execution of the service 
+// itself is unchanged.  The difference is only in whether encryption is needed
+// and whether the result is delivered as an HTTP response or as a direct value.
+
+WebService::{
+  // Rates
+  dec_b = 3.3489;
+  exec_local = 1.35897 ;
+  exec = 0.2351;
+  enc_b = 8.0347;
+  resp_b = 2.5189;
+  res = 1.902351 ;
+
+  Idle = 
+     (request_ws, _).Decoding
+   + (invoke_ws, _).Method;
+
+  Decoding = (decryptRequest_ws, dec_b).Execution;
+  Execution = (execute_ws_local, exec_local).Securing;
+  Securing = (encryptResponse_ws, enc_b).Responding;
+  Responding = (response_ws, resp_b).Idle;
+
+  Method = (execute_ws, exec).Returning;
+  Returning = (result_ws, res).Idle;
+} ;
+
+// We compose the processes defined above
+
+(
+   (SecondPartyClient::Idle <request_b, response_b> Broker::Idle)
+     <request_ws, response_ws>
+   (WebService::Idle <invoke_ws, result_ws> FirstPartyClient::Idle)
+)

@@ -1,0 +1,14 @@
+Plot Lines Map Cdf
+           Experiment ?rate [ 0.5, 1.0, 2.0, 2.5 ]
+                            Passage 
+                            ModelProbe (P::b:start, a:stop)
+                            ModelRate [ r = ?rate ] Model ( r = 1.0 ;
+                                                            m = 4   ;
+                                                            n = 4   ;
+
+                                                            P = (a, r) . (b, r) . P ;
+
+                                                            Q = (a, r) . (d ,r) . Q ;
+
+                                                            P[m] <a> Q[n]  
+                                                          )

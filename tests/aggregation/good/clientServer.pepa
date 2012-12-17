@@ -1,0 +1,11 @@
+mu     = 1.0 ;
+lambda = 1.0 ;
+kappa  = 1.0 ;
+
+Client  = (compute, _) . Client1 ;
+Client1 = (delay, mu) . Client ;
+
+Server  = (compute, lambda) . Server1 ;
+Server1 = (recover, kappa) . Server ;
+
+Client[1000] <compute> Server[10]

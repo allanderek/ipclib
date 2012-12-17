@@ -1,0 +1,12 @@
+// Tests for an alias loop, the error should report that the first three definitions
+// form an alias loop.
+
+r = 1.0 ;
+
+P = S ;
+S = T ;
+T = P ;
+
+R = (a, r).(b, r).R ;
+
+P <> R

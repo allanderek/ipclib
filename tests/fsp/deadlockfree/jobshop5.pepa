@@ -1,0 +1,44 @@
+r = 1;
+
+PoliteWorker0 = (get_hammer, r).PoliteWorker1 
+              + (get_chisel, r).PoliteWorker2;
+PoliteWorker1 = (get_chisel, r).PoliteWorker3
+              + (release_hammer, r).PoliteWorker0;
+PoliteWorker2 = (get_hammer, r).PoliteWorker3
+              + (release_chisel, r).PoliteWorker0;
+PoliteWorker3 = (work, r).PoliteWorker4
+              + (strike, r).Worker4;
+PoliteWorker4 = (release_hammer, r).PoliteWorker5
+              + (release_chisel, r).PoliteWorker6;
+PoliteWorker5 = (release_chisel, r).PoliteWorker0;
+PoliteWorker6 = (release_hammer, r).PoliteWorker0;
+
+Worker0 = (get_hammer, r).Worker1 
+        + (get_chisel, r).Worker2;
+Worker1 = (get_chisel, r).Worker3;
+Worker2 = (get_hammer, r).Worker3;
+Worker3 = (work, r).Worker4
+        + (go_on_strike, r).Worker7;
+Worker4 = (release_hammer, r).Worker5 
+        + (release_chisel, r).Worker6;
+Worker5 = (release_chisel, r).Worker0;
+Worker6 = (release_hammer, r).Worker0;
+Worker7 = (throw_away_tools, r).Worker8;
+Worker8 = (resolve_strike, r).Worker0;
+
+SimpleWorker0 = (get_hammer, r).SimpleWorker1;
+SimpleWorker1 = (get_chisel, r).SimpleWorker2;
+SimpleWorker2 = (work, r).SimpleWorker3;
+SimpleWorker3 = (release_chisel, r).SimpleWorker4;
+SimpleWorker4 = (release_hammer, r).SimpleWorker0;
+
+Hammer_free = (get_hammer, infty).Hammer_taken;
+Hammer_taken = (release_hammer, infty).Hammer_free;
+
+Chisel_free = (get_chisel, infty).Chisel_taken;
+Chisel_taken = (release_chisel, infty).Chisel_free;
+
+((PoliteWorker0 <strike> PoliteWorker0 <strike> PoliteWorker0 <strike> PoliteWorker0 <strike> SimpleWorker0) 
+     <get_hammer, release_hammer, get_chisel, release_chisel>
+ ((Hammer_free <> Hammer_free <> Hammer_free <> Hammer_free <> Hammer_free) <> 
+  (Chisel_free <> Chisel_free <> Chisel_free <> Chisel_free <> Chisel_free)))

@@ -1,0 +1,87 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage{amssymb,amsbsy,verbatim,fancybox,ifpdf}
+\usepackage{graphicx}
+\usepackage[usenames]{color}
+
+
+\input{../ipc/macros.tex}
+
+%% We must define this for the manual to operate correctly.
+\newcommand{\showcommandline}[1]{
+\begin{commandline}
+\$ smc #1
+\end{commandline}
+}
+
+\newcommand{\commandNameIpcSmc}{\smc}
+
+%
+
+\title{The \srmc\ Manual}
+\author{
+Allan Clark, Stephen Gilmore and Mirco Tribastone
+}
+
+
+\begin{document}
+\maketitle
+
+
+
+\section*{About \smc}
+
+This document is a manual for users of the \srmc\ compiler.
+Users are expected to already know how to interpret their models.
+A companion document, "The \srmc\ tutorial" is available.
+The tutorial explains how to use \srmc\ for stochastic modelling.
+
+\section{Input and Output}
+In this section we go over the input into the \srmc\ compiler and the
+output from a normal run. In Section \ref{section:command-line-options}
+the options to change the behaviour of the compiler are discussed.
+
+\adcComment{Todo: explain tool chain}
+
+\section{Command-line Usage}
+\label{section:command-line-options}
+\input{options.tex}
+
+\section{Concrete Syntax}
+\input{concreteSyntax}
+
+\section{Notes, Comments and Questions}
+\begin{itemize}
+\item
+There are three kinds of identifiers.
+An upper-ident these begin with an upper-case letter and are used for
+process names, eg $Client$.
+A lower-ident these begin with a lower-case letter and are used for rate names,
+eg $lambda$.
+An all-upper-ident, these begin with and only contain upper-case letters though 
+they may also have digits in them, eg $EDINBURGH$.
+A qualified name, can end in any of the three kinds of identifiers, but it must
+consist of a (possibly empty) chain of all-upper-idents followed
+by double-colons, eg
+$EDINBURGH::INFORMATICS::LFCS::Client$ is a qualified process name.
+$EDINBURGH::INFORMATICS::LFCS::lambda$ is a qualified rate name.
+
+\item
+One may wish to combine the $conditional$ syntax for conditional behaviour and
+functional rates. However the two te⟨st for distinct things. The first tests are
+generally on rates and may be compiled out before the model is solved.
+Functional rates on the other hand generally consist of process states and 
+are a dynamic test which cannot be compiled out
+(technically, cannot be evaluated at compile-time).
+
+% \item
+% Do we still wish to retain the legacy (optional) \# syntax
+% to begin a process definition?
+% The verdict seems to be yes.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\bibliographystyle{unsrt}
+%\bibliography{../common/pepa}
+
+\end{document}
+

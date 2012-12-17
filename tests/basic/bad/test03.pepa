@@ -1,0 +1,5 @@
+% File: tests/bad/test03.pepa
+% Missing partner for synchronisation (on b)
+P = (a, r).P + (b, s).P;
+Q = (a, infty).Q;
+(P <a, b> Q)

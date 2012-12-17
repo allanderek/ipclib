@@ -1,0 +1,18 @@
+% Tests whether or not our detector for unused
+% process definitions works.
+% Very simple test.
+% This *should* raise an error because the process
+% definition P2 does not get used.
+
+r1 = 1.0 ;
+r2 = 2.0 ;
+r3 = 3.0 ;
+
+% Note that P1 skips over P2 and goes to P3, which goes back to P1
+% hence the process P2 is never invoked and we should get a
+% warning for an unused process definition.
+P1 = (a, r1).P3 ;
+P2 = (a,   r2).P2 ;
+P3 = (a,  r3).P1 ;
+
+(P1 <> P1) 

@@ -1,0 +1,646 @@
+\subsection{Trivial Invocation Options}
+These options only apply to the trivial
+invocations of \commandNameIpcSmc.
+
+\begin{description}
+\item[-v, \ipcflag{version} ]
+\indexipcflag{ version }%
+The command-line:
+
+\showcommandline{\ipcflag{version}}
+will print the version of the \commandNameIpcSmc
+compiler and exit.
+
+\end{description}
+
+\begin{description}
+\item[-h, \ipcflag{help} ]
+\indexipcflag{ help }%
+The command-line
+
+\showcommandline{\ipcflag{ help}}
+
+will print an option and usage summary and exit.
+
+\end{description}
+
+
+\subsection{Output Re-directing Options}
+By default the \commandNameIpcSmc\ command
+will generate output in the same directory and
+with a file name based on the input source name
+The options in this section allow the user to
+redirect the output from the
+\commandNameIpcSmc\ compiler
+
+\begin{description}
+\item[\ipcflag{mod-file} FILE]
+Sets the output \texttt{.mod} file which will be
+the input to the run of \hydra
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{output} FILE]
+A generic output flag, this works regardless of the kind
+output that \commandNameIpcSmc\ is set to produce. For example
+instead of the default \hydra\ the compiler may have
+been set to produce a PRISM model file.
+The \ipcflag{output} can be used to set the
+output file name
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{stdout} ]
+When debugging the compiler it can often be useful
+for the output to be redirected to the terminal for
+immediate inspection by the programmer.
+The \ipcflag{stdout} sets the output file to be
+the standard out. This may also prove useful for
+piping the output into further processing tools.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{graph-output} GRAPHKIND]
+When outputting a graph we wish to be able to select
+what kind of output we want.
+For this use the \ipcflag{graph-output} flag
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{line-width} WIDTH]
+When drawing a line graph we can select the width of a line
+using the \ipcflag{line-width} flag
+
+\end{description}
+
+
+\subsection{Detecting Errors}
+These options control the way that
+static analysis is performed.
+
+\begin{description}
+\item[\ipcflag{staunch} ]
+The flag \ipcflag{staunch} allows the compiler
+to ignore warnings.
+By default this flag is off and when \commandNameIpcSmc\ performs
+any static-analys is over the input \pepa\ model.
+The default behaviour is to treat warnings as errors so
+if there are any warnings it will cause the compiler
+to cancel compilation. This behaviour can be suppressed with
+the \ipcflag{staunch} flag. This will cause the warnings
+to still be emitted but compilation will proceed anyway.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{no-static-analysis} ]
+The flag \ipcflag{no-static-analysis} causes
+\commandNameIpcSmc\ to avoid performing the static analysis over
+the \pepa\ model. It will therefore produce no
+warnings or errors. Because of this compilation may fail
+mysteriously and hence the user is advised only to use this
+flag if they know exactly what they are doing and expect
+their model to fail static-analysis for some reason but
+wish to proceed to compilation anyway.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{allow-self-loops} ]
+The flag \ipcflag{allow-self-loops} does exactly as it
+is named. We allow a model containing self-loops.
+This can allow the correct calculation of apparent
+rates, but note that the self-looping activities
+will be dropped (hence your throughput may be wrong.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{allow-deadlocks} ]
+The flag \ipcflag{allow-deadlocks} does exactly as it
+is named. We allow a model which has deadlocked states.
+Mostly this is only useful for transient analysis so for
+transient analysis it is the default. It is however also
+possible to use this (usefully) for passage-time/end
+analyses in which there is a single source state
+
+\end{description}
+
+
+\subsection{Performance Analysis Kind}
+In this section the options for specifying the
+different kinds of performance analysis are discussed.
+
+\begin{description}
+\item[\ipcflag{average-response} ]
+Use this option to calculate the average response time
+The response-time will be the time that the probe is
+in the running state. This probe may be specified via
+the \ipcflag{probe} argument or implicitly from a set
+of source actions to a set of target actions.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{passage} ]
+Specifies that we should perform a passage-time measurement.
+This is the default. It also means that the passage-probe
+is added to the model. This probe is in addition to the
+master probe. It is used as the start condition of passage.
+The passage-probe has two states an 'on' and 'off' state.
+It will be in the 'on' state for exactly one state after the
+master-probe has switched from the 'Stopped' to the 'Running'
+state and 'off' otherwise.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{pdf} ]
+When specifying a passage-time measurement state that the
+probability density function should be calculated
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{cdf} ]
+When specifying a passage-time measurment state that
+the cummulative distribution function of the passage
+should be calculated.
+This is the default however should you desire both the cdf
+and the pdf, then --cdf --pdf is what you want.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{passage-end} ]
+Specifies a special kind of passage-time calculation
+in which we compare the likelihood of completing a passage
+by the different stop-actions at each time.
+For example we may say that if we complete a request by
+time t then we have a ninety-percent chance that we
+completed the request via a cache but at time 2t there is a
+fifty percent chance that any request completed by then has
+been served by the cache
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{no-normalise} ]
+A passage-end measurement is usually normalised against
+the probability of completing the passage at all.
+To suppress this and produce non-normalised results use
+the \ipcflag{no-normalise} flag.
+This will mean for example that you will get cdfs which
+do not climb to one.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{steady} ]
+Specifies that we should perform a steady-state analysis.
+By default this will measure the probability that the probe
+is in the 'Running' state.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{transient} ]
+Specifies that we should perform a transient analysis
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{count-measure} ACTIONS]
+Specifies that we should perform a 'count' measure.
+This option takes as argument the (comma separated) list of
+action name we are expected to count.
+This will cause hydra to return the average rate that the model
+performs any of the specified actions.
+Note that the specified action can be a communication label sent
+by a probe specified by the user.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{state-measure} C-Expression]
+When performing a steady-state measurement rather than
+specifying the state of interest via a sequence of
+actions (ie, with a probe) sometimes it is desirable to
+specify it with reference to the actual states of the
+components within the model. The argument to this flag
+is the a state expression usually something like: 
+$P3 > 0 \&\& P2 == 0$.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{no-measurement} ]
+Suppresses the output of any measurement specification
+This is generally useful if the user wishes to hand-modify
+the output \texttt{.mod} file before running hydra over it.
+% Therefore this option is generally run in tandem with the
+% --no-run-hydra option.
+
+\end{description}
+
+
+\subsection{Probe Specification Options}
+Measurement of models is performed using automatically
+generated process algebra components called
+\emph{stochastic probes}
+This section describes the options which control
+the performance measure specification probes which
+are added to the model.
+% For more information on this please see section ...
+
+\begin{description}
+\item[-p, \ipcflag{probe} PROBESPEC]
+The flag \ipcflag{ probe } with the shortened version
+\texttt{p} is used to give a full probe specification.
+% In the probe specification language given in section ??
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{no-master} ]
+The flag \ipcflag{ no-master } is used to specify that
+no master probe % as described in section ...
+should be automatically added to the model.
+
+\end{description}
+
+\begin{description}
+\item[-s, \ipcflag{source} ACTIONS]
+The flags \ipcflag{ source } and \ipcflag{ target }
+with the short versions \texttt{s} and \texttt{t}
+respectively, set the state switching actions used
+in the master probe. If other probes are added using the
+\ipcflag{ probe } option then they may perform immediate
+communication actions which are specified in the source and
+target action list.
+Both the \ipcflag{ source } and \ipcflag{ target } flags
+accept as argument a comma separated list of action names.
+
+\end{description}
+
+\begin{description}
+\item[-t, \ipcflag{target} ACTIONS]
+see \texttt{--source}
+\end{description}
+
+\begin{description}
+\item[\ipcflag{source-cond} CONDITION]
+The flags \ipcflag{source-cond} and \ipcflag{target-cond}
+allow the specification of a passage-time measurement 
+with respect to state conditions rather than action
+observations.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{target-cond} CONDITION]
+see \texttt{--source-cond}
+\end{description}
+
+
+\subsection{Aggregation}
+The options in this section control the aggregation
+of components.
+Currently in \commandNameIpcSmc\ a component may
+only be aggregated if the user explicitly writes it
+as a component array of the form $P[N]$.
+
+\begin{description}
+\item[\ipcflag{aggregate} ]
+Tells \commandNameIpcSmc\ to aggregate process arrays
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{no-aggregate} ]
+Tells \commandNameIpcSmc\ \textbf{not} to aggregate
+process arrays. Therefore $P[3][a]$ will be translated
+into the form $P <a> P <a> P$.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{limit} SIZE]
+Tells the state space generator to quit after reaching a
+given limit in the state space size
+
+\end{description}
+
+
+\subsection{Running Hydra}
+This section details options used for running
+the hydra tool after processing of the model by \ipc.
+
+\begin{description}
+\item[\ipcflag{run-hydra} ]
+The flag \ipcflag{run-hydra} causes \commandNameIpcSmc\ to
+automatically run the hydra tool on the produced
+\texttt{.mod} file.
+This option has been deprecated please use the
+\ipcflag{hydra-stage} option described below.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{hydra} PATH]
+If the hydra tool is not installed in a standard
+location the path to the \hydra\ executable can
+be given as an argument to the \ipcflag{hydra} option.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{hydra-stage} STAGE]
+Choose at which stage we should stop using ipc
+and switch over to hydra.
+ This option replaces the older \ipcflag{run-hydra} option.
+There are currently two stages which may be specified:
+\begin{itemize}
+\item 'mod' this outputs a hydra model file in the original
+format. The full state space is not computed by \ipc.
+\item 'flat-mod' here the hydra model file contains a full
+state space and as such does not suffer from a problem of
+very large rate expressions.
+\end{itemize}
+
+\end{description}
+
+
+\subsection{Prism Model Files}
+At some point we wish to be able to generate prism
+model files from Pepa model descriptions.
+All of the options described in this section should be
+considered experimental and not for general use.
+
+\begin{description}
+\item[\ipcflag{prism} STAGE]
+\ipcflag{prism} this is an experimental option to produce
+a prism model.
+When using this one specifies a stage to which we with to
+to compile the pepa model to.
+Currently there are two supported options "trans" and
+"model". The 'model' option should be considered not to be
+working since it is in a very early stage of development
+The 'trans' stage will compile the model down to an
+explicit state space which prism can then import.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{prism-file} FILE]
+The \ipcflag{prism-file} option only has an effect if the
+\texttt{--prism} flag is set. It redirects the output
+prism model to the specified file.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{prism-options} OPTIONS]
+The \ipcflag{prism-options} flag has the effect to
+append the provided string on to the end of the
+the prism command
+
+\end{description}
+
+
+\subsection{Dizzy Model Files}
+At some point we wish to be able to generate dizzy
+model files from Pepa model descriptions.
+The options in this section describe the control of
+the \pepa\ $\rightarrow$ dizzy translation.
+
+\begin{description}
+\item[\ipcflag{dizzy} ]
+\ipcflag{dizzy} this is an experimental option to produce
+a dizzy model. This should not be considered working
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{dizzy-file} FILE]
+The \ipcflag{dizzy-file} option only has an effect if the
+\texttt{--dizzy} flag is set. It redirects the output
+dizzy model to the specified file.
+
+\end{description}
+
+
+\subsection{Extra Output}
+The model undergoes various transformations and
+augmentations on its way to being compiled.
+Sometimes it is helpful to see these intermediate
+stages. The options in this section allow the user
+to specify that \commandNameIpcSmc\ should
+include a particular intermediate model in the output,
+generally inside comments of the output file.
+
+\begin{description}
+\item[\ipcflag{show-simplified} ]
+Specifies that \commandNameIpcSmc\ should show the
+simplified model. This is a model without any of the
+syntactic sugar which the user may use for convenience
+but are unnecessary for the compilation procedure
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{show-probed} ]
+Specifies that the model with the measurement probe
+components added and then simplified is shown.
+
+\end{description}
+
+
+\subsection{Logging Options}
+The options in this section affect what, if anything
+is logged and how it is logged
+
+\begin{description}
+\item[\ipcflag{show-log} ]
+Specifies that the logging information should be shown to stdout
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{log} categories]
+The flag \ipcflag{log} specifies that a log should be kept
+Each log entry is associated with a name and the argument
+to the \ipcflag{log} flag is a name specifying that that
+entry should be output to the log file.
+The name 'all' specifies that all log entries
+should be recorded in the log-file.
+Additionally the 'user' name outputs to the log items
+deemed relevant to the user while 'developer' is a set
+of log items relevant for the developer.
+
+\end{description}
+
+
+\subsection{Miscellaneous Options}
+This section describes options which do not fit
+under any of the previous sub-sections.
+
+\begin{description}
+\item[\ipcflag{steady-mean} ]
+No manual entry but the usage information states:
+use the 'mean' estimator in a steady-state measure
+\end{description}
+
+\begin{description}
+\item[\ipcflag{steady-variance} ]
+No manual entry but the usage information states:
+use the 'variance' estimator in a steady-state measure
+\end{description}
+
+\begin{description}
+\item[\ipcflag{steady-stddev} ]
+No manual entry but the usage information states:
+use the 'stddev' estimator in a steady-state measure
+\end{description}
+
+\begin{description}
+\item[\ipcflag{steady-distrib} ]
+No manual entry but the usage information states:
+use the 'distribution' estimator in a steady-state measure
+\end{description}
+
+\begin{description}
+\item[\ipcflag{start-time} TIME]
+No manual entry but the usage information states:
+specify a time at which to start a performance measure eg passage-time
+\end{description}
+
+\begin{description}
+\item[\ipcflag{stop-time} TIME]
+No manual entry but the usage information states:
+specify a time at which to stop a performance measure eg passage-time
+\end{description}
+
+\begin{description}
+\item[\ipcflag{time-step} TIME]
+No manual entry but the usage information states:
+specify a the time steps for a performance measurement
+\end{description}
+
+\begin{description}
+\item[\ipcflag{solver} SOLVER]
+No manual entry but the usage information states:
+specify which solution method to use/specify to hydra
+\end{description}
+
+\begin{description}
+\item[\ipcflag{rate} DOUBLE]
+No manual entry but the usage information states:
+Override/specify a rate value on the command-line
+\end{description}
+
+\begin{description}
+\item[\ipcflag{rename-proc} P=s]
+No manual entry but the usage information states:
+cause a renaming on the given process within the model
+\end{description}
+
+\begin{description}
+\item[\ipcflag{rename-rate} r=s]
+No manual entry but the usage information states:
+cause a renaming on the given rate within the model
+\end{description}
+
+\begin{description}
+\item[\ipcflag{transform-rule} RULE]
+Provide a transformation rule with which
+to automatically transform the PEPA model
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{prioritise} ACTIONS]
+No manual entry but the usage information states:
+increase the priority of the given actions
+\end{description}
+
+\begin{description}
+\item[\ipcflag{dot-file} ]
+Produce a .dot file of the state space and run the dot program over it
+\end{description}
+
+\begin{description}
+\item[\ipcflag{no-reduce-vanishing} ]
+When producing a state space for external output
+do not remove the vanishing states
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{no-reduce-rate-exps} ]
+No manual entry but the usage information states:
+do not reduce the rate expressions
+\end{description}
+
+\begin{description}
+\item[\ipcflag{hide-non-coop} ]
+No manual entry but the usage information states:
+hide any activities which a component performs but does not cooperate over
+\end{description}
+
+\begin{description}
+\item[\ipcflag{process-num} NUM]
+No manual entry but the usage information states:
+provide a process number which is used to select rates and processes
+\end{description}
+
+\begin{description}
+\item[\ipcflag{fsp} ]
+The \ipcflag{fsp} flag is an experimental option to produce
+an LTSA model. This should not be considered working
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{states-size} ]
+The flag \ipcflag{states-size} informs \commandNameIpcSmc\ to
+print out the size of the state space of the given model
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{estimate-size} ]
+The flag \ipcflag{estimate-size} asks \commandNameIpcSmc\ to simply
+estimate the final state space size of the input model
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{compare-pepato} ]
+The flag \ipcflag{compare-pepato} informs \commandNameIpcSmc\ to
+produce a steady-state analysis and run pepato over
+the model to also produce a steady-state analysis and
+compare the two reports.
+
+\end{description}
+
+\begin{description}
+\item[\ipcflag{experimental} ]
+The flag \ipcflag{expermental} is for developers only
+This is a generic flag meaning:
+"enable a new approach/version of .."
+Generally only to be used by ipc developers.
+So for example a new approach to state space generation,
+rather than inventing a new flag
+"--use-new-state-space-gen" we can just test for this.
+If later we decide that we do actually wish to have both
+*then* we can invent two flags for it.
+
+\end{description}
+
+
+

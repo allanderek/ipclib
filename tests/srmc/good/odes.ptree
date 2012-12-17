@@ -1,0 +1,18 @@
+//Experiment ?trule [ neutral      , Transform (?P ==> ?P)
+//                  , redeployhttp , Transform (Http::Idle[?m] || Ftp::Idle[?n] ==> 
+//                                              Http::Idle[?m - 40] || Ftp::Idle[?n + 40])
+//                  , redeployftp  , Transform (Http::Idle[?m] || Ftp::Idle[?n] ==> 
+//                                              Http::Idle[?m + 40] || Ftp::Idle[?n - 40])
+//                  ]
+Experiment ?trule [ neutral      , Transform (?P ==> ?P)
+                  , redeployhttp , Transform (?P[?m] || ?Q[?n] ==> 
+                                              ?P[?m - 40] || ?Q[?n + 40])
+                  , redeployftp  , Transform (?P[?m] || ?Q[?n] ==> 
+                                              ?P[?m + 40] || ?Q[?n - 40])
+                  ]
+// Plot Lines [ names = Http__Idle, Http__Broken, Ftp__Idle, Ftp__Broken] Transient Odes ?srmc
+Plot Lines [ names = Client::Uploading, Client::Downloading, Client::Inservice ] 
+     Transient [ start-time = 0.0
+                 stop-time  = 1200.0
+               ]
+               Odes ModelTransform ?trule ?srmc

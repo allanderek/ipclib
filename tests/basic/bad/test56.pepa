@@ -1,0 +1,4 @@
+% File: tests/bad/test56.pepa
+% Syntax error, duplicated comma in prefix
+P = (a,, r).P;
+(P <> P)

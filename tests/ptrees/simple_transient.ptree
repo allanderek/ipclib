@@ -1,0 +1,7 @@
+Transient Model ( r = 1.0 ;
+                  Client = (request, r) . Wait ;
+                  Wait   = (response, infty) . Client ;
+                  Service = (request, infty) . Working ;
+                  Working = (response, r) . Service ;
+                  Service <request, response> Client
+                )

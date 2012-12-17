@@ -1,0 +1,16 @@
+Experiment ?trule [ Probe (a:go)
+                  , Probe (a,a:go)
+                  , Probe ((c,c,c/a):go)
+                  ]
+                  Throughput [go] 
+                             ModelProbe ?trule
+                                         Model ( r = 1.0 ;
+                                                 m = 4   ;
+                                                 n = 4   ;
+                                              
+                                                 P = (a, r) . (b, r) . P ;
+
+                                                 Q = (c, r) . (d ,r) . Q ;
+
+                                                 P[m] || Q[n]  
+                                                )

@@ -1,0 +1,6 @@
+% File: tests/bad/test07.pepa
+% Repeated definition of a component (P)
+% This test currently exposes a bug in ipc whereby it goes into an infinite loop
+%P = (a, r).P;
+%P = (b, s).P;
+%(P <> P)

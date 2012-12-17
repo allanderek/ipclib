@@ -1,0 +1,12 @@
+// This file checks that the compiler will bring up an
+// error in the case that we attempt to use a parallel
+// process as the derivative of a prefix.
+
+r = 1.0 ;
+
+P = (a, r).P2 ;
+P1 = (b, r).P ;
+
+P2 = P1 <> P1 ;
+
+P

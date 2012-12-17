@@ -1,0 +1,14 @@
+r = 1.0 ;
+
+// We should be able to do a passage-end query with:
+// req:start, (upstream, res):stopup | (res/upstream):stopcache
+// or something like that.
+User = (req, r) . (res, _) . User ;
+
+Cache = (req, _) . Fetch 
+      + (req, _) . Supply
+      ;
+Supply = (res, r) . Cache ;
+Fetch  = (upstream, r/2) . (downstream, r/5) . Supply ;
+
+User <req, res> Cache

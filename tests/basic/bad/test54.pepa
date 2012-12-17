@@ -1,0 +1,4 @@
+% File: tests/bad/test54.pepa
+% Syntax error, missing comma before rate constant
+P = (a  1.0).P;
+(P <> P)

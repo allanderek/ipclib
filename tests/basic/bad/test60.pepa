@@ -1,0 +1,4 @@
+% File: tests/bad/test60.pepa
+% Illegal character in input file, colon instead of semicolon at end of line 3
+P = (a, r).P:
+(P <> P)

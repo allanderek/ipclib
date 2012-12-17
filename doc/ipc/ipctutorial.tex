@@ -1,0 +1,324 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[usenames]{color}
+
+\input{macros}
+
+\title{A Tutorial in Using Ipc}
+\author{
+Allan Clark, Jeremy Bradley and Stephen Gilmore
+}
+
+
+\begin{document}
+\maketitle
+
+\newcommand{\ipccommandline}[1]{
+
+\noindent
+\texttt{#1}
+}
+
+
+\section{Introduction}
+\pepa\cite{pepa} is a poplular stochastic process algebra.
+The \ipc\ software tool is a compiler for \pepa\ models
+into a format suitable for analysis by the \hydra\cite{pepahydra}
+tool.
+This tutorial will guide you through using the the \ipc\ software
+tool to perform various measurements over various models.
+For full documentation on the \ipc\ tool please refer to the manual.
+
+\section{The Basics}
+We begin with a basic model and will subsequently augment the
+model to take into account more interesting features of \pepa\ and to
+allow some more sophisticated measurements.
+Our model is intended to represent a typical workplace coffee-room.
+The first model is a straight-line model representing only a single tea-drinker.
+The concrete syntax source for this first model is given in Figure
+\ref{figure:pepafile:simpleTea}.
+The rates are described in table \ref{table:pepa-rates:simpleTea}.
+
+\begin{figure}[htb]
+\verbatiminput{models/simpleTea.pepa}
+\caption{
+\label{figure:pepafile:simpleTea}
+The source for the simple tea drinker model.
+}
+\end{figure}
+
+
+
+\begin{table}[htb]
+\begin{tabular}{|l|l|l|}
+\hline\\
+Rate Name & Value & Meaning\\
+\hline
+r\_thirst & 0.01 & Thirsts once every 100 minutes\\
+\hline
+r\_boil  & 1.0 & The kettle takes one minute to boil\\
+\hline 
+r\_pour  & 10.0 & It takes 6 seconds to pour\\
+\hline
+r\_milk  & 6.0 & It takes 10 seconds to add the milk\\
+\hline
+r\_stir  & 10.0 & It takes 6 seconds to stir the tea\\
+\hline
+r\_drink & 0.1  & It takes 10 minutes to drink the tea\\
+\hline
+\end{tabular}
+\caption{
+\label{table:pepa-rates:simpleTea}
+The meaning of the rates in the simpleTea \pepa\ model.
+}
+\end{table}
+
+The simplest invocation of \ipc\ on this model would be the following command:
+
+\ipccommandline{
+ipc simpleTea.pepa
+}
+
+This will cause \ipc\ to compute the entire state space of the model and then
+solve the resulting CTMC for its steady-state solution. The resulting output
+looks like the following that shown in Figure~\ref{figure:steady-output:simpleTea}.
+
+\begin{figure}
+\verbatiminput{simpleTea-steady-output}
+\caption{\label{figure:steady-output:simpleTea}
+The output from the simplest invocation of \ipc\ over the simpleTea model
+}
+\end{figure}
+
+Beyond a simple steady-state analysis, \ipc\ is capable of performing the following
+kinds of analyses over \pepa\ models.
+
+\begin{tabular}{ll}
+Steady-state     & \ipcflag{steady}       \\
+Passage-time     & \ipcflag{passage}      \\
+Transient        & \ipcflag{transient}    \\
+Count measures   & \ipcflag{count}        \\
+Passage-end      & \ipcflag{passage-end}  \\
+\end{tabular}
+
+Each of these will be described in more detail as we apply each to
+the first simple model.
+Special probe components are used to specify complex
+performance measurements however to begin with the user need not know about
+these and use the simpler interface of specifying activities of interest.
+In general \ipc\ will work out which of the kinds of analysis you wish to
+perform via the other command-line arguments that you give, but provided
+are the options shown in the above list.
+We now describe each of these kinds of measurements in detail.
+
+
+\subsection{Passage-time Measurements}
+
+A passage-time measurement is used to measure between two events.
+The user specifies a set of start actions, the observation of the model
+performing any one of these actions will start the measurement.
+The user also specifies a set of stop actions and the measurement is
+terminated when the model performs any actions within that set.
+Without further ado a possible passage-time measurement over our
+simple model would be to measure the passage between a $thirst$
+activity and a $stir$ activity.
+This can be done with the following command line:
+
+\ipccommandline{
+ipc simpleTea.pepa --source thirst --target stir 
+}
+
+This will produce to comma separated value files corresponding to the
+probability density function and the cumulative distribution function
+of the specified passage, in this case between the occurrence of a
+$thirst$ activity and an occurrence of the $stir$ activity.
+These files can then be processed by \gnuplot. Instead if you wish to
+create a viewable graph directly with \ipc\ you can add a 
+\ipcflag{graph-output} flag to your command line. The graphs in
+Figure~\ref{figure:simpleTea-passage-results-graphs}
+where produced with the command-line:
+
+\ipccommandline{
+ipc simpleTea.pepa --source thirst --target stir
+    \textcolor{red}{--graph-output pdf}
+}
+
+Other arguments to the \ipcflag{graph-output} flag can be found from
+
+
+\ipccommandline{ipc --help | grep ``graph-output''}
+
+\begin{figure}
+\begin{tabular}{ll}
+\includegraphics[scale=0.4]{models/simpleTea-cdf.pdf}
+&
+\includegraphics[scale=0.4]{models/simpleTea-pdf.pdf}
+\end{tabular}
+\caption{\label{figure:simpleTea-passage-results-graphs}
+Two graphs showing the PDF and CDF functions for our first
+passage-time analysis over the simple tea drinker model
+}
+\end{figure}
+
+This graph shows the cummulative distribution function, this means
+it maps the probability that the given passage has completed at
+the point in time corresponding to the x-axis. In this particular
+case we can see that the probability rises quickly before flattening
+out close to pronbability $1$ (on a long enough timeline all teas are made).
+
+Note that the time units given are arbitrary and may mean whatever the user
+has decided. The time units reflect whatever units the activity rates
+in the model have used. As such these should all be the same. So in the model
+we have said that the kettle takes approximately one minute to boil and
+given that rate as $1.0$. Therefore the time units in this model are minutes.
+From the graph we see that after around 1.3 time units, or 1.3 minutes, or
+$78$ seconds there is a probability of 50\% of having completed the passage.
+So after $78$ seconds there is an equal probability that the passage will
+have completed as there is that it has not completed. 
+After about $5$ minutes there is a high probability
+that the passage has completed.
+
+Note that the measurement is from the completion of a $thirst$ activity
+and the completion of a $stir$ activity. Therefore in this measurement
+the time taking to perform the $thirst$ activity is irrelevant but the
+time take to perform the $stir$ activity does matter.
+
+
+
+
+\subsection{Steady-state Measurements}
+A steady-state measurement analyses the long-term probability that 
+the model is in a given state or set of states.
+
+This first measurement analyses the probability that the $TeaDrinker$
+is currently in the process of making their tea. To do this we start
+the measurement at the $thirst$ activity and stop at the $stir$ activity.
+Shown here is both the command used to invoke \ipc\ and the response
+from the subsequent run of \hydra.
+Note here the short forms of the \texttt{--source} and 
+\texttt{--target} options have been used, these are \texttt{-s}
+and \texttt{-t} respectively.
+
+\noindent
+\texttt{
+ipc -s thirst -t stir \textcolor{red}{--steady} --run-hydra simpleTea.pepa
+}
+\begin{verbatim}
+State Measure 'steady_measure'
+
+  mean                  1.2271774918e-02
+\end{verbatim}
+This tells us that there is a very low probability, just over 1 percent,
+that the user is currently making tea, this is intuitively correct since
+generally the user is either enjoying a tea or not yet thirsty.
+We can therefore also measure the probability that the $TeaDrinker$ has
+finished their last cup of tea but is not yet ready for another.
+To do this we measure the probability of being in any state between the
+occurrence of the $drink$ activity and the occurrence of a $thirst$ activity
+(in this case there is only one such state).
+
+\noindent
+\texttt{
+ipc \textcolor{red}{-s drink -t thirst} --steady --run-hydra simpleTea.pepa
+}
+\begin{verbatim}
+State Measure 'steady_measure'
+  mean                 8.9793475007e-01
+\end{verbatim}
+This tells us that there is almost an 81 percent chance that the user is
+in this state.
+
+
+\subsection{Transient Measurements}
+Transient measures are similar to passage time measurements but may be used
+to measure the short-term rather than steady-state probabilities.
+Our simple first model behaves similarly in the short-term than in the long-term
+this is because there are no interacting components so there is no need for
+the single straight line component to 'settle' into a steady-state.
+A transient measurement is invoked with the \ipcflag{--transient} flag, below
+is shown a sample command-line.
+As with a passage-time measurements the results are written to the file
+named \texttt{simpleTea.PT\_RESULTS}.
+
+\noindent
+\texttt{
+ipc -s thirst -t stir \textcolor{red}{--transient} --run-hydra simpleTea.pepa
+}
+
+\subsection{Count Measurements}
+Count measures are used to calculate the mean rate at which a given set of
+activities occurs within a model. The mean rate an activity is performed
+depends upon the mean rate at which the activity is enabled and the
+long-term probability that the model is in a state in which the activity
+is enabled.
+For our simple model we could calculate the mean rate at which the
+$TeaDrinker$ has a cup. This may be calculated with the following
+command-line:
+
+\noindent
+\texttt{
+ipc \textcolor{red}{--count-measure drink} --run-hydra simpleTea.pepa
+\newline
+Count Measure 'my\_count\_measure'
+  mean                0.008979347501
+}
+
+These results tell us that it is quite a low rate in comparison to
+the rates involved in making the tea, again as one would expect.
+At a mean rate of approximately $0.009$ this means the tea-drinker
+enjoys a cup every $1/0.009$ minutes, or once every $111$ minutes.
+This in intuitively correct since the tea drinker 'thirsts' 
+at a rate of once every $100$ minutes and the time taken to make and
+drink the tea are both small by comparison.
+
+
+\section{Intermediate}
+
+We will now consider some more complex measurements.
+For this we update our model to include a boiler which continuously
+boils water for the tea drinkers.
+
+The model used for these measurements is given in Figure:
+\ref{figure:pepafile:boiler}.
+
+\begin{figure}[htb]
+\verbatiminput{models/boiler.pepa}
+\caption{
+\label{figure:pepafile:boiler}
+The source for the tea drinker and boiler.
+}
+\end{figure}
+
+\subsection{Probe Specifications}
+Rather than specifying start and stop actions one can specify
+a probe. We begin with an example first.
+Suppose we wish to find out the probability that the boiler has boiled
+three times in a row without any water being taken from it.
+If this probability is high then we can conclude that the boiler is
+inefficient since it will unnecessarily boil water which is not then
+subsequently used.
+
+The probe specification to ask this question is the following:
+$((boil, boil, boil)/pour) : start, pour : stop$
+This probe specifies that once we have witnessed three $boil$ activities
+without witnessing a $pour$ activity then the measurement should $start$.
+Once the measurement is started the a $pour$ activity will stop it.
+We could perform a passage-time measurement on this model and probe however
+this would tell us only the expected time to a $pour$ activity after witnessing
+a sequence of three $boil$ activities. This is not what we want.
+Instead we use a steady-state measure to calculate the probablity that we are
+in any of the measured states.
+Therefore our command-line is:
+
+\noindent
+\texttt{
+ipc --probe "((boil, boil, boil)/pour) : start, pour : stop" 
+$\backslash$ \newline \hspace*{2cm} --steady --run-hydra boiler.pepa
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{unsrt}
+\bibliography{../common/pepa}
+\end{document}
+

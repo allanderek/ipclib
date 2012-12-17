@@ -1,0 +1,5 @@
+Steady Model ( r = 1.0 ;
+               Client = (request, r) . (response, infty) . Client ;
+               Service = (request, infty) . (response, r) . Service ;
+               Service <request, response> Client
+             )

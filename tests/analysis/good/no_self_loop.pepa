@@ -1,0 +1,10 @@
+% This model should succeed because there is no self loop
+% because of the synchronisation on the action a
+
+r1 = 1.0 ;
+
+P  = (a, r1) . P ;
+Q  = (a, r1) . Q2 ;
+Q2 = (b, r1) . Q ;
+
+( P <a> Q )

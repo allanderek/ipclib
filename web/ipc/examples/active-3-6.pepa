@@ -1,0 +1,25 @@
+%% Generalisation of Gilmore et al's ARTS active badge model
+%% Presented at UKPEW'03 in Warwick, UK
+%% From a paper by Bradley, Dingle, Gilmore and Knottenbelt
+%% Model created by: mkActive - parameters: 3 people, 6 rooms
+
+# Person1 = (reg1, r).Person1 + (move2, m).Person2;
+# Person2 = (move1, m).Person1 + (reg2, r).Person2 + (move3, m).Person3;
+# Person3 = (move2, m).Person2 + (reg3, r).Person3 + (move4, m).Person4;
+# Person4 = (move3, m).Person3 + (reg4, r).Person4 + (move5, m).Person5;
+# Person5 = (move4, m).Person4 + (reg5, r).Person5 + (move6, m).Person6;
+# Person6 = (reg6, r).Person6 + (move5, m).Person5;
+# Sensor1 = (reg1, infty).(rep1, s).Sensor1;
+# Sensor2 = (reg2, infty).(rep2, s).Sensor2;
+# Sensor3 = (reg3, infty).(rep3, s).Sensor3;
+# Sensor4 = (reg4, infty).(rep4, s).Sensor4;
+# Sensor5 = (reg5, infty).(rep5, s).Sensor5;
+# Sensor6 = (reg6, infty).(rep6, s).Sensor6;
+# Dbase1 = (rep1, infty).Dbase1 + (rep2, infty).Dbase2 + (rep3, infty).Dbase3 + (rep4, infty).Dbase4 + (rep5, infty).Dbase5 + (rep6, infty).Dbase6;
+# Dbase2 = (rep1, infty).Dbase1 + (rep2, infty).Dbase2 + (rep3, infty).Dbase3 + (rep4, infty).Dbase4 + (rep5, infty).Dbase5 + (rep6, infty).Dbase6;
+# Dbase3 = (rep1, infty).Dbase1 + (rep2, infty).Dbase2 + (rep3, infty).Dbase3 + (rep4, infty).Dbase4 + (rep5, infty).Dbase5 + (rep6, infty).Dbase6;
+# Dbase4 = (rep1, infty).Dbase1 + (rep2, infty).Dbase2 + (rep3, infty).Dbase3 + (rep4, infty).Dbase4 + (rep5, infty).Dbase5 + (rep6, infty).Dbase6;
+# Dbase5 = (rep1, infty).Dbase1 + (rep2, infty).Dbase2 + (rep3, infty).Dbase3 + (rep4, infty).Dbase4 + (rep5, infty).Dbase5 + (rep6, infty).Dbase6;
+# Dbase6 = (rep1, infty).Dbase1 + (rep2, infty).Dbase2 + (rep3, infty).Dbase3 + (rep4, infty).Dbase4 + (rep5, infty).Dbase5 + (rep6, infty).Dbase6;
+# Sys = (((Person1 <> (Person1 <> Person1)) <reg1, reg2, reg3, reg4, reg5, reg6> (Sensor1 <> (Sensor2 <> (Sensor3 <> (Sensor4 <> (Sensor5 <> Sensor6)))))) <rep1, rep2, rep3, rep4, rep5, rep6> Dbase1);
+Sys

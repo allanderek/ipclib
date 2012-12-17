@@ -1,0 +1,19 @@
+% Take the comment for this from the written notes!!
+
+% A drinker is defined as :
+
+r_drink  = 1.0 ;
+r_thirst = 1.0 ;
+
+Relaxing = (thirst, r_thirst).Thirsty ;
+Thirsty  = (serve, infty).Drinking ;
+Drinking = (drink, r_drink).Relaxing ;
+
+
+% In the first model the barman is defined as :
+extra_effort = 1.2 ;
+r_serve      = 5.0 ;
+
+Serve = (serve, (Thirsty * extra_effort) * r_serve).Serve ;
+
+Serve <serve> Relaxing[50]

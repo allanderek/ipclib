@@ -1,0 +1,4 @@
+--probe  "Car1 airbag:car1airbag, finished:stop"
+--probe "((airbag, car1airbag:start)/reportToService), stop"
+--nomaster
+tests/misc/airbag.pepa

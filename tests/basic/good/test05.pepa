@@ -1,0 +1,11 @@
+// File: tests/good/test05.pepa
+// Syntax analysis: hiding is supported
+
+r = 1.0;
+s = 10.0;
+
+P1 = (a, r).P2;
+P2 = (b, s).P1; 
+
+P1/{b} <> P1/{b}
+

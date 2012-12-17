@@ -1,0 +1,15 @@
+Plot Lines [ names  = E:S, E, P, S
+             // output = "mm-ode.pdf"
+           ]
+ Transient [ start-time = 0.0
+             stop-time  = 200.0
+             time-step  = 0.1 
+           ] 
+           BioPepaFile [ rate-params = [ k1  = 0.01
+                                         km1 = 0.01
+                                         k2  = 0.001
+                                       ] 
+                         initial-concentrations = [ E = 100
+                                                    S = 100
+                                                  ]
+                       ] "MM.biopepa"

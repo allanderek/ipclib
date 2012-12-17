@@ -1,0 +1,17 @@
+
+requestRate    = 1.0 ;
+breakRate      = 1.0 ;
+repairRate     = 1.0 ;
+computeServer  = 1.0 ;
+responseServer = 1.0 ;
+
+ClientIdle        = (request, requestRate).ClientWaiting      ;
+ClientWaiting     = (response, infty).ClientIdle              ;
+
+ServerIdle        = (request, infty).ServerComputing
+                  + (break, breakRate).ServerBroken           ;
+ServerComputing   = (compute, computeServer).ServerResponding ;
+ServerResponding  = (response, responseServer).ServerIdle     ;
+ServerBroken      = (repair, repairRate).ServerIdle           ;
+
+ClientIdle[50] <request, response> (ServerIdle[4])

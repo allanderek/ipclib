@@ -1,0 +1,5 @@
+% File: tests/bad/test01.pepa
+% Missing synchronisation (on a)
+P = (a, r).P;
+Q = (a, infty).Q;
+(P <> Q)

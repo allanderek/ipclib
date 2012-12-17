@@ -1,0 +1,7 @@
+OdeResponse [ stop-time       = 300
+            , time-step       = 2.0
+            , RanUser         = 300.00
+            , RanBuying       = 645.98
+            , RunningBrowsing = 54.00
+            ] 
+            ModelFile "web4.pepa"

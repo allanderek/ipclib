@@ -1,0 +1,8 @@
+// File: tests/good/test01.pepa
+// Lexical analysis: testing comment syntax
+r = 1.0;
+
+P1 = (a, r).P2; // a Java-style comment
+P2 = (b, r).P1; // a Java-style comment
+
+P1 || P1      // A LaTeX-style comment 

@@ -1,0 +1,4 @@
+% File: tests/bad/test22.pepa
+% Ill-formed numeric rate containing a letter O (Oh) instead of a digit 0
+P = (a, 120O).P;
+(P <> P)

@@ -1,0 +1,15 @@
+r_join  = 0.1 ;
+r_serve = 1.0 ;
+
+clients = 10 ;
+
+Client = (join, r_join) . Wait ;
+Wait   = (response, infty) . Client ;
+
+Place_free = (join, infty) . Place_held ;
+Place_held = (response, infty) . Place_free ;
+Serve = (join, infty).Serve + (response, r_serve).Serve ;
+
+Queue = Serve <join, response> Place_free[5] ;
+
+Queue <join, response> Client[clients]

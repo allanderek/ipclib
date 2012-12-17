@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>ipclib</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
+  </head>
+
+  <body>
+    <img src="ipclib_logo.png">
+    <!-- <h1>ipclib</h1> -->
+    <p>
+      This page contains information about "ipclib".
+   
+      ipclib is a library for working with PEPA models and stochastic probes.  
+      Probes allow the modeller to specify a passage of interest through the
+      behaviour of the model and, in tandem with ipc/Hydra,
+      computing cumulative distribution functions across this passage.
+   
+
+      A small paper relating to ipclib is available
+      <a href="http://homepages.inf.ed.ac.uk/s9810217/papers/qest2007acsg.pdf">here</a>.
+    </p>
+    <p>
+      A manual for the pepaprobe utility is available
+      <a href="../doc/pepaprobe/pepaprobemanual.pdf">here</a>
+    </p>
+    <p>
+    Automatically haddock generated documentation is available
+   <a href="../dist/doc/html/index.html">
+   here
+   </a>.
+    </p>
+      <!-- 
+      <b>Please note:</b> this is a very experimental version and I would expect
+      you to both encounter problems and damage some data.
+      -->
+
+   <h2>Utilities which use ipclib</h2>
+   There are some utilities which come with the ipclib distribution.
+        <ul>
+           <li>
+           pepacheck : A utility which performs the static analysis provided by ipclib on
+             the input PEPA models.
+          </li>
+           <li>
+           pepalatex : A utility which outputs the given PEPA model as LaTeX source which may
+           then be included in a LaTeX document. Additionally pepalatex may perform
+           any number of renamings over rate and process names.
+          </li>
+           <li>
+           pepaprobe : A utility which transforms a PEPA model by adding one or many performance
+           specification probes.
+           To invoke pepaprobe, a pepa model file is given as an argument and a number of
+           probes are given using the <code>--probe</code> option. The arguments to the
+           <code>--probe</code> option will in general need to be surrounded by quotes.
+           <br>
+           <code> pepaprobe --probe probe1 --probe probe2 --probe probe3 model.pepa </code>
+           <br>
+
+           The file
+            <a href="../tests/probes/good/clientServer.pepa">clientServer.pepa
+            </a>
+           contains a pepa model of a group of clients cooperating with a group of servers.
+           
+           These can be analysed with a variety of probes such as:
+               <ul>
+                 <li><code>
+                  "ClientIdle request:clientReq, response:clientResp"
+                 </code></li>
+                 <li><code>
+                  "ServerIdle break:serverBreak, repair:serverRepair"
+                 </code></li>
+                 <li><code>
+                 "(serverBreak, clientReq:start)/serverRepair, clientResp:stop"
+                 </code></li>
+               </ul>
+          <p>
+          The first of these probes attaches itself to a <code>ClientIdle</code> process.
+          Notice that the only such processes are within a process array hence
+          <code>pepaprobe</code> will split up the array so that a single
+          <code>ClientIdle</code> process can be monitored. The probe waits for a
+          <code>request</code> action and sends a <code>clientReq</code> communication signal
+          upon observing one. Once this has happened the probe will wait for a
+          <code>response</code> action and send a <code>clientResp</code> signal.
+          If the probe observes one action while waiting for the other no communication signal
+          is sent.
+          </p>
+
+          <p>
+          The second probe is very similar except that it is attached to a 
+          <code>ServerIdle</code> process.
+          The actions it is concerned with are the <code>break</code> and
+          <code>repair</code> actions.
+          </p>
+
+          <p>
+          Finally a master probe is defined which is not localised to any process but is
+          combined with the entire model, including those probes added before it. The master
+          probe simply waits for the communication signals to be sent from the localised probes.
+          The probe waits for a <code>serverBreak</code> signal followed by a
+          <code>clientReq</code> signal. In between these two signals if the probe observes a
+          <code>serverRepair</code> signal then the probe is reset into its original state.
+          In this way the probe only ever sends a <code>start</code> signal if a client makes
+          a request while (at least) one of the servers is broken. After sending a
+          <code>start</code> signal the probe waits for a <code>clientResp</code> signal and
+          when recieved sends a <code>stop</code> signal.
+          </p>
+
+          <p>
+          In this way the master probe will send start and stop signals to indicate the passage
+          from a client's request to that request being serviced, but only if the request was
+          made when at least one of the servers was broken.
+          </p>
+
+          Some probes can become quite complicated and it comes helpful to store them in
+          files. The <code>pepaprobe</code> utility therefore accepts an argument
+          <code>--argfile file</code> which specifies a file in which command line arguments
+          can be kept. Hence the above 
+            <a href="../tests/probes/good/clientServer.pepa">clientServer.pepa
+            </a> file can be used with the
+            <a href="../tests/probes/good/clientServer.args">clientServer.args
+            </a> file with the command-line:<br>
+            <code>pepaprobe --argfile clientServer.args</code>
+         
+          </li>
+       </ul>
+
+    <h2>Obtaining ipclib and related utilities</h2>
+    <h3>Precompiled Linux Binaries</h3>
+      There are three utility programs created with ipclib.
+      Pre-compiled binaries of these programs may be downloaded here:
+        <ul>
+           <li>
+           <a href="pepacheck">
+           pepacheck
+           </a>
+           : A utility which performs the static analysis provided by ipclib on
+             the input PEPA models.
+          </li>
+           <li>
+           <a href="pepalatex">
+           pepalatex
+           </a>
+           : A utility which outputs the given PEPA model as LaTeX source which may
+           then be included in a LaTeX document. Additionally pepalatex may perform
+           any number of renamings over rate and process names.
+          </li>
+           <li>
+           <a href="pepaprobe">
+           pepaprobe 
+           </a>
+           : A utility which transforms a PEPA model by adding one or many performance
+           specification probes.
+          </li>
+       </ul>
+    <h3>Darcs</h3>
+    The source for ipclib can be downloaded via darcs by giving the command:<br>
+    <code>&nbsp;darcs get --partial http://homepages.inf.ed.ac.uk/s9810217/software/ipclib/</code><br>
+    <h3>A Source tarball</h3>
+    The source is also available in a compressed tar file:
+       <a href = "../ipclib.tar.gz">
+       ipclib.tar.gz
+       </a>
+   <h3>Compiling the Source</h3>
+   To compile the source, the
+   <a href = "http://homepages.inf.ed.ac.uk/s9810217/software/hatexlib.tar.gz">
+    hatexlib.tar.gz
+   </a>
+   library is required. Assuming the reader is now in a directory with two sub-directories
+   <code>hatexlib</code> and <code>ipclib</code> corresponding to the uncompressed source
+   directories, the code for ipclib can be compiled with the following commands:<br>
+   <code>
+cd hatexlib<br>
+runhaskell Setup.hs configure --user --prefix=dirname<br>
+runhaskell Setup.hs build<br>
+runhaskell Setup.hs install<br>
+cd ../ipclib<br>
+runhaskell Setup.hs configure --user --prefix=dirname<br>
+runhaskell Setup.hs build<br>
+runhaskell Setup.hs install<br>
+   </code>
+The name <code>dirname</code> should be set to some suitable location within your path.
+Both options to the configure commands may be omitted if installing as root.
+   
+<hr>
+<img
+src="http://www.haskell.org/sitewiki/images/4/43/Built-with-Cabal-light.png">   
+<hr>
+Last modified: Mon May 14th 2007
+  </body>
+</html>

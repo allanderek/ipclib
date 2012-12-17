@@ -1,0 +1,8 @@
+Plot Lines Cdf
+     Passage Source [start] Target [stop]
+     ModelProbe (request:start, response:stop)
+             Model ( r = 1.0 ;
+                     Client = (request, r) . (response, infty) . Client ;
+                     Service = (request, infty) . (response, r) . Service ;
+                     Service <request, response> Client
+                   )

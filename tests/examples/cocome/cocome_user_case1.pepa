@@ -1,0 +1,341 @@
+// This model represents User Case one in the
+// Commom Component Modelling Example
+
+rBegin       = 1.0  ; % A random value
+rReceipt     = 1.0 ; % Give a receipt roughly once per second
+rPressEnd    = 1.0 ; % Pressing end takes one second
+rPressBar    = 1.0 ; % Pressing bar takes one second
+// rPayCash     = 0.1  ; % Takes roughly 10 seconds to pay
+// rUpdateStore = 1.0  ; 
+// rLog         = 1.0  ;
+
+rEnterItem   = 0.2  ;
+rScan        = 10.0 ; % Cashier takes a tenth of a second to decide
+                      % that there are more items left to scan.
+// Note we could get rid of that rate if we made 'scanItem' a 
+// an immediate action, check if we can have a choice between an
+// immediate action and a non-immediate action. I think it would
+// be fine since they would not both be activated at the same time.
+
+rEnterCash          = 0.5 ; //t15a2-1
+rOpenBox            = 1.0 ; //t15a3-1
+rDisplayReceived    = 100 ; //t15a4-1
+rCloseBox           = 1.0 ; //t15a5-1
+
+rEnterPin           = 5.0 ; //THIS IS WRONG, should be uniform, see what to do t15b2-1
+rSwipe              = 0.5 ; //t15b1-2
+
+rPressCard          = 1.0 ; //t15b-1
+
+Customer  = (begin, rBegin).CustomerItems     ;
+
+Customer100 = ( scanItem, infty) . Customer99 ;
+Customer99 = ( scanItem, infty) . Customer98 ;
+Customer98 = ( scanItem, infty) . Customer97 ;
+Customer97 = ( scanItem, infty) . Customer96 ;
+Customer96 = ( scanItem, infty) . Customer95 ;
+Customer95 = ( scanItem, infty) . Customer94 ;
+Customer94 = ( scanItem, infty) . Customer93 ;
+Customer93 = ( scanItem, infty) . Customer92 ;
+Customer92 = ( scanItem, infty) . Customer91 ;
+Customer91 = ( scanItem, infty) . Customer90 ;
+Customer90 = ( scanItem, infty) . Customer89 ;
+Customer89 = ( scanItem, infty) . Customer88 ;
+Customer88 = ( scanItem, infty) . Customer87 ;
+Customer87 = ( scanItem, infty) . Customer86 ;
+Customer86 = ( scanItem, infty) . Customer85 ;
+Customer85 = ( scanItem, infty) . Customer84 ;
+Customer84 = ( scanItem, infty) . Customer83 ;
+Customer83 = ( scanItem, infty) . Customer82 ;
+Customer82 = ( scanItem, infty) . Customer81 ;
+Customer81 = ( scanItem, infty) . Customer80 ;
+Customer80 = ( scanItem, infty) . Customer79 ;
+Customer79 = ( scanItem, infty) . Customer78 ;
+Customer78 = ( scanItem, infty) . Customer77 ;
+Customer77 = ( scanItem, infty) . Customer76 ;
+Customer76 = ( scanItem, infty) . Customer75 ;
+Customer75 = ( scanItem, infty) . Customer74 ;
+Customer74 = ( scanItem, infty) . Customer73 ;
+Customer73 = ( scanItem, infty) . Customer72 ;
+Customer72 = ( scanItem, infty) . Customer71 ;
+Customer71 = ( scanItem, infty) . Customer70 ;
+Customer70 = ( scanItem, infty) . Customer69 ;
+Customer69 = ( scanItem, infty) . Customer68 ;
+Customer68 = ( scanItem, infty) . Customer67 ;
+Customer67 = ( scanItem, infty) . Customer66 ;
+Customer66 = ( scanItem, infty) . Customer65 ;
+Customer65 = ( scanItem, infty) . Customer64 ;
+Customer64 = ( scanItem, infty) . Customer63 ;
+Customer63 = ( scanItem, infty) . Customer62 ;
+Customer62 = ( scanItem, infty) . Customer61 ;
+Customer61 = ( scanItem, infty) . Customer60 ;
+Customer60 = ( scanItem, infty) . Customer59 ;
+Customer59 = ( scanItem, infty) . Customer58 ;
+Customer58 = ( scanItem, infty) . Customer57 ;
+Customer57 = ( scanItem, infty) . Customer56 ;
+Customer56 = ( scanItem, infty) . Customer55 ;
+Customer55 = ( scanItem, infty) . Customer54 ;
+Customer54 = ( scanItem, infty) . Customer53 ;
+Customer53 = ( scanItem, infty) . Customer52 ;
+Customer52 = ( scanItem, infty) . Customer51 ;
+Customer51 = ( scanItem, infty) . Customer50 ;
+Customer50 = ( scanItem, infty) . Customer49 ;
+Customer49 = ( scanItem, infty) . Customer48 ;
+Customer48 = ( scanItem, infty) . Customer47 ;
+Customer47 = ( scanItem, infty) . Customer46 ;
+Customer46 = ( scanItem, infty) . Customer45 ;
+Customer45 = ( scanItem, infty) . Customer44 ;
+Customer44 = ( scanItem, infty) . Customer43 ;
+Customer43 = ( scanItem, infty) . Customer42 ;
+Customer42 = ( scanItem, infty) . Customer41 ;
+Customer41 = ( scanItem, infty) . Customer40 ;
+Customer40 = ( scanItem, infty) . Customer39 ;
+Customer39 = ( scanItem, infty) . Customer38 ;
+Customer38 = ( scanItem, infty) . Customer37 ;
+Customer37 = ( scanItem, infty) . Customer36 ;
+Customer36 = ( scanItem, infty) . Customer35 ;
+Customer35 = ( scanItem, infty) . Customer34 ;
+Customer34 = ( scanItem, infty) . Customer33 ;
+Customer33 = ( scanItem, infty) . Customer32 ;
+Customer32 = ( scanItem, infty) . Customer31 ;
+Customer31 = ( scanItem, infty) . Customer30 ;
+Customer30 = ( scanItem, infty) . Customer29 ;
+Customer29 = ( scanItem, infty) . Customer28 ;
+Customer28 = ( scanItem, infty) . Customer27 ;
+Customer27 = ( scanItem, infty) . Customer26 ;
+Customer26 = ( scanItem, infty) . Customer25 ;
+Customer25 = ( scanItem, infty) . Customer24 ;
+Customer24 = ( scanItem, infty) . Customer23 ;
+Customer23 = ( scanItem, infty) . Customer22 ;
+Customer22 = ( scanItem, infty) . Customer21 ;
+Customer21 = ( scanItem, infty) . Customer20 ;
+Customer20 = ( scanItem, infty) . Customer19 ;
+Customer19 = ( scanItem, infty) . Customer18 ;
+Customer18 = ( scanItem, infty) . Customer17 ;
+Customer17 = ( scanItem, infty) . Customer16 ;
+Customer16 = ( scanItem, infty) . Customer15 ;
+Customer15 = ( scanItem, infty) . Customer14 ;
+Customer14 = ( scanItem, infty) . Customer13 ;
+Customer13 = ( scanItem, infty) . Customer12 ;
+Customer12 = ( scanItem, infty) . Customer11 ;
+Customer11 = ( scanItem, infty) . Customer10 ;
+Customer10 = ( scanItem, infty) . Customer9 ;
+Customer9 = ( scanItem, infty) . Customer8 ;
+Customer8 = ( scanItem, infty) . Customer7 ;
+Customer7 = ( scanItem, infty) . Customer6 ;
+Customer6 = ( scanItem, infty) . Customer5 ;
+Customer5 = ( scanItem, infty) . Customer4 ;
+Customer4 = ( scanItem, infty) . Customer3 ;
+Customer3 = ( scanItem, infty) . Customer2 ;
+Customer2 = ( scanItem, infty) . Customer1 ;
+Customer1 = ( scanItem, infty) . Customer0 ;
+Customer0 = (pressEnd, infty).CustomerPay ;
+
+Customer1to8 = tau . Customer1 +
+     tau . Customer2 +
+     tau . Customer3 +
+     tau . Customer4 +
+     tau . Customer5 +
+     tau . Customer6 +
+     tau . Customer7 +
+     tau . Customer8 ;
+Customer9to15 = tau . Customer9 +
+     tau . Customer10 +
+     tau . Customer11 +
+     tau . Customer12 +
+     tau . Customer13 +
+     tau . Customer14 +
+     tau . Customer15 ;
+Customer16to25 = tau . Customer16 +
+     tau . Customer17 +
+     tau . Customer18 +
+     tau . Customer19 +
+     tau . Customer20 +
+     tau . Customer21 +
+     tau . Customer22 +
+     tau . Customer23 +
+     tau . Customer24 +
+     tau . Customer25 ;
+Customer26to50 = tau . Customer26 +
+     tau . Customer27 +
+     tau . Customer28 +
+     tau . Customer29 +
+     tau . Customer30 +
+     tau . Customer31 +
+     tau . Customer32 +
+     tau . Customer33 +
+     tau . Customer34 +
+     tau . Customer35 +
+     tau . Customer36 +
+     tau . Customer37 +
+     tau . Customer38 +
+     tau . Customer39 +
+     tau . Customer40 +
+     tau . Customer41 +
+     tau . Customer42 +
+     tau . Customer43 +
+     tau . Customer44 +
+     tau . Customer45 +
+     tau . Customer46 +
+     tau . Customer47 +
+     tau . Customer48 +
+     tau . Customer49 +
+     tau . Customer50 ;
+Customer51to75 = tau . Customer51 +
+     tau . Customer52 +
+     tau . Customer53 +
+     tau . Customer54 +
+     tau . Customer55 +
+     tau . Customer56 +
+     tau . Customer57 +
+     tau . Customer58 +
+     tau . Customer59 +
+     tau . Customer60 +
+     tau . Customer61 +
+     tau . Customer62 +
+     tau . Customer63 +
+     tau . Customer64 +
+     tau . Customer65 +
+     tau . Customer66 +
+     tau . Customer67 +
+     tau . Customer68 +
+     tau . Customer69 +
+     tau . Customer70 +
+     tau . Customer71 +
+     tau . Customer72 +
+     tau . Customer73 +
+     tau . Customer74 +
+     tau . Customer75 ;
+Customer76to100 = tau . Customer76 +
+     tau . Customer77 +
+     tau . Customer78 +
+     tau . Customer79 +
+     tau . Customer80 +
+     tau . Customer81 +
+     tau . Customer82 +
+     tau . Customer83 +
+     tau . Customer84 +
+     tau . Customer85 +
+     tau . Customer86 +
+     tau . Customer87 +
+     tau . Customer88 +
+     tau . Customer89 +
+     tau . Customer90 +
+     tau . Customer91 +
+     tau . Customer92 +
+     tau . Customer93 +
+     tau . Customer94 +
+     tau . Customer95 +
+     tau . Customer96 +
+     tau . Customer97 +
+     tau . Customer98 +
+     tau . Customer99 +
+     tau . Customer100 ;
+CustomerItems = ( choose1to8, 0.3:immediate) . Customer1to8 +
+     ( tau, 0.1:immediate) . Customer9to15 +
+     ( tau, 0.15:immediate) . Customer16to25 +
+     ( tau, 0.15:immediate) . Customer26to50 +
+     ( tau, 0.2:immediate) . Customer51to75 +
+     ( tau, 0.1:immediate) . Customer76to100 ;
+
+
+
+
+
+
+
+CustomerPay = tau.CustomerPayByCash + tau.CustomerPayByCard ;
+
+CustomerPayByCash = (pressBar, infty).CustomerPayCash ;
+CustomerPayCash = ( tau, 0.3:immediate) . ( payCash, 5.0 ) . CustomerWait
+                + ( tau, 0.5:immediate) . ( payCash, 8.0 ) . CustomerWait
+                + ( tau, 0.2:immediate) . ( payCash, 10.0) . CustomerWait ;
+     
+
+CustomerPayByCard = (pressCard, infty).CustomerGiveCard ;
+CustomerGiveCard  = (receiveCard, infty).CustomerEnterPin ;
+CustomerEnterPin  = (enterPin, rEnterPin).CustomerWait ;
+
+
+CustomerWait = (giveChange, infty).(giveReceipt, infty).Customer ;
+
+
+Cashier   = (begin, infty).Cashier2 ; // Presses New Sale, but I think this
+                                      // is more of a functional specification
+                                      // ie. it checks that the cash desk is
+                                      // in a mode which can accept a 'start'
+Cashier2  = (scanItem, rScan).CashierReadItem
+          + (pressEnd, rPressEnd).CashierPay ;
+
+
+CashierReadItem = (tau, 0.99:immediate).CashierScan
+                + (tau, 0.01:immediate).CashierEnter ;
+
+// Maybe should have rate names for these
+CashierScan     = (tau, 0.9:immediate).(tau, 3.0).Cashier2 
+                + (tau, 0.05:immediate).(tau, 1.0).Cashier2
+                + (tau, 0.04:immediate).(tau, 0.5).Cashier2
+                + (tau, 0.01:immediate).(tau, 0.2).Cashier2 ;
+
+
+CashierEnter    = (tau, rEnterItem).Cashier2 ;
+
+
+
+CashierPay = ((pressBar, rPressBar).(payCash, infty).CashierChange) +
+             ((pressCard, rPressCard).CashierReceiveCard) ;
+
+CashierReceiveCard = (tau,0.6:immediate).(receiveCard, 4.0).CashierCardSwipe
+                   + (tau,0.4:immediate).(receiveCard, 5.0).CashierCardSwipe ;
+
+CashierChange = (enterCash, rEnterCash) .
+                (openBox, rOpenBox) .
+                (displayReceived, rDisplayReceived) .
+                CashierGiveChange ;
+        
+CashierGiveChange = ( tau, 0.2:immediate) . ( giveChange, 3.0) . CashierReceipt
+                  + ( tau, 0.6:immediate) . ( giveChange, 4.0) . CashierReceipt
+                  + ( tau, 0.2:immediate) . ( giveChange, 5.0) . CashierReceipt ;
+
+CashierCardSwipe = (swipeCard, rSwipe).CashierEnterPin ;
+CashierEnterPin  = (enterPin, infty).CashierReceipt ;
+
+
+CashierReceipt = (closeBox, rCloseBox).(giveReceipt, rReceipt).Cashier ; 
+
+
+// CashDesk     = (begin, infty).CashDeskSale ;
+// CashDeskSale = (pressEnd, infty).CashDeskLog ;
+// CashDeskLog  = (logItems, rLog).CashDesk ;
+// 
+// Inventory = (logItems, infty).(updateStore, rUpdateStore).Inventory ;
+
+// scanItem is done at rate 'rScan', this rate takes into account the possibilities
+// that the barcode is dirty or otherwise unsuitable for scanning and so the cashier
+// automatically types it in
+// the barcode looks suitable but doesn't scan when tried and hence the cashier types
+// it in
+// the cashier types it in incorrectly and has to do so again
+// the cashier just feels like typing it in
+// the cashier scans the item in 
+
+
+
+
+
+Customer < begin
+         , scanItem
+         , payCash
+         , pressEnd
+         , pressBar
+         , giveChange
+         , giveReceipt
+         , pressCard
+         , receiveCard
+         , enterPin
+         > 
+Cashier  
+//< begin, pressEnd >
+//CashDesk < logItems >
+//Inventory
+

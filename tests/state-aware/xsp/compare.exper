@@ -1,0 +1,25 @@
+( "compare.pdf"
+, "Comparison of passage-time results based on start conditions"
+, [ [ ( "model file"      , "busy.pepa" )
+    , ( "probe definition", "Client::work:start, send:stop" )
+    , ( "title"           , "Round-Robin" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "queue.pepa" )
+    , ( "probe definition", "Client::work:start, send:stop" )
+    , ( "title"           , "Queue" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "random.pepa" )
+    , ( "probe definition", "Client::work:start, send:stop" )
+    , ( "title"           , "Random" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  ]
+)

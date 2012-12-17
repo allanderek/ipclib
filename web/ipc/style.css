@@ -1,0 +1,36 @@
+body, ol, ul, p, td {font-family: helvetica,arial,sans-serif;font-size: 10pt; color: #000000; }
+th {font-family: helvetica,arial,sans-serif;font-size: 10pt; color: #000000; font-weight: bold; text-align: left;}
+p.code {color: #0000FF;font-family: "courier new", courier, monospace;font-size: 10pt;}
+
+h1 {font-size: 150%; }
+
+div.title {background-color: #8c5656; margin: 0px; border-width: 1px; padding: 1px; padding-left: 3px; border-style: solid; border-color: #000000; font-weight: bold; }
+div.frame {background-color: #d6cfcf; margin: 0px; margin-bottom: 24px; border-width: 1px; border-style: solid; border-color: #d6cfcf; }
+div.subtitle {background-color: #8c5656; margin: 0px; border-width: 0px; border-color: #000000; font-weight: bold; color: #ffffff; }
+
+div.papertitle {font-weight: bold; }
+div.paperauthors {font-weight: normal; margin-bottom: 5px}
+
+div.exampletitle {background-color: #8c5656; margin: 0px; margin-bottom: 8px; border-width: 0px; border-color: #000000; font-weight: bold; color: #ffffff; }
+div.example {font-weight: bold; margin-bottom: 5px}
+
+
+div.whitebox {
+	color: #000000;
+	font-size: 10pt;
+	background-color: #efefef; 
+	margin: 6px; 
+	padding: 5px;
+	border-style: solid;
+	border-width: 1px; 
+	border-color: #00000; 
+}
+
+a {text-decoration: none;}
+a:link {color: #601616;}
+a:visited {color: #601616;}
+a:active {color: #333399;}
+a:hover {background-color: #8c5656; color: #ffffff;}
+body {background-color: #ffffff;}
+pre {font-family: "courier new", courier, monospace;}
+

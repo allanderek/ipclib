@@ -1,0 +1,43 @@
+// The same as web2.pepa but with an absorbing probe, this one will actually
+// block the component. Plus all of the components will actually start in the
+// source state of the probe.
+
+r_browse     = 0.9 ;
+r_buy        = 0.1 ;
+r_getPage    = 5.0 ;
+r_getConfirm = 5.0 ;
+
+r_sendPage    = 35.0 ;
+r_sendConfirm = 3 ;
+
+users           = 1000 ;
+servers         = 10 ;
+
+// The probe has already run (or never will in this particular component)
+BrowseUser   = (browse, r_browse) . BrowseBrowsing
+            + (buy, r_buy) . BrowseBuying 
+            ;
+BrowseBuying      = (getConfirm, r_getConfirm) . BrowseUser ;
+BrowseBrowsing    = (getPage, r_getPage) . BrowseUser ;
+
+BuyUser   = (browse, r_browse) . BuyBrowsing
+            + (buy, r_buy) . BuyBuying 
+            ;
+BuyBuying      = (getConfirm, r_getConfirm) . BuyUser ;
+BuyBrowsing    = (getPage, r_getPage) . BuyUser ;
+
+RunningBrowsing = (getPage, r_getPage) . BrowseUser ;
+RunningBuying   = (getConfirm, r_getConfirm) . BuyUser ;
+
+// This is just because a bug in the ipc model analyser won't
+// generate odes for transient component states unless they are
+// named in the system equation or reachable from it.
+DummyUser   = (browse, r_browse) . RunningBrowsing
+            + (buy, r_buy) . RunningBuying
+            ;
+
+Server      = (getPage, r_sendPage) . Server
+            + (getConfirm, r_sendConfirm) . Server
+            ;
+
+Server[servers] <getPage, getConfirm> (DummyUser[users])

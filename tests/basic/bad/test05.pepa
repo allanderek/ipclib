@@ -1,0 +1,5 @@
+% File: tests/bad/test05.pepa
+% Cyclic component definition (of P)
+P = P;
+(P <> P)
+

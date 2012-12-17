@@ -1,0 +1,228 @@
+Name:            ipclib
+Version:         0.2.0
+License:         GPL
+License-file:    LICENSE
+Author:          Allan Clark
+Synopsis:        A library for handling pepa models
+Homepage:        http://www.dcs.ed.ac.uk/pepa/tools/ipc/
+Cabal-version:   >= 1.2.3
+Build-Type:      Simple
+Data-files:      Gipc/gipc.glade
+
+flag web
+  Default: True
+  Description: Enables the building of the web interface
+
+flag quick
+  Default: False
+  Description: Disables the building of examples for fast/development should be used sparingly
+
+flag onlyipc
+  Default: False
+  Description: Disables the building of everything other than ipc for experimental development
+
+flag smc
+  Default: True
+  Description: Enables the building of the srmc compiler and graphing tools
+
+flag eba
+  Default: True
+  Description: Enables the building of the eba for biopepa
+
+flag gipc
+  Default: True
+  Description: Enables the building of the graphical user interface
+
+flag manuals
+  Default: True
+  Description: Enables the building of the user manuals
+
+flag all
+  Default: False
+  Description: Build absolutely everything (excepting obsolete stuff)
+
+library
+  Build-depends:   base, parsec >= 2.1.0.0 && < 3.0, 
+                   directory, containers, pretty, process, filepath, mtl,
+                   gnuplot >= 0.3.1, haskell-matrix == 0.0.1, horddes == 0.0.1
+  exposed-modules: Language.Pepa Language.Pepa.QualifiedName Language.Pepa.Syntax 
+                   Language.Pepa.Parser Language.Pepa.FileParser
+                   Language.Pepa.PepaUtils Language.Pepa.ApparentRates
+                   Language.Pepa.Utils Language.Pepa.MainControl
+                   Language.Pepa.Print Language.Pepa.Analysis.FixMap
+                   Language.Pepa.Analysis.Analysis Language.Pepa.Analysis.Typing
+                   Language.Pepa.Transform.Simplify
+                   Language.Pepa.Transform.HideAll 
+                   Language.Pepa.Transform.Replace
+                   Language.Pepa.Transform.Rules.Syntax
+                   Language.Pepa.Transform.Rules.Parser
+                   Language.Pepa.Transform.Rules.Apply
+                   Language.Hydra.Syntax Language.Hydra.Print
+                   Language.Hydra.Parser Language.Hydra.Transform
+                   Language.Hydra.Analysis
+                   Language.Pepa.Compile.Model Language.Pepa.Compile.Hierarchical
+                   Language.Pepa.Compile.States Language.Pepa.Compile.StateMap
+                   Language.Pepa.Compile.GenMatrix Language.Pepa.Compile.EmbeddedMarkov
+                   Language.Pepa.Compile.Hydra
+                   Language.Pepa.Compile.Uniformise Language.Pepa.Compile.MarkovChain
+                   Language.Pepa.Compile.Odes
+                   Language.Pepa.Compile.PartEval
+                   Language.Pepa.Probes.Syntax Language.Pepa.Probes.AddProbes
+                   Language.Pepa.Probes.Parser Language.Pepa.Probes.Translate
+                   Language.Pepa.Probes.StateMachines.NfaTypes
+                   Language.Pepa.Probes.StateMachines.NfaCombinators
+                   Language.Pepa.Probes.StateMachines.NfaToDfa
+                   Language.Pepa.Probes.StateMachines.MinimiseDfa
+                   Language.Pepa.Srmc.Syntax Language.Pepa.Srmc.Print
+                   Language.Pepa.Srmc.Parser Language.Pepa.Srmc.SrmcPepa
+                   Language.Ptrees.Syntax
+                   Language.Ptrees.Parser
+                   Language.Ptrees.Evaluate
+                   Language.Ptrees.Print
+                   Language.Ptrees.DataBase
+                   Language.BioPepa.Syntax Language.BioPepa.Parser
+                   Language.BioPepa.PepaTranslate Language.BioPepa.OdesTranslate
+                   Smc.Cli Smc.DataBase
+                   Ipc.Cli Ipc.Ipc Ipc.DrawGraph
+                   Language.Prism.Syntax Language.Prism.Print 
+                   Language.Dizzy.Syntax Language.Dizzy.Print
+                   Language.Pepa.Compile.TimedSystemEquation Language.Pepa.Compile.Dizzy
+  Other-modules:   Language.Pepa.PrivateTokenParser 
+                   Language.Pepa.Transform.NameSupply
+                   Ipc.CliParsers
+--                 tests/quickcheck/Properties.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+
+executable ipc
+  Main-is:         Ipc/Main.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+
+executable ipcmanual
+  Main-is:         Ipc/CliDoc.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  if (flag(manuals) || flag(all)) && !flag(onlyipc)
+    Buildable: True
+  else 
+    Buildable: False
+
+executable ipctests
+  Main-is:         Test/Main.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  if flag(quick) || flag(onlyipc)
+    Buildable: False
+  else
+    Buildable: True
+    build-depends:   HUnit
+
+executable ipcweb
+  Main-is:         web/interface/IpcWeb.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  if (flag(web) || flag(all)) && !flag(onlyipc)
+    Buildable: True
+    build-depends:   cgi, xhtml
+  else
+    Buildable: False
+
+executable gipc
+  Main-is:         Gipc/Main.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  if (flag(gipc) || flag(all)) && !flag(onlyipc) 
+    Buildable: True
+    build-depends:   gtk, glade, glib, cairo, Chart, colour
+  else
+    Buildable: False
+
+executable pepacheck
+  Main-is:         examples/PepaCheck.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  if flag(quick) || flag(onlyipc)
+    Buildable: False
+  else
+    Buildable: True
+
+executable pepasimplify
+  Main-is:         examples/PepaSimplify.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  if flag(quick) || flag(onlyipc)
+    Buildable: False
+  else
+    Buildable: True
+
+executable pepaprobe
+  Main-is:         examples/PepaProbe.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  if flag(quick) || flag(onlyipc)
+    Buildable: False
+  else
+    Buildable: True
+
+executable smc
+  Main-is:         Smc/Smc.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  if (flag(smc) || flag(all)) && !flag(onlyipc)
+    Buildable: True
+  else
+    Buildable: False
+
+executable smcmanual
+  Main-is:         Smc/CliDoc.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  if (flag(manuals) || flag(all)) && !flag(onlyipc)
+    Buildable: True
+  else
+    Buildable: False
+
+-- smcgraph is now obsolete, we use a ipc with a database and ptree.
+-- Should we decide that it is worth it then it should be buildable
+-- if the smc flag is set
+executable smcgraph
+  Main-is:         Smc/SmcGraph.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  Buildable: False
+
+executable eba
+  Main-is:         Eba/Main.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+  if (flag(eba) || flag(all)) && !flag(onlyipc)
+    Buildable: True
+  else
+    Buildable: False
+
+-- Simulation of pepa models using Stochastic Simulation
+executable pepatimed
+  Buildable:       False
+  Main-is:         examples/PepaTimed.hs
+  Other-modules:   Language.Pepa.Ode.TimedSystemEquation
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+
+
+executable pepaode
+  Buildable:       False
+  Main-is:         examples/PepaOde.hs
+  Other-modules:   Language.Pepa.Ode.OdeGeneration
+                   Language.Pepa.Ode.TimedSystemEquation
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+
+executable pepadizzy
+  Buildable:       False
+  Main-is:         examples/PepaDizzy.hs
+  Extensions:      PatternGuards ScopedTypeVariables
+  Ghc-options:     -Wall -fwarn-tabs
+
+
+

@@ -1,0 +1,4 @@
+% File: tests/bad/test23.pepa
+% Illegal activity identifier (activities should begin with a lowercase letter)
+P = (A, r).P + (a, r).P;
+(P <> P)

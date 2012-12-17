@@ -1,0 +1,16 @@
+Let ?expr Experiment ?rate [ 0.5, 1.0, 1.5, 2.0 ]
+          Passage ModelProbe (P::a:start, b:stop)
+                  ModelRate [ r = ?rate ] Model ( r = 1.0 ;
+                                                    m = 4   ;
+                                                    n = 4   ;
+                                              
+                                                    P = (a, r) . (b, r) . P ;
+
+                                                    Q = (c, r) . (d ,r) . Q ;
+
+                                                    P[m] || Q[n]  
+                                                  )
+In
+ Plot Multi-lines Cdf $exper
+ and
+ Plot Multi-lines Pdf $exper

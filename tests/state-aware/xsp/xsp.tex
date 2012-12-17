@@ -1,0 +1,1050 @@
+\documentclass[times, 10pt,twocolumn]{article} 
+\usepackage{ieeedoublecolumn}
+% \usepackage{times}
+\usepackage{amssymb,amsbsy,verbatim,fancybox,pepa}
+\usepackage{graphicx}
+\usepackage{verbatim}
+
+\newcommand{\adcComment}[1]{\textbf{#1}}
+\newcommand{\adcCommentl}[1]{\textbf{#1}\\}
+\newcommand{\rewordthis}[1]{\textsl{#1}\\}
+
+\newcommand{\ipc}{\textsf{ipc}}
+\newcommand{\hydra}{\textrm{Hydra}}
+\newcommand{\Condor}{\textrm{Condor}}
+\newcommand{\hydrus}{\textsf{hydrus}}
+\newcommand{\collate}{\textsf{collate}}
+\newcommand{\puffball}{\textsf{puffball}}
+\newcommand{\gnuplot}{\textsf{gnuplot}}
+\newcommand{\pepa}{\textrm{PEPA}}
+\newcommand{\sectref}[1]{Sect.~\ref{#1}}
+\newcommand{\figref}[1]{Fig.~\ref{#1}}
+%
+
+% For displaying a single graph in a figure.
+\newcommand{\graphicfigure}[3]{
+\begin{figure}
+\includegraphics[scale=0.5]{#1}
+\caption{
+\label{#2}
+#3
+}
+\end{figure}
+}
+
+
+% For displaying a probe
+\newcommand{\showprobe}[1]{$#1$}
+
+% For displaying a state specification
+\newcommand{\showstatespec}[1]{$#1$}
+
+% Quote an activity name
+\newcommand{\quoteActivity}[1]{$#1$}
+
+% Quote a process name
+\newcommand{\quoteProcess}[1]{$#1$}
+
+\title{State-Aware Performance Measurement Probes - Extended Probe Specifications}
+\author{
+Allan Clark, Stephen Gilmore and Mirco Tribastone
+}
+
+
+\begin{document}
+\maketitle
+
+
+\section{Introduction}
+
+In this paper we describe a combined mechanism for specifying
+performance measurements in a process algebra.
+Our work has been concerned with the process algebra \pepa\cite{pepa}
+however the ideas involved are relevant to all timed process algebras
+with an underlying stateful representation such as a
+Continuous Time Markov Chain.
+
+When modelling complex systems we generally wish to make measurements 
+and therefore must describe or specify to the solver the set of states
+in which we are interested.
+The measurement in question may be a steady-state measure asking a question
+such as: ``In the long-run what percentage of its time does the server spend idle?''
+The set of states in which we are interested is then the \emph{steady-set}.
+Passage-time measurements are often concerned with events however to the solver
+the measurement must still be specified as a set of states, which we will call
+the \emph{passage-set}.
+To perform the passage-time measurement the solver can extract
+the set of source states and the set of target states from the passage-set.
+The set of source states is taken to be all of those states in the passage-set
+which are the target of some transition whose source lies out with the
+passage-set. Conversely the set of target states is taken to be the set of states
+out with the passage-set which are the target of some transition whose source
+lies within the passage-set.
+In some cases it is not possible to provide the solver with only the passage-set
+as the calculation of the source and target sets will be incorrect.
+This occurs when it is possible for the model to transition into the middle
+of a passage without passing through a source state.
+In these cases the user must provide the source and target sets explicitly.
+An example of this circumstance will be shown in section
+\ref{sub:section:splitting:measurement}.
+
+More generally whether we are performing a steady-state or passage-time measure
+we will be interested in specifying the \emph{measure-set}.
+
+
+\subsection{State Specifications}
+There are currently two kinds of mechanism for specifying the measure-set to
+the solver. A state-specification and an activity-probe specification.
+A state-specification is a set of formulae over the concentrations of the
+sequential components within a system. For any given concrete state it is
+defined to be within the measure-set if all of the state-equations are true
+in that state. The equations may compare a concentration to a constant
+or another component's concentration.
+Typical equations tests for the presence, abscence or abundance of a particular
+component. However more complex arrangements are possible, for example:
+
+$ClientWait > (2 * ServerReady)$
+
+\noindent
+This specifies all states in which the number of clients waiting is more than
+twice the number of ready servers.
+The full syntax for state-specification equations is given in
+Figure \ref{figure:state:specification:grammar}.
+
+\newcommand{\grammartopline}[3]{
+$#1$ & $:=$ & $#2$ & #3
+}
+
+\newcommand{\splitgrammartopline}[4]{
+\grammartopline{#1}{#2}{}\\
+\grammarline{#3}{#4}
+}
+
+\newcommand{\grammarline}[2]{
+& $\mid$ & $#1$ & #2
+}
+
+\newcommand{\splitgrammarline}[3]{
+& $\mid$ & $#1$ & \\
+&        & $#2$ & #3
+}
+
+\newcommand{\doublesplitgrammarline}[4]{
+& $\mid$ & $#1$ & \\
+&        & $#2$ & \\
+&        & $#3$ & #4
+}
+
+
+\begin{figure}
+\begin{tabular}{lclr}
+\grammartopline{ name }
+               { ident }
+               {process name}\\
+\grammartopline{ pred }
+               { \neg pred }
+               {not}\\
+\grammarline{ \mbox{true}\ \mid\ \mbox{false} }
+            {boolean}\\
+\doublesplitgrammarline{\mbox{if}\ pred}
+                       {\mbox{then}\ pred}
+                       {\mbox{else}\ pred}
+                       {conditional}\\
+\grammarline{ pred\ \vee pred }
+            {disjunction}\\
+\grammarline{ pred\ \wedge\  pred }
+            {conjunction}\\
+\grammarline{ expr }
+            {expression}\\
+
+\grammartopline{expr}
+               { p\_name }
+               {concentration}\\
+\grammarline{ int } 
+            {constant}\\
+\grammarline{expr\ relop\ expr}
+            {comparison}\\
+\grammarline{expr\ binop\ expr }
+            {arithmetic}\\
+
+\splitgrammartopline{ relop }
+               { ==\ \mid\ \not=\ \mid\ >\ \mid\ <\ }
+               { \ge\ \mid\ \le}
+               {relation operators}\\
+
+\grammartopline{ binop }
+               { + \mid - \mid\ \times\ \mid\ \div }
+               {binary operators}\\
+\end{tabular}
+\caption{
+\label{figure:state:specification:grammar}
+The syntax for state specificatons
+}
+\end{figure}
+%\adcComment{incomplete list of binary operators}
+
+
+\subsection{Activity Probes}
+An activity-probe specification is written as a regular-expression-like term
+describing the sequence of observable events which lead to the measure-set and
+conversely the sequence of observations which leads to the model exiting
+the measure-set. The labels $start$ and $stop$ are used to indicate the events
+which lead to entering and exiting the measure-set respectively.
+The specification of a probe is automatically translated into a component which
+is then attached to the model. It may be attached to the model at the highest
+level thereby observing all of the model or attached locally with a given component.
+The probe is attached using the cooperation operator and cooperates with the
+component to which it is attached over all of the activities within the probe's
+alphabet. It is important that the probe is always able to perform all of these
+activities such that the probe does not alter the behaviour of the model.
+
+A very simple probe may specify the set of states between a $begin$
+and an $end$ activity:
+
+$begin:start, end:stop$
+
+\noindent
+However more complex measures are possible such as:
+
+$((pass, pass, pass)/send):start, send:stop)$
+
+\noindent
+This specifies that if we observe three \quoteActivity{pass}
+activities without observing a \quoteActivity{send} activity
+then the model has entered the measure-set.
+Once in the measure-set if a \quoteActivity{send}
+activity is observed the the model has exited the measure-set.
+The full syntax for activity-probe specification equations is given in
+Figure \ref{figure:activity:probe:grammar}.
+
+\begin{figure}
+\begin{tabular}{lclr}
+\grammartopline{ P_{def} }
+               { p\_name :: R }
+               {locally attached probe}\\
+\grammarline{ R }
+            {globally attached probe}\\
+\grammartopline{ R } 
+               { activity }
+               {observe action}\\
+\grammarline{ R_1, R_2 }    {sequence}\\
+\grammarline{ R_1 \mid R_2 }{choice}\\
+\grammarline{ R : label }   {labelled}\\
+\grammarline{ R\ n }        {iterate}\\
+\grammarline{ R \{m, n\} }  {iterate}\\
+\grammarline{ R + }         {one or more}\\
+\grammarline{ R * }         {zero or more}\\
+\grammarline{ R ? }         {zero or one}\\
+\grammarline{ R / activity }{resetting}\\
+\grammarline{ ( R ) }       {bracketed}\\
+\end{tabular}
+\caption{
+\label{figure:activity:probe:grammar}
+The syntax for activity probe specification
+}
+\end{figure}
+
+
+Activity probes have two abstract states, \emph{running}
+and \emph{stopped}.
+An \emph{abstract} state of a (component of a) model, 
+is a set of states usually with some common property.
+For example given the process:
+
+\begin{tabular}{lcl}
+$Car$ & = & $(breakdown, r) . (tow, r)$ \\
+      & . & $(garage, r) . (collect, r) . Car ;$
+\end{tabular}
+
+\noindent
+the abstract state of the car $Broken$ may consist of all states
+of the car that occur after a \quoteActivity{breakdown} occurrence
+and before a \quoteActivity{collect} occurrence.
+
+When the probe is in between the two labels \quoteActivity{start}
+and \quoteActivity{stop} the probe is said to be in the running
+state and otherwise in the stopped state.
+
+A probe is a stateful component which may \emph{advance} to a further
+state whenever an activity is observed which is in the first-set of
+the probe. For example the probe \showprobe{(a|b), R} can advance
+to a state represented by the probe $R$ on the activites
+\quoteActivity{a} or \quoteActivity{b}.
+A given probe will \emph{self-loop} on any activity which is in the
+alphabet of the full probe but is not in the current first-set.
+This means that the probe observes the occurrence of the activity,
+and hence does not prevent the model from performing it, but remains
+in the same state it was in.
+
+\subsection{Extended Probe Specifications - XSP}
+
+The novel method in this paper is to combine the two approaches
+to measurement specification.
+We do this by allowing a sub-probe of an activity-probe specification
+to be \emph{guarded} by a state-specification.
+The additional syntax 
+-- shown in Figure \ref{figure:guarded:probes:grammar} --
+is very light.
+The meaning of the probe $\{p\}R$ is any activity which begins
+the probe $R$ must occur when the state of the model
+satisfies the state-specification predicate $p$.
+If this predicate is not satisfied then the probe self-loops on
+the given activity.
+
+\begin{figure}
+\begin{tabular}{lclr}
+\grammartopline{R}
+               { \{ pred \}R }
+               {guarded}\\
+\end{tabular}
+\caption{
+\label{figure:guarded:probes:grammar}
+The additional syntax for extended probe specifications.
+}
+\end{figure}
+
+The rest of the paper is structured as: \adcComment{todo}
+
+
+\section{An example scenario}
+In this section we discuss an example modelling scenario which
+we will use to convey the ideas behind the three measurement
+specification techniques described above.
+Our scenario involves the arbitration of many processes to a shared
+resource. Here we are considering a symmetric multi-processing 
+architecture in which there are several processors which must be allowed
+access to a shared memory. However the models and measurement specifications
+can be applied to similar scanarios involving access by many clients to a
+shared resource, for example a wireless network in which the clients must
+compete to send/receive over a shared channel.
+
+With our models we wish to compare choices for arbitration, here we will
+compare a round-robin scheme with a first-come, first-served queueing system.
+In the round-robin scheme each client is given the chance to use the shared
+resource in turn, at each such turn the client may choose to pass up the
+oppurtunity or it may use the resource. In a first-come, first-served queue
+a client continues to work without the shared resource until it is required
+and then signals its interest in access to the shared resource.
+At this point the client is put to the end of the queue of clients
+and must wait until all the clients ahead of it in the queue have
+finished with their turn at the resource before begin granted access.
+
+The measurements we will be concerned with is the time it takes from after
+a specific client has performed some internal \emph{work} indicating that
+it is now ready to use the shared resource, until after it has completed
+a \emph{send}. Here the send activity is used as the name for accessing
+the shared resource and can be thought of as either sending data to the
+shared memory in a symmetric multi-processor environment or
+using the shared channel to send data in a wireless network.
+
+\subsection{The Round-Robin Model}
+
+For the round-robin scheme we model the resource as a token
+which may be in one of several places where each place represents
+a slot in which exactly one client may use the resource.
+A client is able to perform the \quoteActivity{work} activity
+before being able to use the resource. It must cooperate with the
+resource and can of course only do this if the token of the resource
+is in the correct place. In addition to being able to perform a
+\quoteActivity{work} activity the client may pass up on the opportunity
+to use its slot.
+The \quoteProcess{Client} component then is modelled as:
+
+\newcommand{\topPepaDef}[2]
+{ $#1$ & = & $#2$ \\}
+
+\newcommand{\pepaChoice}[1]
+{ & + & $#1$ \\}
+
+\newcommand{\closePepaDef}{ & ; & \\}
+
+\newcommand{\pepaTop}{\top}
+
+\begin{tabular}{lcl}
+\topPepaDef{Client}{(work, work\_rate) . Wait}
+\pepaChoice{(pass, \pepaTop) . Client}
+\closePepaDef
+\topPepaDef{Wait}{(send, send\_rate) . Client ;}
+\end{tabular}
+
+The resource is modelled by the \quoteProcess{Token} process.
+The \quoteProcess{Token} when in position zero may cooperate with the client
+over the \quoteActivity{send} or the \quoteActivity{pass} activity.
+To model each of the other places for the token we could model more
+clients. Instead we assume that the token moves on from each place
+at a given rate which encompasses both the possibilities that the
+respective client sends or passes. So in position 'N' the token
+is modelled by:
+
+\begin{tabular}{lcl}
+\topPepaDef{Token_N}
+          {(delay, delay\_rate) . Token_{N - 1} ;}
+\end{tabular}
+
+When the token is in position zero it is defined as:
+
+\begin{tabular}{lcl}
+\topPepaDef{Token_0}
+           {(send, \pepaTop) . Token_{M}}
+\pepaChoice{(pass, pass\_rate) . Token_{M}}
+\closePepaDef
+\end{tabular}
+
+Where 'M' is the number of places/clients on the network.
+% The full model shown in Figure \ref{figure:model:busy} 
+
+Figure \ref{figure:token:states}
+depicts the entire state space
+of the model where $M$ is set to four.
+
+% \graphicfigure{token_states.pdf}
+%               {figure:token:states}
+%               {States of the token-ring network model.}
+
+\graphicfigure{token_states.pdf}
+              {figure:token:states}
+              {States of the token-ring network model.}
+
+\subsection{The Queue Model}
+The queue model is a little more complex since the client in which
+we are interested in measuring may join the queue at any time but
+must only be served when it is at the head of the queue.
+The queue is modelled in a similar fashion to the \quoteProcess{Token}
+process. It may be in one of $M$ states \quoteProcess{Queue_N} where
+$N$ is the current length of the queue.
+
+The client is now measured as being in a state of working or
+in one of a set of $M$ states \quoteProcess{Client_N} 
+each of which corresponds to a position in the queue.
+When the client performs the \quoteActivity{work} activity
+and is ready to use the shared resource it cooperates with the
+\quoteProcess{Queue} process over an action which indicates into which
+state the client should proceed. Only once the client is in state
+\quoteProcess{Client_0} can it perform the \quoteActivity{send}
+activity which will end our measurement.
+Again the other clients in the model may be modelled explicitly but
+here we allow the queue to move from state \quoteProcess{Queue_N}
+to state \quoteProcess{Queue_{N + 1}} at the rate
+$(M - N) * send\_rate$ since when there are $N$ clients in the queue
+there will be $M - N$ clients which may join the queue.
+
+\adcComment{The full model is shown in the appendix???}
+\adcComment{The rate of joining should actually depend as well on
+whether the client is there or not}
+
+\subsection{The Random Model}
+The random model is used for comparison. The random scheme operates
+in a similar fashion to the queue scheme, except that there are a number
+of clients in the queue and the client which is given access to the shared
+resource is entirely random. It may be the client that was the first to
+enter the queue but it may be the client that was last to enter the queue.
+
+In this model we do measure the other clients since they are the same
+as the client we wish to measure.
+\adcComment{Todo -- explain more about this model}
+
+\subsection{The passage-time measurement}
+With these models we are looking to measure the expected time it takes
+for the resource to be granted to the client once the client is ready.
+For this we wish to measure from after a \quoteActivity{work}
+activity has been performed until after a \quoteActivity{send}
+activity has been performed. We therefore must identify the
+passage-set. That is, the set of states which lie between those two events.
+
+In Figure \ref{figure:token:states} the states within the passage-set
+for this particular measurement have been coloured green and are double circles.
+
+To specify this set using a state-specification we must use our
+knowledge of the system to identify the conditions held at all
+of the states within the passage-set.
+
+For the first model, the round-robin model, this is simply when
+the client is in the \quoteProcess{Wait} state.
+
+\showstatespec{Wait == 1}
+
+\noindent
+This also works for the random model.
+For the second model, the queue model, it is whenever the client is in
+any of the queue states.
+
+\showstatespec{ Client1 == 1 \vee Client2 == 1 \vee Client3 == 1 \vee Client4 == 1}
+
+\noindent
+To specify this measurement using an activity probe we use the two activities
+themselves as the begin and end events for the probe.
+The probe definition is given as:
+
+\showprobe{ Client::work:start, send:stop }
+
+\noindent
+Note that this same probe works for all three models.
+For the round-robin and queue models it is not strictly necessary
+for us to attach the probe to the \quoteProcess{Client} component
+since there is only one client component which may performe the
+observed activities. However doing so leads to a more robust probe
+as evidenced by the fact that the same probe can be used for the
+random model in which there are additional client processes.
+
+\subsection{Comparison}
+
+Having performed this measurement for all three models we can compare
+the speed with which each arbitration method allows a waiting client
+to use the shared resource.
+The Figures \ref{figure:compare:cdf} and \ref{figure:compare:pdf}
+shows a comparison of the cumulative distribution function 
+and the probability density function respectively 
+for the passage-time queries on the three models
+representing the three arbitration schemes. 
+
+\graphicfigure{compare_cdf.pdf}
+              {figure:compare:cdf}
+              {Comparison between the passage-time results for the three models}
+
+\graphicfigure{compare_pdf.pdf}
+              {figure:compare:pdf}
+              {Comparison between the passage-time results for the three models}
+
+From the results we can see that the queue and random models perform very
+similarly and both outperform that of the round-robin scheme.
+In the following section we will split up this measurement to gain
+more insight into the performance characteristics of each scheme.
+
+
+\subsection{Splitting the measurement}
+\label{sub:section:splitting:measurement}
+
+We may wish to partition these results to enable us to report
+what the likely time the client has to wait depending on the
+state of the model at the time at which the client becomes ready
+to use the shared resource.
+So for example in the round-robin model above we may wish to 
+ask the question:
+``What is the expected time between the client performing a
+\quoteActivity{work} activity and the client performing a
+\quoteActivity{send} activity given that the \quoteActivity{work}
+activity occurs when the token process is in state
+\quoteProcess{Token4}?''
+This question may be of particular interest because it represents
+the worst case scenario. We have shown that the overall or
+average performance of the round-robin scheme is worse than that
+of the queue and random schemes. However it may be that the
+round-robin scheme has less eratic performance. In that it matters
+less at what time the client becomes ready to use the shared resource.
+It may be that the worst case performance for the round-robin scheme is
+better than that for both the queue and random schemes.
+This may be of particular interest in say a network, where traffic can
+become congested at particular times and hence the worst case performance
+is of more interest than the average case performance.
+
+To write this exact measurement as a state-specification we must
+resort to specifying the source set and the target set explicitly.
+This is because if we specify the states as a passage-set it will
+include the states where the token is in the places 3-1, while the
+client is still waiting. Clearly these states are reachable from
+a transition from a state out with the passage-set.
+In fact specifying the passage-set in this manner would give identical
+results as the measurement above measuring the time the client must
+wait regardless of when the \quoteActivity{work} activity was completed.
+With this in mind our source and target sets for the round-robin
+model worst case scenario are specified respectively by:
+
+\showstatespec{source : Wait == 1\ \&\&\ Token4 == 1}
+
+\showstatespec{target : Client == 1}
+
+\noindent
+Note however that it is a little unsatisfactory that we had to know
+so much about the behaviour of the model. Even if one considers this
+a good thing
+-- modellers should know about the behaviour of their models --
+the measurement is very fragile in that if we modify our model in
+anyway it is likely this this measurement must also be updated.
+In addition the target set is larger than necessary, this will not
+affect the measurement but may cause the solver to spend longer
+calculating the measurement. Again a very similar state-specification
+can be used for the random model.
+
+For the queue model worst case scenario measurement we can use our
+knowledge of the system to make our state specification simpler
+than in the average case, this is because there are less source
+states. Our state measurement is written as:
+
+\showstatespec{source : ClientQ == 1}
+
+\showstatespec{target : Client == 1}
+
+Here we have used the fact that the client cannot be in the 
+\quoteProcess{ClientQ} state unless it is blocked by the fact that
+the queue cannot allow it to progress to a \quoteProcess{Client_N} state
+and the fact that this can only occur in the case that the queue is in
+the worst possible state.
+
+To write this measurement as an activity probe we must identity a
+sequence of activities which will place the model in the source-set
+and the sequence of activities which will complete the passage
+(from a source state).
+Specifying this using an activity probe means that the measurement need
+not be split up. This is because the probe is in the abstract running state
+only when it has passed through a source state. This means that we need not
+split our specification into two separate ones however the drawback
+is that the state space is increased.
+Our measurement for the round-robin model is specified by:
+
+\showprobe{Client:: ((pass|send), work)/delay : start, send:stop}
+
+\noindent
+The $(pass | send)$ component ensures that the token has moved to
+state \quoteProcess{Token4} before we observe the \quoteActivity{work}
+activity. By hiding the \quoteActivity{delay} activity
+(with $/delay$) we assert that the probe will not move past the
+\quoteActivity{start} label unless the sequence ending with the
+\quoteActivity{work} occurrence does not contain a \quoteActivity{delay}
+activity. This in turn ensures that the token is in the state
+\quoteProcess{Token4} when the probe transitions to running.
+If a \quoteActivity{delay} is observed this resets the probe which must
+then wait to observe a \quoteActivity{pass} or \quoteActivity{send}
+once again.
+
+The state space is increased because there are states within the
+passage which must be duplicated. For example the state in which the
+token is in state \quoteProcess{Token3} and the client is in state
+\quoteProcess{Wait} is duplicated since the probe component may be
+in either the running or the stopped state depending on whether the
+given state was reached via a source-state.
+
+For both the random model and the queue model specifying this condition
+as an activity probe is particularly difficult.
+Previously (see \cite{LocationAwareStochasticProbes})
+we have used communicating local probes to convey state information.
+In this case though we would be required to modify our model or
+come up with a somewhat complicated and rather fragile probe specification.
+The details of which are left to the reader as in the following section
+we detail a far more portable and robust method of obtaining these
+measurements, namely the use of extended probe specifications.
+
+
+\adcComment{For state space sizes I get 10 for the non-probed version
+and 20 for the non-probed version, but I will investigate this a bit
+further.}
+
+
+\section{Using Extended Probe Specifications}
+
+In the previous section we discussed the two main methods for
+specifying a measure-set. Both have advantages and disadvantages
+and can be used in different circumstances.
+
+Recall from section
+\ref{sub:section:splitting:measurement}
+the measurement specifications given to measure the expected
+waiting time of the \quoteProcess{Client} when the client perfomed
+the \quoteActivity{work} activity in the worst case -- when the
+token was furthest from the measured client (in place \quoteProcess{Token4}).
+We can now give the extended probe specification for this measurement
+in the round-robin scheme model.
+
+\showprobe{ Client:: \{Token4 == 1\}work:start, send:stop }
+
+\noindent
+This probe will only be started by an observation of the
+\quoteProcess{Client} performing a \quoteActivity{work}
+activity if the token is currently in the state \quoteProcess{Token4}.
+All other occurrences of the \quoteActivity{work} activity will be ignored
+-- ie cause the probe to self-loop.
+
+To specify the same worst case scenario measurement for the queue
+we can specify the extended probe:
+
+\showprobe{ Client:: \{Queue4 == 1\}work:start, send:stop }
+
+\noindent
+This specification works in exactly the same way the only difference
+is the name of the state of the resource in the worst case scenario.
+For the random model the probe is exactly the same
+\adcComment{actually currently it is Queue5==1 but I'm hoping to change this.}.
+
+Additionally without changing the models we can make additional measurements
+corresponding to all of the different possible states of the resource at the
+time at which the client becomes ready to make use of the shared resource.
+In the case of the round-robin scheme this is the different places that the
+token may be in. In the case of queue and random models this is the length
+of the queue.
+We provide the probes:
+
+\showprobe{ Client:: \{TokenN == 1\}work:start, send:stop }
+
+\showprobe{ Client:: \{QueueN == 1\}work:start, send:stop }
+
+\noindent
+The graphs in Figures
+\ref{figure:robin:cdf},
+\ref{figure:robin:pdf},
+\ref{figure:queue:cdf},
+\ref{figure:queue:pdf},
+\ref{figure:random:cdf} and
+\ref{figure:random:pdf}
+show the cummulative distribution and probability density functions
+of the passage-time responses given by restricting the probe to the
+conditions of the shared resource.
+
+
+\graphicfigure{busy_cdf.pdf}
+              {figure:robin:pdf}
+              {Busy model with passage-time probabilities}
+
+\graphicfigure{busy_pdf.pdf}
+              {figure:robin:cdf}
+              {Busy model with passage-time pdf}
+
+% \section{Queuing Example}
+% 
+% Figure \ref{figure:queue:cdf} show the cummulative distribution functions
+% for the queue model and Figure \ref{figure:queue:pdf} shows the probability
+% density functions for the queue model.
+
+\graphicfigure{queue_cdf.pdf}
+              {figure:queue:cdf}
+              {Queue model with passage-time probabilities}
+
+\graphicfigure{queue_pdf.pdf}
+              {figure:queue:pdf}
+              {Queue model with passage-time pdf}
+
+% \section{Random Example}
+% 
+% Figure \ref{figure:random:cdf} show the cummulative distribution functions
+% for the queue model and Figure \ref{figure:random:pdf} shows the probability
+% density functions for the queue model.
+
+\graphicfigure{random_cdf.pdf}
+              {figure:random:cdf}
+              {Random queue model with passage-time probabilities}
+
+\graphicfigure{random_pdf.pdf}
+              {figure:random:pdf}
+              {Random queue model with passage-time pdf}
+
+
+
+\subsection{Discussion of Results}
+
+Although this paper is more concerned with the methods used to
+obtain such results depicted in the graphs above this section
+takes stock of what we can learn from such results.
+
+With the basic measurements we determined that the average case
+response-time was worst for the round-robin scheme and very
+comparable for the queue and random schemes.
+The results for the individual circumstances for the round-robin
+and the queue models shows that the results are identical.
+This is because in both cases the number and rates of the timed
+activities that we must observe between the source and target
+are identical for each equivalent circumstance. When the queue is
+empty and the token is in the correct place both models are only
+measuring one activity, name the \quoteActivity{send} activity.
+This tells us that the reason the average case is worse for the
+round-robin model is because the worser cases happen more frequently
+than for the queue model. This may only be the case because of the
+particular rate values which we have chosen and we may wish to 
+change those rates to see if we could make the round-robin model
+out perform the queue model (in the average case).
+
+In the case of the random model we can see that although the
+average case performance is very similar to that of the
+first-come, first-served queue the performance is actually much
+less varied. This is because for each state of the queue at the
+time of the client becoming ready to use the resource there are
+still more paths to the target states over which to average out
+the performance. For example if the client becomes ready when the
+queue is empty this is no guarantee that our client will be the next
+client to use the resource. Similarly if the queue is full we may
+still be the next client to use the resource. The random queue may
+have some other less desirable properties, for example a client may
+spend an unbounded amount of time in queue, however our results show
+that at least for the parameters we have specified a long time in the
+queue is highly unlikely.
+
+\subsection{Which measurement specification should we use?}
+
+In the previous section we have shown that the two techniques
+used to specify the source and target sets of a measurement
+-- or more generally a measure-set -- both have advantages and
+disadvantages.
+
+We are mostly interested in the robustness and portability of our
+measurement specifications. For robustness we would like to ensure
+that our measurment specification remains correct whenever we make
+un-related changes to our model. For portability we would like one
+measurement specification to be used over several differing models.
+Additionally it is important that we are able to perform several
+different measurements over a model without modifying it.
+
+The robustness of the measurement specification in general depends on
+what the modeller is likely to modify.
+In our example above the state-specification is vulnerable to any change
+in the model which increases the number of states in which the client
+may be in either the abstract state of 'waiting' or the abstract state
+of 'working'. The abstract state of 'waiting' in our model corresponds
+to exactly one state of the client, namely: \quoteProcess{Wait}.
+Similarly the abstract state of 'working', which is used to specify
+that the \quoteActivity{send} activity has completed, maps to exactly
+one component state, namely: \quoteProcess{Client}.
+If the model is modified such that either of these two mappings from
+abstract state to a concrete set of states is disturbed then the
+state specification will be invalid and must be revised.
+
+In contrast the activity probe need not be modified since there could
+for example be any number of unobserved activities and associated
+intermediate states between the \quoteActivity{work} and the
+\quoteActivity{send} activities. However if we modify the activities
+which can move between the abstract states then we must revise
+our probe specification. For example above there were only two activities
+which the \quoteProcess{Token0} component may perform to become a
+\quoteProcess{Token4} component, namely : \quoteActivity{pass}
+and \quoteActivity{send}. However if this were to change then our
+probe specification would be invalid and would require updating.
+
+Portability requirement is parallel to robustness since separate
+models can be seen as modifications of the original model.
+So our choice of measurement specification technique depends on what
+we foresee as the likely set to be modified. If we envisage modifying
+the sets of states corresponding to the abstract states then we should
+use an activity probe. However if we expect to modify the activities
+which cause transitions between the measured abstract states to change
+then we should use a state-specification.
+In our experience it is more common to modify the sets of states
+corresponding to the abstract states. Where the sets of activities
+are modified it is common that the sets of states are also modified
+and therefore whenever we must modify an activity probe it usual that
+the equivalent state-specification would have to be updated as well.
+For this reason we have used mostly activity probes in our past research
+however this has led to some disadvantages
+\adcComment{which are explained in more depth is section
+\ref{sub:section:activity:probes:insufficient}}.
+In particular the description of an abstract state which represents
+a balancing of dual activities is at best awkward using
+a regular-expression like language. The size of the state-space may also
+be increased unnecessarily though at least only linearly with respect
+to the size of the probe specification.
+
+\adcComment{Some measurements simply not possible with state:
+this is mentioned in the section below}
+\adcComment{But the counter point is that the probe often increases
+the state-space size (unnecessarily), we are however looking at techniques
+to reduce this, some specifying the source and target sets separately
+seems to have some promise}.
+
+
+\section{Necessity}
+
+In this section we discuss the necessity of combining both approaches.
+We have seen that some measurements are more appropriately done
+using a state-specification or using an activity probe.
+However simply offering the user the choice of either is not sufficient
+as there are some measurements that call for a combination of both.
+We first review the reasons why either measurement specification
+on its own is insufficient.
+
+\subsection{Why state only measures are not enough}
+
+We consider a measurement specification mechanism that only allows the 
+user to describe states not to be sufficient.
+There are two main reasons for this; the first is simply that some
+measurements are more intuitively written, more robust and more portable
+if written with reference to the observed activities.
+If we consider a state in which we are interested to be the result of
+an observation of some sequence of activities rather than the present state
+of the components within the system then a measurement specification
+using activity observations is more appropriate.
+This kind of measurement is the most common whenever we consider response-time
+measurements over a system. In particular whenever the modeller requires a
+passage-time measurement between the occurence of one event and the occurrence
+of another event. Commonly we measure between a set of 'start' activities and
+a set of 'stop' activities. As above we measured between the 'work' activity
+and the 'send' activity. This was clearly specified by the probe:
+\showprobe{ Client:: work:start, send:stop }.
+To specify this using a state-only measurement specification one must first
+work out the states which follow an observation of a 'work' activity.
+In our model above we could give a name to the state $(send, send\_rate).Client$.
+However note that this involves modifying our model. If our model is later
+changed such that there are more states of the 'Client' process between its
+'work' and 'send' activities we are required to update our measurement.
+
+The second reason concerns the distinguishing of states due to the sequence
+of activities that have lead to that state. In the original system states
+may not have been distinguished by the order of events that have lead
+to the same state and hence it is impossible to distinguish between those
+states and make an accurate measurement. In other words the addition
+of an observing probe may increase the number of states in the system.
+This is best shown with an example. We may wish to garner some aspects of
+utilisation of each of the clients' ``token slot''. That is; how often 
+does the token come round to the 'Client' when the client is not ready
+to make use of its slot. The first measurement to take therefore is the
+throughput of the \quoteActivity{pass} activity.
+However we may wish to ask a question of the model such as:
+``What is the likelihood that the system is in a state such that the
+Client component has performed three or more \quoteActivity{pass} activities
+without performing a \quoteActivity{send} activity''.
+
+Note that this measurement is not possible without increasing the current
+size of the state-space. This is because the current model has no memory
+of previous \quoteActivity{pass} and \quoteActivity{send} activities.
+The state-space however can be automatically increased by adding an
+activity observing probe component specified as:
+\showprobe{((pass, pass, pass)/send):start, send: stop}
+
+This probe concisely and intuitively specifies the measurement that we wish
+to make. The extra states required for the measurment are automatically added
+as a consequence of adding the probe component to the model.
+
+
+\subsection{Why activity-only probes are not enough}
+\label{sub:section:activity:probes:insufficient}
+
+While activity observing probes form an appropriate measurement specification
+vehicle for many measurements the inability for the user to specify states
+of the components of the model is limiting. 
+In particular because the activity-probe specification language is similar
+to that of regular expressions, the language is poor at specifying the
+matching of bracketing events.
+Bracketing events are events which signal that some set of the components
+are in a particular 'state'.
+Whereby 'state' is meant to mean a more abstract notion than that of the states
+of the underlying Markov chain. A common example is a component that may be either
+operational or broken. Where these two states are really sets of states or can
+be equivalently seen as a partitioning of all the states in which the component
+may be.
+
+Suppose we wish to measure how likely it is that a given component is 'broken'.
+To achieve this we must first identify all of the activities which cause the
+component to move from a state of 'operational' to a state of 'broken',
+call this set $L$.
+In addition we must identify all of the activities which cause the component
+to go from a state of 'broken' to a state of 'operational' call this set M.
+Our probe is then written something like:
+\showprobe{L:start, M:stop}
+
+Where $L$ means the choice of any of the activities in $L$ so for 
+$L = \{a,b,c\}$ and $M = \{x,y,z\}$ we have the probe:
+\showprobe{(a|b|c):start, (x|y|z):stop}
+
+However this is not the whole story. Consider the case that once in the 'broken'
+state the process in question may still perform an activity in the set $L$
+and that having done so this further breakage must be repaired in addition
+to the original one before we return to the 'operational' state.
+This occurs frequently when we consider the case of a number of servers and
+our 'operational' state in which we are interested is 'all servers operational'.
+In the case of two servers we may write this probe as:
+\showprobe{L:start (L, M) *, M:stop}
+
+
+This states that once we have observed an activity in set $L$
+(hence referred to as a 'break' activity) then the probe must wait
+to obverve an activity in the set $M$
+(hence referred to as a 'repair' activity).
+In between these two events we may observe any number,
+including zero, of 'break', 'repair' sequences, however it must be a whole
+number, so that every 'break' is matched by a 'repair' before we observe
+the final (probe stopping) 'repair' activity.
+For a model containing three servers the probe becomes more complicated
+still, however the more serious drawback is that the probe must be changed
+at all to accomodate models with varying numbers of servers.
+
+In addition to this short-coming we have not even considered the case where a
+component may perform an activity in the set $L$ but remain operational or
+an activity in the set $M$ but remain broken. To be able to measure this system
+with activity observing probes only we would require to alter our model.
+
+\subsection{Are two seperate techniques enough?}
+
+So far we have shown that one or other approach to specifying performance
+measurements is insufficient. Both approaches serve contrasting modelling
+situations. The obvious solution then is to allow the user to specify
+\emph{either} a state description measure \emph{or}
+an activity observation probe.
+
+However it is clear that many situations will call for a combination of
+the two approaches. These situations arise when the modeller wishes to
+combine observations with state descriptions. A common example of such
+a combination is to ask about the response-time when the request is made
+at a time when a particular system component is in a particular (abstract)
+state. A standard query is: 
+``What is the response-time when at least one of the servers is broken''.
+We have shown that specifying that one of the servers is broken is awkward
+and that observation probes are frequently more appropriate for response-time
+measurements. In our language such a measurement would be specified by:
+
+\showprobe{Client::\{Broken > 0\}request:start, response:stop}
+
+
+% \section{Probe Specification Language}
+
+% 
+% \section{Real World Example}
+% \adcComment{Probably something with a security sub-system which could itself fail.
+% Question: when the security sub-system fails what are the consequences.}
+% \adcComment{Perhaps also something to do with logging, eg what is the possiblity
+% that a failure/attack occurs when logging is currently broken meaning that the
+% fault/attack cannot be traced.}
+
+
+\section{Implementation}
+
+The implementation of activity probe specifications follows a tradition
+of translating regular-expression languages to finite automata.
+We first translate the probe specification into a non-deterministic
+finite automata. This cannot itself be translated directly into a
+\pepa\ component so we first translate this into a deterministic
+finite automata. Having done this the self-loops may then be added to
+each state of the finite automata. Since at each state either an activity
+advances the probe into a further state or is currently not available.
+If it is currently unavailable then this may block the model and hence
+modify the behaviour of the model. This would be a strict failure to observe
+the given model and hence whenever an activity is unavailable we add a self-loop
+to the same state.
+
+Although for some probe specifications it is unavoidable that we increase the
+state space of the model we wish to keep the cost of this as low as possible.
+With this in mind the translated deterministic finite automata is minimised.
+It is the dfa with the addition of the self-loops and then minimised which
+can be translated directly into a \pepa\ model.
+The translation is in fact as simple as a re-formatting. We must only take
+into account whether or not the model performs each observed action as
+a timed activity or an immediate action. In the case of the probe component
+must passively observe the activity at rate $\top$ and in the case of the latter
+it is simply added itself as an immediate activity.
+
+\adcComment{cite my pasta paper?}
+
+Probe definitions, and in particular local probe definitions, may use
+labels to communicate important events to some master probe.
+The \quoteActivity{start} and \quoteActivity{stop} labels are special
+cases of this communication where by the event is the transition of the probe
+into the abstract running or stopped states. All communication labels are
+implemented as immediate actions so as not to distort the behaviour of the
+model. Care must be taken not to add self-loops to a state in which immediate
+communication is possible in case the observed action on which the self-loop is
+performed is itself immediate, which would lead to non-determinism.
+
+The guards on the the activities of a probe in an extended probe specification
+are implemented as guards on the activities of the translated probe component.
+These in turn may be implemented as functional rates in which the rate is
+zero if the predicate is false. Care must be taken when adding the self-loops.
+Previously a self-loop on activity \quoteActivity{x} in the alphabet of the probe
+was added to a given state if activity \quoteActivity{x} could not currently
+be performed to advance the state of the probe.
+Now whenever it is possible for a guarded activity \quoteActivity{x} to advance
+the state of the probe we must add a self-loop for the case in which the guard
+is false. However it must not self-loop whenever the guard is true hence the
+self-loop is itself guarded by the negation of the guard predicate.
+
+\section{Related Work}
+
+\section{Conclusions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{ieeedoublecolumn}
+\bibliography{pepa}
+\end{document}
+

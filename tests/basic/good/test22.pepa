@@ -1,0 +1,8 @@
+// File: tests/good/test22.pepa
+// Using arithmetic expressions in rates
+r1 = 0.12;
+
+P1 = (a, r1).P2;
+P2 = (a, 2 * r1).P1;
+
+(P1 <> P1)

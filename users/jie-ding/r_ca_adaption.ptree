@@ -1,0 +1,6 @@
+Plot Lines 
+Experiment ?rate [ pointtwo = 0.2, pointfour = 0.4, pointsix = 0.6, pointeight = 0.8, one = 1.0, onepointtwo = 1.2, onepointfour = 1.4, onepointsix = 1.6, onepointeight = 1.8, two = 2.0 ]
+          Cdf
+          Passage ModelProbe (pde_int_cont_req:start, pde_user_interface:stop)
+                  ModelRate [ r_ca_adaptation = ?rate] ModelFile "ICC2009_T.pepa"
+

@@ -1,0 +1,23 @@
+% Bio-PEPA model of protein synthesis
+
+% transcription, translation, mRNA degradation, dimerization, dimer inhibition
+
+%biopepa.independent.replications: 1000
+%biopepa.show.all.replications: true
+%biopepa.simulation.stoptime: 20000
+%stochkit.opt.progress.interval: 10
+
+transcription = [ v * D / (kM + P2) ] ;
+translation = [ k2 * M ] ;
+degradation_mRNA = [ k3 * M ] ;
+% degradation_protein = [ k4 * P ] ;
+dimerization = [ k5 * P * (P - 1) / 2 ] ;
+dedimerization = [ km5 * P2 ] ;
+
+D = (transcription,1)(.) ;
+M = transcription>> + (translation,1)(.) + degradation_M<< ;
+P = translation>> + (dimerization,2)<< + (monomerization,2)>> ;
+P2 = (transcription,1)(.) + dimerization>> + monomerization<< ;
+Res = (degradation_M,1)(.) ;
+
+(D <> (M <> (P <> (P2 <> Res))))

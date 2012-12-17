@@ -1,0 +1,5 @@
+% File: tests/bad/test53.pepa
+% Syntax error, missing semicolon between declarations
+P = (a, r).P
+Q = (b, s).Q;
+(P <> Q)

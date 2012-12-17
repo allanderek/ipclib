@@ -1,0 +1,13 @@
+%% ** The Imperial PEPA compiler:
+%% ipc v1.01-rc1 June 22, 2006 ("Patrick McGoohan" Release)
+%% DNAmaca generator: Jeremy Bradley;
+%% PEPA parser: Stephen Gilmore and Allan Clark
+%% Produced on location in/between Edinburgh, Leeds, London and Ludlow, 2002-6
+%% Queries or problems: jb@doc.ic.ac.uk, stg@inf.ed.ac.uk or a.d.clark@ed.ac.uk
+1 : Par__0
+2 : ("Par__0",Par: "Par__1" <["a"]> "_CliProbeL")
+3 : ("Par__1",Par: "P" <[]> "P")
+4 : ("_CliProbeL",Seq: ("a", PEPAtop) "SeqProbe_0")
+5 : ("SeqProbe_0",Seq: ("b", PEPAtop) "_CliProbeL_run")
+6 : ("P",Seq: ("a", PEPA_r) "Q")
+7 : ("Q",Seq: ("b", PEPA_r) "P")

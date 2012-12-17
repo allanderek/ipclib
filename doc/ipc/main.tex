@@ -1,0 +1,522 @@
+% We must define this as the options file will output tex
+% containing this comamnd.
+\newcommand{\showcommandline}[1]{
+\begin{commandline}
+\$ ipc #1
+\end{commandline}
+}
+
+\newcommand{\commandNameIpcSmc}{\ipc}
+
+\clearpage
+
+\section{Usage}
+
+\input{options}
+
+\subsection{Using \ipc\ to evaluate a single model}
+In this section we will learn how to invoke \ipc\ to peform
+various analyses over simple models. 
+%% The concrete syntax should be give
+
+As a simple example consider the \pepa\ model shown here in
+the concrete syntax of \ipc.
+\verbatiminput{models/tiny.pepa}
+
+\subsection{Basic Invocation}
+Invoking the compiler to give basic information can be done by
+specifying either the \ipcflag{version} or \ipcflag{help} flags.
+\begin{verbatim}
+ipc --version
+\end{verbatim}
+
+\begin{verbatim}
+ipc --help
+\end{verbatim}
+
+Many of the flags and options have a corresponding one letter alias,
+for example the version can be printed with the command:
+\begin{verbatim}
+ipc -v
+\end{verbatim}
+For the remainder of this manual we will use the long versions for
+clarity.  The short versions can be found by reading the output of the
+help flag.
+
+Beyond the trivial invocations involving version and help information,
+\ipc\ must be invoked with a \pepa\ model argument.
+The general form is
+\begin{verbatim}
+ipc [flags and options] tiny.pepa
+\end{verbatim}
+
+The simplest command-line for our \texttt{tiny.pepa} file would be:
+\begin{verbatim}
+ipc tiny.pepa
+\end{verbatim}
+
+Such a simple command will display a steady state probability distribution
+of all the states in your model. In the future we hope to make this a little
+more useful by providing names of components, utilisation and throughput of
+activities.
+Generally of course the point of solving the model is to make some
+measurement of the model. The following section
+\ref{specsourceandtarget} begins with the simplest way in which
+to specify a measurement.
+
+%   [
+%     Option "v"     ["verbose"]     (NoArg CliVerbose)        
+%     "logfile output to STDOUT"
+
+%   , Option "V"     ["version"]     (NoArg CliVersion)        
+%     "show version info"
+
+%   , Option "h"     ["help"]        (NoArg CliHelp)
+%     "show options and documentation"
+
+\subsubsection{Specifying source and target options}
+\label{specsourceandtarget}
+%   , Option "s"     ["source"]      (ReqArg startActions      "STARTACTIONS" )   
+%     "start actions for stochastic probe"
+
+%   , Option "t"     ["target"]      (ReqArg stopActions       "STOPACTIONS" )    
+%     "stop actions for stochastic probe"
+
+The \ipc/Hydra tool chain can be used to calculate three major types of
+performance measure:
+\begin{enumerate}
+\item Passage time quantiles and distributions
+\item Transient measures
+\item Steady state measures
+\end{enumerate}
+
+There are two ways in which to specify the states in which the
+measurement is concerned. 
+In this section simple measurements which can be done by specifying
+sets of source and target actions are considered.
+Section \ref{section:probespecifications} is concerned with more
+complex measurements.
+
+As the names suggest, the source activity is used
+to start the measurement and the target activity is used to end the measurement.
+
+Thus if we were interested in computing the passage from an occurrence
+of the \texttt{start} activity to the occurrence of the \texttt{stop}
+activity by either of the copies of the process in the tiny model then
+we would use the following command
+\indexipcflag{source}%
+\indexipcflag{target}%
+\begin{verbatim}
+ipc --source start --target stop tiny.pepa
+\end{verbatim}
+
+This will generate two comma separated files:
+\texttt{tiny\_cdf.csv} and \texttt{tiny\_pdf.csv}.
+These are the cummulative distribution function and the probability
+density function of the specified passage respectively.
+
+With each of these arguments more than one action may be given as a 
+comma separated list of actions.
+For example one might give a command such as:
+\begin{verbatim}
+ipc --source halfFull,halfEmpty --target full,empty optimism.pepa
+\end{verbatim}
+
+% Since \hydra\ will more often than not be invoked on the output
+% \texttt{.mod} file one can specify the \ipcflag{run-hydra} flag.
+% By default the kind of measurement is a passage-time measurement
+% and \ipc\ knows this and will run the corresponding
+% \texttt{hydra-uniform} command after the initial run of
+% \hydra\ itself. So by issuing the command:
+% \begin{verbatim}
+% ipc tiny.pepa --source start --target stop --run-hydra
+% \end{verbatim}
+% You should produce the file: \texttt{tiny.PT\_RESULTS}.
+% The \gnuplot\ program can then be used to produce a graph of
+% the results such as the one in Figure
+% \ref{figure:tiny-passage-time-results}.
+% This graph plots the cummulative probability of completion
+% of the passage against time. That is the probability that
+% $t$ seconds after observing a $start$ activity a $stop$ activity
+% is observed.
+
+\begin{figure}{htb}
+% \includegraphics{models/tiny_cdf.pdf}
+\caption{
+\label{figure:tiny-passage-time-results}
+Shows the cummulative probability of completion against time.
+}
+\end{figure}
+
+\begin{figure}{htb}
+%\includegraphics{models/tiny_pdf.pdf}
+\caption{
+\label{figure:tiny-passage-time-pdf-results}
+Shows the probability density of completion against time.
+}
+\end{figure}
+
+
+\subsection{Changing the analysis type}
+We can specify the three different kinds of analysis with the
+three flags:
+\begin{itemize}
+\item \ipcflag{steady}
+\item \ipcflag{transient}
+\item \ipcflag{passage}
+\item \ipcflag{no-measurement}
+\end{itemize}
+
+A passage-time measure is the default unless the user does not
+specify either a measurement probe or a set of source/target actions.
+In this case \ipc\ defaults to no measurement.
+
+\TODO{Explain what each of the measurement kinds mean and in
+particular for the given example what it would compute}.
+% For steady-state then this would compute the probability that
+% we are in a state in which we have observed a start action without
+% having observed a stop action.
+
+\subsection{Re-directing the output}
+\label{redirectoutputsection}
+% By default \ipc\ outputs logging information.  The default file to
+% output the log information to is based on the name of the PEPA model
+% file.  With the command line
+% \begin{verbatim}
+% ipc  --source start --target stop tiny.pepa
+% \end{verbatim}
+% the logging information will be placed in the file \texttt{tiny.log}.
+% This can be changed with the \ipcflag{logfile} option such as
+% \begin{verbatim}
+% ipc  --source start --target stop --logfile ipc.log tiny.pepa
+% \end{verbatim}
+
+For all output files one can redirect it by giving the \ipcflag{output}
+flag. This will redirect a file of the same suffix. So for example
+if you give
+
+\begin{verbatim}
+ipc -s a -t b --output picture_cdf.csv simple.pepa
+\end{verbatim}
+
+Then the cdf comma separated value file will be placed in
+\texttt{picture\_cdf.csv} rather than \texttt{simple\_cdf.csv}.
+
+% The output model used as input to the \hydra\ tool will by
+% default be placed in the file \texttt{tiny.mod}, but this can be
+% overridden with the command line option 
+% \ipcflag{mod-file} as in:
+% \begin{verbatim}
+% ipc --source start --target stop --mod-file ipc.mod tiny.pepa
+% \end{verbatim}
+
+\ifDeveloperVersion
+To aid debugging it's often useful to dump the output to standard
+out for inspection. The \ipcflag{stdout} flag redirects the
+output to the terminal.
+\else
+\fi
+
+% As a sometimes more convenient method of redirecting output the user
+% can specify an output directory. So we can run the following commands:
+% \indexipcflag{--outputdir}
+% \begin{verbatim}
+%    mkdir output
+% ipc --source start --target stop --outputdir output tiny.pepa
+% \end{verbatim}
+% This will have the effect that all of the files generated by this run
+% of \ipc\ will be placed in the \texttt{output} directory,
+% including the \texttt{.mod} the \texttt{.log} files and also other
+% generated files which are explained in the sections that follow.
+% In particular see Sections \ref{Condoroutputsection} and
+% \ref{processdatabaseoutputsection}.
+
+Note that as mentioned above we will be giving command line options in
+their long forms, but most of them have short forms. The
+\texttt{--source} and \texttt{--target} options have the short forms
+\texttt{-s} and \texttt{-t} respectively. Because start and stop
+actions must be given for almost all runs of \ipc\ we will use the
+short options to reduce the length of command lines where appropriate
+in the remainder of this manual.
+
+% Todo: what exactly does this do? and does it suppress the later
+% modelling, I think it does.
+%   , Option "P"     ["pepaoutput"]  (ReqArg CliPepaOutput     "FILE" )           
+%     "produce PEPA with probe to FILE"
+
+%\subsubsection{Using legacy active rate calculation}
+% Allan look in the code and find out exactly what this does!!
+%   , Option "W"     ["pwbcompat"]   (NoArg CliPwbCompat)      
+%     "use legacy active rate calculation"
+
+
+\subsection{Specifying start and stop times}
+%   , Option ""      ["starttime"]   (ReqArg startTime         "STARTTIME" )
+%     "Sets the start time"
+
+%   , Option ""      ["stoptime"]    (ReqArg stopTime          "STOPTIME"  )
+%     "Sets the stop time"
+
+%   , Option ""      ["timestep"]    (ReqArg stepTime          "TIMESTEP"  )
+%     "Sets the value of the time step"
+% Via Hydra, \ipc\ computes performance measures such as probability
+% density functions (PDFs) and cumulative distribution functions (CDFs).
+% Together the PDF and CDF give a complete description of the
+% probability distribution of a random variable.  Both are evaluated
+% against increasing time in order to produce function plots.  \ipc\ has
+% default values for the start time and stop time for the plot,
+% as well as the time step which determines how many evaluations of these
+% functions Hydra is to do.  The command-line options 
+% \ipcflag{start-time}, \ipcflag{stop-time} and \ipcflag{time-step}
+% allow us to override these defaults.
+
+To specify a start time of 50 seconds and an end time of 100 seconds
+with a timestep of 10 seconds we would pass the following command-line
+options to \ipc.
+\begin{verbatim}
+ipc --start-time 50 --stop-time 100 --time-step 10 ...
+\end{verbatim}
+
+\section{Probe Specifications}
+\label{section:probespecifications}
+
+\ifDeveloperVersion
+\section{Hydra Compilation Details}
+This section details the transformations that the input pepa model goes
+through in the translation to a \hydra\ model.
+% The other compilation targets will be discussed in the following sections.
+We begin by listing the stages and then each stage will be discussed in
+greater detail.
+
+\begin{itemize}
+\item The input \pepa\ model is parsed.
+\item The syntactic sugar forms are removed: these are such constructs as:
+   \begin{itemize}
+      \item Parallel Definitions eg $P = Q <> R$.
+      \item Non-aliased sub-components, eg $(a, r).P + (b, r).Q$ is turned
+            into $P1 + Q1$ with the appropriate definitions added.
+   \end{itemize}
+\item Qualify the model. Briefly this means that each defined process is
+used exactly once from the main cooperation.
+\item Remove the hiding operator
+\end{itemize}
+
+At this point the model is still in \pepa\ format and could be output
+suitably for other \pepa\ related tools. 
+
+\begin{itemize}
+\item This model is then translated into a structured form of the
+\hydra\ transitions. Essentially this is sets of dnam transitions which may
+cooperate with each other.
+\item The structured sets of \hydra\ transitions are flattened into one list.
+At this point the apparent rates are calculated.
+\item The \hydra\ model is formatted appropriately for the
+\hydra\cite{pepahydra}
+Markov chain analyser.
+\end{itemize}
+
+\subsection{Removal of Syntactic Sugar}
+As we will see later \pepa\ models of a specific form are more convenient to
+convert into a model suitable for \hydra.
+The specific form of a \pepa\ model is a normal form, the grammar for
+this form of \pepa\ model is given in Figure
+\ref{figure:pepaNormalForm:grammar}.
+The interesting notions are the following:
+\begin{itemize}
+\item There are no parallel definitions
+eg( $P \rmdef Q \sync{} R$ )
+These are removed by substituting their definitions into the main system
+equation.
+\item There are no alias definitions,
+eg( $P \rmdef Q$). Again these are removed by substitution.
+\item All component sums have only identifiers as their left and right choices.
+\item Prefix operations only have identifiers as their successor components.
+\end{itemize}
+
+\begin{figure}
+\begin{eqnarray*}
+def & := & P \rmdef sequential ;    \\
+sequential & :=   & (a, r) . P      \\
+           & \mid & P + Q           \\
+parallel   & :=   & P               \\
+           & \mid & P < actions > Q \\
+           & \mid & P / { actions } \\
+           & \mid & P[N][actions]   \\
+model      & :=   & def^+ parallel  \\
+\end{eqnarray*}
+\caption{
+\label{figure:pepaNormalForm:grammar}
+The grammar for a pepa model in normal form.
+}
+\end{figure}
+
+\subsection{Qualifying the Model}
+
+\adcComment{Definitely rewrite this better.}
+The model in normal form however is still not ready to be converted into a
+\hydra\ model. We must distinguish between each invocation of a given defined
+process. The transformation for this must be deep, in that it must see through
+definitions otherwise one process may become another one and hence violate
+the uniqueness property that we require.
+
+The transformation provided adds a suffix number to each process name.
+Figure
+\ref{figure:qualifyModel}
+gives an example of qualifying a very simple \pepa\ model.
+We start with the main composition and the list of original definitions
+are used as a dictionary but are not included in the final model.
+The transformation then must return a new main parallel composition
+plus a new list of process definitions.
+
+\begin{figure}
+\begin{eqnarray*}
+P & \rmdef & (a, r) . Q \\
+Q & \rmdef & (b, r) . P \\
+  & & P \sync{a} P
+\end{eqnarray*}
+\begin{eqnarray*}
+P_1 & \rmdef & (a, r) . Q_1 \\
+Q_1 & \rmdef & (b, r) . P_1 \\
+P_2 & \rmdef & (a, r) . Q_2 \\
+Q_2 & \rmdef & (b, r) . P_2 \\
+  & & P_1 \sync{a} P_2
+\end{eqnarray*}
+\caption{
+\label{figure:qualifyModel}
+An example model and the qualified version.
+}
+\end{figure}
+
+The first part of the algorithm requires us to qualify a sequential
+process. We turn a given process identifier into a list of new definitions.
+We assume that $lookup(P)$ will return the sequential component which
+the process identifier $P$ is bound to in the original list of process
+definitions (which will ultimately be discarded).
+
+In order to do this we define two mutually recursive functions.
+Since most components will be cyclic we must end the recursion,
+we do this by maintaining a list of 'seen' process identifiers.
+Whenever we attempt to redefine a process in the 'seen' list then
+we return the empty set of new definitions.
+The $T\_def$ function checks if we have already seen the given
+process identifier and if not looks it up the initial list of
+process definitions. The $T$ function takes in a process name
+to define and a sequential component to qualify.
+Notice that this algorithm is trivial because we already know
+that the model is in normal form.
+
+\begin{verbatim}
+T(i, seen, P, (a, r).Q) = [ P_i = (a, r) . Q_i ] union
+                          T_def (i, seen, Q)
+T(i, seen, P, Q + R)    = ( [ P_i = Q_i + R_i ] union
+                            T_def(i, seen, Q) union
+                            T_def(i, seen, R)
+
+T_def = (i, seen, P)    = if P is in seen then []
+                          else T(i, P:seen, P, lookup(P))
+\end{verbatim}
+
+
+The second part of the algorithm proceeds via recursion through the main
+system component. This simply updates a counter upon each process encountered.
+Because we know we have already removed parallel definitions and aliases each
+encountered process can be assumed to be a sequentially defined component.
+We must return three results; the list of newly defined components, the updated
+suffix number, and the qualified parallel process.
+
+\begin{verbatim}
+T(i, P)             = ( i+1, T_def(i, [], P), P_i )
+T(i, r <acts> s)    = let (j, defs_r, r_i) = T(i, r)
+                          (k, defs_s, s_i) = T(j, s)
+                      (k, defs_r union defs_s, r_i <acts> s_i)
+T(i, p/{actions})   = let (j, defs, p_i) = T(i, p)
+                          (j, defs, p_i/{actions}
+T(i, P[N][actions]) = let (j, defs, p_i) = T_def(i, [], p)
+                          (j, defs, p_i/{actions}
+\end{verbatim}
+
+\subsection{Removal of the Hiding Operator}
+The hiding operator can now be trivially removed.
+This is because the model is in qualified form.
+The hiding operator can be removed simply by renaming the hidden actions.
+This works because each occurrence of a process is unique therefore
+its definition is used only once and each action that it may perform
+is either hidden or not hidden.
+Figure \ref{figure:removeHiding:Model}
+gives an example qualified model and the same model with the hiding operator
+removed. Notice that the processes $P_1$ and $P_2$ may still cooperate over
+the $a$ action, though it is renamed to $a_1$.
+
+\begin{figure}
+\begin{eqnarray*}
+P_1 & \rmdef & (a, r) . Q_1 \\
+Q_1 & \rmdef & (b, r) . P_1 \\
+P_2 & \rmdef & (a, r) . Q_2 \\
+Q_2 & \rmdef & (b, r) . P_2 \\
+P_3 & \rmdef & (a, r) . Q_3 \\
+Q_3 & \rmdef & (b, r) . P_3 \\
+  & & (P_1 \sync{a} P_2)/\{a\} \sync{} P_3
+\end{eqnarray*}
+\begin{eqnarray*}
+P_1 & \rmdef & (a_1, r) . Q_1 \\
+Q_1 & \rmdef & (b, r) . P_1 \\
+P_2 & \rmdef & (a_1, r) . Q_2 \\
+Q_2 & \rmdef & (b, r) . P_2 \\
+P_3 & \rmdef & (a, r) . Q_3 \\
+Q_3 & \rmdef & (b, r) . P_3 \\
+  & & (P_1 \sync{a_1} P_2) \sync{} P_3
+\end{eqnarray*}
+\caption{
+\label{figure:removeHiding:Model}
+An example qualified model showing the removal of the hiding operator.
+}
+\end{figure}
+
+\subsection{Structured \hydra\ Transitions}
+Because of the previous set of transformations the \pepa\ models which
+reach this stage of compilation are in a very strict form.
+Each sequential component can be easily tranformed into a list of transitions
+which it may perform. Where a transition consists of a rate and the
+pre-conditions for the transition to be active, and the post-conditions
+or effects on the model's state that the transition has.
+The pre-conditions at this
+stage is simply that there be at least one of the named process.
+
+
+Sequential components then are turned into a list of transitions for the
+$P_1$ component of the example given in Figure
+\ref{figure:removeHiding:Model}
+we can make the list of transitions:
+
+\begin{verbatim}
+{ kind = a
+  rate = r
+  preconditions  = P_1 > 0
+  postconditions = P_1 = P_1 - 1
+                   Q_1 = Q_1 + 1   
+}
+{ kind = b
+  rate = r
+  preconditions  = Q_1 > 0
+  postconditions = Q_1 = Q_1 - 1
+                   P_1 = P_1 + 1
+}
+\end{verbatim}
+
+These sets are of transitions are stored within the original models structure
+for the main system equation. So that we have sets of transitions cooperating
+over action names.
+
+\subsection{Flattened List of Transitions}
+The structured sets of transitions are combined together into single list
+of transitions. Where the transitions are not cooperated over this is a simple
+union. Where the transitions cooperate then two transitions are combined into a
+single one. The apparent rate of the single transition is calculated at this
+stage.
+
+% \section{The Compilation of Process Arrays}
+\else
+\fi
+
+
+\section{Attaching Performance Measurement Probes}

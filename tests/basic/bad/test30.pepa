@@ -1,0 +1,5 @@
+% File: tests/bad/test30.pepa
+% A PEPA component may not offer an activity both actively and
+% passively due to the apparent rate computation.
+P = (a, r). P + (a, infty).P ;
+(P <a> P)

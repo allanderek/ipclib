@@ -1,0 +1,77 @@
+// PEPA model of the GetLoan scenario
+
+// Mean delay time for CB=0.14s, BR=0.43s, BL=0.14s, LE=0.57s
+timeOfCB=0.11;  
+timeOfBR=0.258;  
+timeOfBL=0.14;  
+timeOfLE=0.46;  
+
+// Mean delay time for CBfast=0.11s, BRfast=0.34s, BLfast=0.11s,
+// LEfast=0.46s 
+//timeOfCBfast=0.11;  
+//timeOfBRfast=0.34;  
+//timeOfBLfast=0.11;  
+//timeOfLEfast=0.46;  
+
+// Rate is 1/duration
+r_CB=1.0/timeOfCB;
+//  r_CB=7.142857143;
+r_BR=1.0/timeOfBR;
+//  r_BR=2.325581395;
+r_BL=1.0/timeOfBL;
+//  r_BL=7.142857143;
+r_LE=1.0/timeOfLE;
+//  r_LE=1.754385965;
+
+// Rates of activities outside the passage which do not affect the SLA 
+r = 1.0;
+t = 1.0;
+
+// A really fast rate to avoid having an infinite rate
+reallyFast = 12;
+
+// Component definitions follow
+
+
+
+// Customer (CR)
+// but we need different versions of these for
+// the probed and unprobed versions
+// However this is a particularly easy model to do this for
+// because there is only one running state for this component.
+CRdone = (request, r).CRreadydone;
+CRreadyrunning = (response, reallyFast).CRcompleteddone;
+CRreadydone = (response, reallyFast).CRcompleteddone;
+CRcompleteddone = (think, t).CRdone;
+// CRreadyrunning = (response, reallyFast).CRcompleteddone;
+
+
+// Network between Customer and Broker (CB)
+CB = (request, reallyFast).CB1;
+CB1 = (transferToBroker, r_CB).CB2;
+CB2 = (transferFromBroker, reallyFast).CB3;
+CB3 = (response, r_CB).CB;
+
+// Broker (BR)
+BR = (transferToBroker, reallyFast).BR1;
+BR1 = (requestLender, r_BR).BR2;
+BR2 = (responseLender, reallyFast).BR3;
+BR3 = (transferFromBroker, r_BR).BR;
+
+// Network between Broker and Lender (BL)
+BL = (requestLender, reallyFast).BLtrans;
+BLtrans = (transferToLender, r_BL).BLwait;
+BLwait = (transferFromLender, reallyFast).BL4;
+BL4 = (responseLender, r_BL).BL;
+
+// Lender (LE)
+LE = (transferToLender, reallyFast).LE1;
+LE1 = (transferFromLender, r_LE).LE;
+
+// The model is a composition of CR, CB, BR, BL and LE
+CRreadyrunning[1000] <request, response>
+    (CB[1000] <transferToBroker, transferFromBroker> 
+        (BR[1000] <requestLender, responseLender> 
+            (BL[1000] <transferToLender, transferFromLender> LE[100])
+        )
+    )

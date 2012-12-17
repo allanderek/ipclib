@@ -1,0 +1,5 @@
+% File: tests/bad/test04.pepa
+% Wrong identifier in synchronisation set
+P = (a, r).P;
+(P <b> P)
+

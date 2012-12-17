@@ -1,0 +1,11 @@
+// This test is for wildcards
+// If the wild card is working this should have 4 states, otherwise it will
+// have 16 states.
+r  = 1.0 ;
+
+P1 = (a, r) . P2 ;
+P2 = (b, r) . P3 ;
+P3 = (c, r) . P4 ;
+P4 = (d, r) . P1 ;
+
+P1 <*> P1

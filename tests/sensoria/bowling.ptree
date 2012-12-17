@@ -1,0 +1,7 @@
+Experiment ?rate [ 0.5, 1.0, 1.5, 2.0 ]
+PassageEnd Source [send] Target [roll_0,roll_1,roll_2,roll_3,roll_4,roll_5,roll_6] 
+ [ start-time = 0.5
+ , stop-time  = 10.0
+ , time-step  = 0.2
+ ]
+ ModelRate [ sample_rate = ?rate ] ModelFile "bowling.pepa"

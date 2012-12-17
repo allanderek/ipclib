@@ -1,0 +1,4 @@
+% File: tests/bad/test20.pepa
+% Ill-formed numberic constant used for rate
+P = (a, 1.5E).P;
+(P <> P)

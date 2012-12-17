@@ -1,0 +1,20 @@
+rq = 1.0 ;
+rp = 1.0 ;
+rB = 1.0 ;
+rA = 1.0 ;
+rc = 1.0 ;
+ru = 1.1 ;
+
+KDC = (request, _) . KDC
+    + (response, rp) . KDC
+    ;
+
+AliceAndBob0 = ( request, rq) . AliceAndBob1 ;
+AliceAndBob1 = ( response, _) . AliceAndBob2 ;
+AliceAndBob2 = ( sendBob, rB) . AliceAndBob3 ;
+AliceAndBob3 = ( sendAlice, rA) . AliceAndBob4 ;
+AliceAndBob4 = ( confirm, rc) . AliceAndBob5 ;
+AliceAndBob5 = ( usekey, ru) . AliceAndBob0 ;
+
+// Main system equation
+KDC <request, response> AliceAndBob0[3] 

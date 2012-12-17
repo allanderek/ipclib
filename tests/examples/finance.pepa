@@ -1,0 +1,68 @@
+// For now I'll stick to a model which is hopefully analysable
+// using a markov chain but I may then upgrade that.
+
+r_request    = 1.0 ;
+r_enter_data = 1.0 ;
+r_upload     = 1.0 ;
+r_reapply    = 1.0 ;
+
+r_validate   = 1.0 ;
+r_predecide  = 1.0 ;
+r_sendBank   = 1.0 ;
+
+r_decide     = 1.0 ;
+r_inform     = 1.0 ;
+
+p0           = 1 / 3 ;
+p1           = 1 / 3 ;
+p2           = 1 / 3 ;
+
+q0           = 1 / 2 ;
+q1           = 1 / 2 ;
+
+s0           = 1 / 2 ;
+s1           = 1 / 2 ;
+
+t0           = 1 / 2 ;
+t1           = 1 / 2 ;
+
+
+
+Customer = (request, r_request) . Entering ;
+Entering = (enterData, r_enter_data) . Upload ;
+Upload   = (uploadData, r_upload) . Wait ;
+Wait     = (approve, infty) . Customer
+         + (decline, infty) . Decide 
+         ;
+// In the face of rejection the customer may upload more data
+// say about securities for example, at the moment this is kind
+// of useless since I have no ending activity since 'reapply' could
+// be either continue or stop, but I may use it later.
+Decide   = (reapply, r_reapply * t0) . Entering
+         + (reapply, r_reapply * t1) . Customer
+         ;
+
+
+Service  = (uploadData, infty) . Validate ;
+Validate = (validateData, r_validate) . SendBank ;
+SendBank = (sendBank, r_sendBank) . Service ;
+
+Bank      = (sendBank, infty) . PreDecide ;
+PreDecide = (predecide, r_predecide * p0) . Approve 
+          + (predecide, r_predecide * p1) . Decline 
+          + (predecide, r_predecide * p2) . Employee
+          ;
+Employee  = (decide, r_decide * q0) . Confirm
+          + (decide, r_decide * q1) . Decline
+          ;
+// So if the first employee approves the loan they must get
+// confirmation from their supervisor
+Confirm   = (decide, r_decide * s0) . Approve
+          + (decide, r_decide * s1) . Decline
+          ;
+
+Approve   = (approve, r_inform) . Bank ;
+Decline   = (decline, r_inform) . Bank ;
+
+Customer <uploadData, approve, decline>
+(Service <sendBank>Bank)

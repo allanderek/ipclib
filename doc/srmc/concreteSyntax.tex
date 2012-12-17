@@ -1,0 +1,354 @@
+The concrete syntax for srmc model files is given in Figure
+\ref{figure:syntax:srmcfiles}.
+The parts of the grammar which are written down within an srmc file
+are highlighted in \textcolor{blue}{blue}, everything else is a 
+bnf style operator.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% General commands for writing a grammar
+\newcommand{\esyntaxlabel}[1]{
+( #1 )
+}
+
+\newcommand{\esyntaxtopline}[3]{
+$ #1 $ & $ := $ & $ #2 $ & \esyntaxlabel{ #3 }
+}
+\newcommand{\esyntaxline}[2]{
+& $ \mid $ & $ #1 $ &  \esyntaxlabel{ #2 }
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The commands for the grammar
+\newcommand{\model}{ model }
+\newcommand{\definitionList}{def\_list}
+\newcommand{\definition}{def}
+
+\newcommand{\ratedef}{rate\_def}
+\newcommand{\processdef}{process\_def}
+\newcommand{\namespace}{name\_space}
+
+% Rates
+\newcommand{\rateId}{rate\_ident}
+\newcommand{\qualifiedRateId}{Q\rateId}
+\newcommand{\rateSet}{rate\_set}
+\newcommand{\rate}{rate}
+\newcommand{\rateExp}{rate\_exp}
+\newcommand{\commaRateExps}{rate\_list}
+\newcommand{\rateOp}{rOper}
+\newcommand{\rateCond}{rCond}
+
+
+% Processes
+\newcommand{\processId}{process\_ident}
+\newcommand{\qualifiedProcessId }{ Q\processId }
+\newcommand{\processSet}{process\_set}
+\newcommand{\process}{process}
+\newcommand{\commaProcesses}{process\_list}
+\newcommand{\prefix}{prefix}
+\newcommand{\condOper}{condOper}
+
+% Conditional behaviours
+\newcommand{\beCondition}{condition}
+
+% Name spaces
+\newcommand{\namespaceId}{space\_ident}
+\newcommand{\qualifiedNameSpaceId}{Q\namespaceId}
+
+% Actions
+\newcommand{\actionName}{action\_name}
+\newcommand{\actionList}{action\_list}
+
+% Numbers
+\newcommand{\forgivFloat}{int\_or\_float}
+
+%Identifiers
+\newcommand{\lowerid}{lower\_ident}
+\newcommand{\upperid}{upper\_ident}
+\newcommand{\qualifier}{qualifier}
+\newcommand{\qualifiedLower}{Q\lowerid}
+\newcommand{\qualifiedUpper}{Q\upperid}
+
+\newcommand{\lowers}{\concrete{a}-\concrete{z}}
+\newcommand{\uppers}{\concrete{A}-\concrete{Z}}
+\newcommand{\digits}{\concrete{0}-\concrete{9}}
+
+\newcommand{\systemEquation}{system}
+
+% bnf operators
+\newcommand{\optional}[1]{\langle #1 \rangle}
+\newcommand{\oneOrMore}[1]{ #1^+ }
+\newcommand{\bnfBracket}[1]{ \{ #1 \} }
+\newcommand{\oneOrMoreBracketed}[1]{\oneOrMore{\bnfBracket{#1}}}
+\newcommand{\zeroOrMore}[1]{ #1^* }
+\newcommand{\zeroOrMoreBracketed}[1]{\zeroOrMore{\bnfBracket{#1}}}
+
+
+%Parts of the actual concrete grammar
+\newcommand{\concrete}[1]{\textcolor{blue}{\texttt{#1}}}
+\newcommand{\concreteBraces}[1]{\concrete{ \{ } #1 \concrete{ \} }}
+\newcommand{\equals}{\concrete{=}}
+\newcommand{\comma}{\concrete{,}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The grammar figure
+\begin{figure}[htb]
+\begin{tabular}{lclr}
+% Models
+\esyntaxtopline{ \model }
+               { \definitionList\ \systemEquation }
+               { model }
+\\
+% Definition lists
+\esyntaxtopline{ \definitionList }
+               { \oneOrMoreBracketed{ \definition \concrete{;} } }
+               { definition list }
+\\
+%% \esyntaxline   { \definition }
+%%                { one definition }
+%% \\
+% Definitions
+\esyntaxtopline{ \definition }
+               { \ratedef }
+               { rate definition }
+\\
+\esyntaxline   { \processdef }
+               { process definition }
+\\
+\esyntaxline   { \namespace }
+               { name space }
+\\
+
+% RateDefinitions
+\esyntaxtopline{ \ratedef }
+               { \rateId\ \equals\ \rateSet }
+               { rate definition }
+\\
+\esyntaxtopline{ \rateSet }
+               { \rateExp }
+               { Single rate }
+\\
+\esyntaxline   { \concreteBraces{ \commaRateExps } }
+               { set of rates }
+\\
+\esyntaxtopline{ \commaRateExps }
+               { \rateExp\ \oneOrMoreBracketed{ \comma\ \rateExp } }
+               { set of rates }
+\\
+% Process Definitions
+\esyntaxtopline{ \processdef }
+               { \optional{\concrete{ \# } } \processId
+                 \concrete{ = } \process }
+               { process definition }
+\\
+% Name space selection
+\esyntaxtopline{ \namespace }
+               { \namespaceId :: \concrete{ = }
+                                 \concreteBraces{ \qualifiedNameSpaceId 
+                                                  \oneOrMoreBracketed{ \comma\ \qualifiedNameSpaceId }
+                                                }
+               }
+               { Name space selection}
+\\
+% Name space
+\esyntaxtopline{ \namespace }
+               { \namespaceId :: \concreteBraces{ \definitionList } }
+               { Name space }
+\\
+% Components
+\esyntaxtopline{ \process }
+               { \qualifiedProcessId }
+               { named process }
+\\
+\esyntaxline   { \prefix
+                 \ \process
+               }
+               { Prefix components }
+\\
+\esyntaxline   { \concrete{ if }
+                 \ \beCondition
+                 \ \concrete{ then }
+                 \ \prefix
+                 \ \process
+               }
+               { conditional behaviour }
+\\
+\esyntaxline   { \process
+                 \concrete{ + }
+                 \process
+               }
+               { Choice }
+\\
+\esyntaxline   { \process
+                 \concrete{ < }
+                 \optional{ \actionList }
+                 \concrete{ > }
+                 \process
+               }
+               { Cooperation }
+\\
+\esyntaxline   { \process \concrete{ / }
+                          \concreteBraces{ \actionList }
+               }
+               { Hiding }
+\\
+\esyntaxline   { \qualifiedProcessId 
+                 \concrete{ [ }
+                 \concrete{ \digits }
+                 \concrete{ ] }
+                 \optional{ \concrete{ [ }
+                            \actionList
+                            \concrete{ ] }
+                          }
+               }
+               { process array }
+\\
+% Prefixes
+\esyntaxtopline{ \prefix }
+               { \concrete{ ( } \actionName
+                 \concrete{,}
+                 \rate
+                 \concrete{ ) . }
+               }
+               { timed prefix }
+\\
+\esyntaxline   { \actionName 
+                 \concrete{ . }
+               }
+               { immediate prefix }
+\\
+
+% conditions
+\esyntaxtopline{ \beCondition }
+               { \qualifiedRateId
+                 \ \condOper
+                 \ \rateExp
+               }
+               { behaviour condition }
+\\
+
+% condition operators
+\esyntaxtopline{ \condOper }
+               {      \concrete{ < }
+                 \mid \concrete{ > }
+                 \mid \concrete{ = }
+                 \mid \concrete{ >= }
+                 \mid \concrete{ <= }
+                 \mid \concrete{ <> }
+               }
+               { condition operators }
+\\
+% Rates
+\esyntaxtopline{ \rate }
+               { \concrete{ infty } \mid \concrete{ \_ } }
+               { passive }
+\\
+\esyntaxline   { \rateExp }
+               { timed rate expression }
+\\
+\esyntaxline   { \forgivFloat
+                 \concrete{ : immediate } 
+               }
+               { immediate }
+\\
+% Rate Expressions
+\esyntaxtopline{ \rateExp }
+               { \qualifiedRateId }
+               { named rate }
+\\
+\esyntaxline   { \forgivFloat }
+               { literal float }
+\\
+\esyntaxline   { \rateExp\ \rateOp\ \rateExp }
+               { binary op expression }
+\\
+\esyntaxline   { \qualifiedProcessId }
+               { process rate }
+\\
+\esyntaxline   { \concrete{ if }
+                 \rateCond
+                 \concrete{ then }
+                 \rateExp 
+                 \concrete{ else }
+                 \rateExp
+               }
+               { conditional rate }
+\\
+               
+% Rate Expression binary operators
+\esyntaxtopline{ \rateOp }
+               { \concrete{ + }
+                 \mid
+                 \concrete{ - }
+                 \mid
+                 \concrete{ / }
+                 \mid
+                 \concrete{ * }
+               }
+               { rate operators }
+\\
+% Rate conditions
+\esyntaxtopline{ \rateCond }
+               { \qualifiedProcessId }
+               { Process present }
+\\
+
+% Forgiving Floats
+\esyntaxtopline{ \forgivFloat }
+               { \concrete{ \digits }
+                 \optional{ \concrete{. \digits } }
+               }
+               { integer or float }
+\\
+% Action List
+\esyntaxtopline{ \actionList }
+               { \actionName \oneOrMoreBracketed{ \concrete{ , }
+                                                  \actionName
+                                                }
+               }
+               { comma action list }
+\\
+
+% Identifiers
+\esyntaxtopline{ \actionName }
+               { [\lowers]\zeroOrMore{[\lowers\ \uppers\ \digits]} }
+               { lower identifier }
+\\
+\esyntaxtopline{ \rateId }
+               { [\lowers]\zeroOrMore{[\lowers\ \uppers\ \digits]} }
+               { lower identifier }
+\\
+\esyntaxtopline{ \processId }
+               { [\uppers]\zeroOrMore{[\lowers\ \uppers\ \digits]} }
+               { upper identifier }
+\\
+\esyntaxtopline{ \namespaceId }
+               { [\uppers]\zeroOrMore{[\lowers\ \uppers\ \digits ]} }
+               { all upper }
+\\
+\esyntaxtopline{ \qualifier }
+               { \zeroOrMoreBracketed{ \namespaceId \concrete{::} } }
+               { name qualifier }
+\\
+\esyntaxtopline{ \qualifiedRateId }
+               { \qualifier\ \rateId }
+               { qualified rate name }
+\\
+\esyntaxtopline{ \qualifiedProcessId }
+               { \qualifier\ \processId }
+               { qualified process name }
+\\
+\esyntaxtopline{ \qualifiedNameSpaceId }
+               { \qualifier\ \namespaceId }
+               { qualified process name }
+\\
+% Finallly the system description
+\esyntaxtopline{ \systemEquation }
+               { \process }
+               { main system }
+\\
+\end{tabular}
+\caption{
+\label{figure:syntax:srmcfiles}
+The concrete syntax for srmc model files
+}
+\end{figure}

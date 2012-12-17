@@ -1,0 +1,4 @@
+% File: tests/bad/test50.pepa
+% Syntax error, missing comma in synchronisation set
+P = (a, r).P;
+(P <a a> P)

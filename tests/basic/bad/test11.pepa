@@ -1,0 +1,5 @@
+% File: tests/bad/test11.pepa
+% Illegal synchronisation (on tau)
+P = (tau, r).P;
+Q = (tau, r).Q;
+(P <tau> Q)

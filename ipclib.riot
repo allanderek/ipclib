@@ -1,0 +1,771 @@
+From background-static Wed Aug 27 11:48:44 BST 2008
+Message-Id: <riot.20080827114844.1@riot.invalid>
+Date: Wed Aug 27 11:48:44 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 11:48:44 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Static analysis to detect the mixing of passive and active rates.
+
+Static analysis to detect the mixing of passive and active rates.
+This is not a top priority since we do so during compilation, but of course
+it is nicer to give the user a message up front.
+
+From background-static Thu Feb 19 09:41:04 GMT 2009
+Message-Id: <riot.20090219094104.1@riot.invalid>
+Date: Thu Feb 19 09:41:04 GMT 2009
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Thu Feb 19 09:41:04 GMT 2009
+Content-Type: text/plain; charset=utf-8
+Subject: Big point, the master and passage probes may get out of sync.
+
+Big point, the master and passage probes may get out of sync.
+Fixing this could fix the problem that Stephen had in Leicester.
+Certainly need to look at specifying start and stop actions instead
+of a probe.
+
+From background-static Wed Feb 18 15:17:46 GMT 2009
+Message-Id: <riot.20090218151746.1@riot.invalid>
+Date: Wed Feb 18 15:17:46 GMT 2009
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Feb 18 15:17:46 GMT 2009
+Content-Type: text/plain; charset=utf-8
+Subject: Print out the source and target events in L.Ptree.Print for passage queries
+
+Print out the source and target events in L.Ptree.Print for passage queries
+
+From background-static Wed Feb 18 14:08:50 GMT 2009
+Message-Id: <riot.20090218140850.1@riot.invalid>
+Date: Wed Feb 18 14:08:50 GMT 2009
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Feb 18 14:08:50 GMT 2009
+Content-Type: text/plain; charset=utf-8
+Subject: Bug with laziness of errors. Try a relatively large model with a static-analysis warning such as a
+
+Bug with laziness of errors. Try a relatively large model with a static-analysis warning such as a
+defined but unused rate variable. You will see that the system is derived and the answer calculated
+but we then simply print out an error message. For very large models this could be extremely
+frustrating. 
+
+From background-static Thu Feb  5 17:16:16 GMT 2009
+Message-Id: <riot.20090205171616.1@riot.invalid>
+Date: Thu Feb  5 17:16:16 GMT 2009
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Thu Feb  5 17:16:16 GMT 2009
+Content-Type: text/plain; charset=utf-8
+Subject: For transient analysis we (in general) require a non-transposed generator matrix, but we
+
+For transient analysis we (in general) require a non-transposed generator matrix, but we
+may be able to generate a pre-transposed embedded markov chain FROM the non-transposed
+generator matrix.
+
+From background-static Mon Jan 19 11:56:32 GMT 2009
+Message-Id: <riot.20090119115632.1@riot.invalid>
+Date: Mon Jan 19 11:56:32 GMT 2009
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Jan 19 11:56:32 GMT 2009
+Content-Type: text/plain; charset=utf-8
+Subject: The GeneratorMatrix datatype should have two constructors for a transposed version
+
+The GeneratorMatrix datatype should have two constructors for a transposed version
+and a non-transposed version. This means we could just construct the transposed version
+rather than the non-transposed version and I hope that this is faster.
+This will mean that we have to take into account that we are using the non-transposed
+version when performing such operations as computing the Embedded Markov Chain, hence
+the reason I suggest to record this information in the data type.
+
+From background-static Fri Dec 12 15:10:56 GMT 2008
+Message-Id: <riot.20081212151056.1@riot.invalid>
+Date: Fri Dec 12 15:10:56 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Fri Dec 12 15:10:56 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: I really don't think that 'Render' should be in the Ptree.Result data structure.
+
+I really don't think that 'Render' should be in the Ptree.Result data structure.
+It should be a graph representation (such as [ SimpleLine ]) and then we only render it
+when we are outputting it. This means that we can store a csv graph output as the same
+kind of result as a graphical one. Ie we store it as a graph, not a rendered graph.
+
+From background-static Tue Dec  9 12:07:28 GMT 2008
+Message-Id: <riot.20081209120728.1@riot.invalid>
+Date: Tue Dec  9 12:07:28 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Tue Dec  9 12:07:28 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Do some testing of L.P.T.Simplify.reduceConstantMappings, in particular can we reduce
+
+Do some testing of L.P.T.Simplify.reduceConstantMappings, in particular can we reduce
+virtual components of more than one level. Eg:
+P = [ A + B ] ;
+A = [ R ] ;
+R = [ SomeActualProcess ] ;
+
+Additionally we really need to check what happens if we have a cyclic definition.
+P = [ A + B ] ;
+A = [ P ] ;
+
+From background-static Tue Nov 25 11:41:30 GMT 2008
+Message-Id: <riot.20081125114130.1@riot.invalid>
+Date: Tue Nov 25 11:41:30 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Tue Nov 25 11:41:30 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: In the simplifier when we expand aliases, we should probably also expand rate (and size) expressions
+
+In the simplifier when we expand aliases, we should probably also expand rate (and size) expressions
+so that functional rates do not count expanded out aliases, that way we can remove the alias
+definitions.
+
+From background-static Mon Nov 17 12:30:30 GMT 2008
+Message-Id: <riot.20081117123030.1@riot.invalid>
+Date: Mon Nov 17 12:30:30 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Nov 17 12:30:30 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: So one big problem in performance trees is that earlier things may depend
+
+So one big problem in performance trees is that earlier things may depend
+on later ones. For example plot option name, if, ultimately the model is
+a biopepa model and I translate it, then I want to do some translation on
+those plot names.
+Caveat sometimes it might be nice to show: E:S_low.
+
+From background-static Mon Nov 17 12:26:57 GMT 2008
+Message-Id: <riot.20081117122657.1@riot.invalid>
+Date: Mon Nov 17 12:26:57 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Nov 17 12:26:57 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Check out obj on Hackage, might be a cool way to draw 3d images for fancy graphs
+
+Check out obj on Hackage, might be a cool way to draw 3d images for fancy graphs
+
+From background-static Tue Nov  4 16:52:36 GMT 2008
+Message-Id: <riot.20081104165236.1@riot.invalid>
+Date: Tue Nov  4 16:52:36 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Tue Nov  4 16:52:58 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Allow state descriptions and graphs etc to ignore any stateless components.
+
+Allow state descriptions and graphs etc to ignore any stateless components.
+For example we often define something like:
+Server = (request, infty) . Server
+       + (service, r)     . Server
+       ;
+This component has only one state and hence could be removed from things such as
+the steady state populations or a timeseries. In fact we use these stateless components
+in the translation from biopepa to PEPA and hence it would be quite nice to ignore
+them, although we do at least have the names option to Plot.
+
+From background-static Tue Nov  4 16:24:19 GMT 2008
+Message-Id: <riot.20081104162419.1@riot.invalid>
+Date: Tue Nov  4 16:24:19 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Tue Nov  4 16:24:19 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Sort out stoichiometry in biopepa, shouldn't be a string for starters.
+
+Sort out stoichiometry in biopepa, shouldn't be a string for starters.
+
+From background-static Mon Nov  3 10:04:37 GMT 2008
+Message-Id: <riot.20081103100437.1@riot.invalid>
+Date: Mon Nov  3 10:04:37 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Nov  3 10:04:37 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Get rid of the seperate flags for the smaller applications.
+
+Get rid of the seperate flags for the smaller applications.
+Either they use the ones from ipc, or they have their own ones plus an "--ipc-flags" command.
+To do this we should turn ProbeTranslateFlags into a data structure like GenerateOptions.
+
+From background-static Wed Oct 29 17:47:37 GMT 2008
+Message-Id: <riot.20081029174737.1@riot.invalid>
+Date: Wed Oct 29 17:47:37 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Nov  3 12:27:33 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: *DONE* Add in an option to not warn about deadlock, especially for transient analysis.
+
+*DONE* Add in an option to not warn about deadlock, especially for transient analysis.
+
+From background-static Tue Oct 28 18:08:19 GMT 2008
+Message-Id: <riot.20081028180819.1@riot.invalid>
+Date: Tue Oct 28 18:08:19 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Tue Oct 28 18:08:19 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Static analysis should detect if we have
+
+Static analysis should detect if we have
+ P <*> Q
+but P and Q do not have any activities in common.
+
+From background-static Tue Oct 28 18:04:11 GMT 2008
+Message-Id: <riot.20081028180411.1@riot.invalid>
+Date: Tue Oct 28 18:04:11 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Tue Oct 28 18:04:11 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Re-introduce self-loop detection to the static analyser.
+
+Re-introduce self-loop detection to the static analyser.
+
+From background-static Tue Oct 28 17:37:18 GMT 2008
+Message-Id: <riot.20081028173718.1@riot.invalid>
+Date: Tue Oct 28 17:37:18 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Tue Oct 28 17:37:18 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Revamp the analysis. I think I might try to go for performing the analysis
+
+Revamp the analysis. I think I might try to go for performing the analysis
+all at one time. Actually may not actually work. In any case I would rather
+it returned something other than the MainControl. I just want it to return
+a result. Something like:
+ Passed
+ SomeWarnings [Warnings]
+ SomeFailings [Failings]
+
+From background-static Mon Oct 27 12:29:41 GMT 2008
+Message-Id: <riot.20081027122941.1@riot.invalid>
+Date: Mon Oct 27 12:29:41 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Oct 27 12:29:41 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Allow for functional  rates within a rate definition, currently this is broken
+
+Allow for functional  rates within a rate definition, currently this is broken
+because we complain about not being able to reduce a constant expression.
+
+From background-static Tue Dec  2 17:07:10 GMT 2008
+Message-Id: <riot.20081202170710.1@riot.invalid>
+Date: Tue Dec  2 17:07:10 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Tue Dec  2 17:07:10 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: I should be scoping activity names in srmc.
+
+I should be scoping activity names in srmc.
+Note though that this would mean I would have to 'deal' with probes in the same way
+that I'm 'dealing' with process names in query specifications.
+
+From background-static Mon Oct 27 12:32:15 GMT 2008
+Message-Id: <riot.20081027123215.2@riot.invalid>
+Date: Mon Oct 27 12:32:15 GMT 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Oct 27 12:32:15 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Allow for deadlocked states to be allowed. These are useful for transient analysis
+
+Allow for deadlocked states to be allowed. These are useful for transient analysis
+with multiple source states. Generally transient analysis often has only a single
+source state and hence the generator matrix is not computed and hence we do not
+complain about deadlocked states. However if there are multiple states we will
+compute the embedded markov chain and may complain about a deadlocked state.
+Although it's not clear what to do in that situation, how do we weight the source
+states?
+
+From background-static Wed Oct  1 17:47:54 BST 2008
+Message-Id: <riot.20081001174754.1@riot.invalid>
+Date: Wed Oct  1 17:47:54 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Thu Jan  8 10:43:46 GMT 2009
+Content-Type: text/plain; charset=utf-8
+Subject: *DONE* The Model (and related) datatype(s) should be moved from L.P.C.States to a module of its own
+
+*DONE* The Model (and related) datatype(s) should be moved from L.P.C.States to a module of its own
+because it is useful for non-statespace based compilations such as hierarchical hydra
+and (possibly) ODE/SSA.
+
+From background-static Wed Sep 17 12:06:44 BST 2008
+Message-Id: <riot.20080917120644.1@riot.invalid>
+Date: Wed Sep 17 12:06:44 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Sep 17 12:06:44 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Add indentation to the performance tree viewing widget, which is sadly not really happening at the moment, I thought it would happen automatically but sadly not.
+
+Add indentation to the performance tree viewing widget, which is sadly not really happening at the moment, I thought it would happen automatically but sadly not.
+
+From background-static Mon Sep 15 16:05:01 BST 2008
+Message-Id: <riot.20080915160501.1@riot.invalid>
+Date: Mon Sep 15 16:05:01 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Sep 15 16:05:01 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Allow the saving of pepa model (and other) files in gipc
+
+Allow the saving of pepa model (and other) files in gipc
+
+From background-static Fri Sep 12 10:12:20 BST 2008
+Message-Id: <riot.20080912101220.1@riot.invalid>
+Date: Fri Sep 12 10:12:20 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Fri Sep 12 10:12:20 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Add mtl as a general dependency (it's already one for ipcweb) and make MainControlT an
+
+Add mtl as a general dependency (it's already one for ipcweb) and make MainControlT an
+instance of MonadIO.
+
+From background-static Mon Sep  1 15:42:59 BST 2008
+Message-Id: <riot.20080901154259.1@riot.invalid>
+Date: Mon Sep  1 15:42:59 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Sep  1 15:42:59 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Overhall the printing. We now want two prefixes:
+
+Overhall the printing. We now want two prefixes:
+hprintBLAH means turn a BLAH into a nicely printed String.
+pprintBLAH means turn a BLAH into a pretty printed Doc. 
+
+From background-static Mon Sep  1 14:35:41 BST 2008
+Message-Id: <riot.20080901143541.1@riot.invalid>
+Date: Mon Sep  1 14:35:41 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Sep  1 14:35:41 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Parsec parsers used in the parsing of command-line options. These should be wrapped around
+
+Parsec parsers used in the parsing of command-line options. These should be wrapped around
+a combinator which insists on having 'eof' at the end. Otherwise you can for example write
+--transform-rule "P ==> P $alksd" where '$' is not in the syntax of rules. The parse will
+not currently fail, because after the 'P' we have a complete parse of a rule so that part
+is accepted and the rest is returned as the remainder of the input. 
+So basically we want to have in Utils or in Pepa.Parser a combinator:
+commandLineFlag : Parser a -> Parser a
+commandLineFlag aParser = do a <- aParser
+                             eof
+                             return a
+
+From background-static Mon Sep  1 10:16:56 BST 2008
+Message-Id: <riot.20080901101656.1@riot.invalid>
+Date: Mon Sep  1 10:16:56 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Sep  1 10:16:56 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Allow normalising passage-end calculations over their eventual probabilities
+
+Allow normalising passage-end calculations over their eventual probabilities
+to produce the cdf and pdfs we have in mind.
+Requires using more than one absorbing state which we currently do not have.
+Note though we only need one per target set, not one per target state.
+
+From background-static Thu Aug 28 13:53:24 BST 2008
+Message-Id: <riot.20080828135324.1@riot.invalid>
+Date: Thu Aug 28 13:53:24 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Nov  3 12:26:37 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: *DONE* (without printing which is just in the syntax module, fair enough)
+
+*DONE* (without printing which is just in the syntax module, fair enough)
+Change the structure of the Language.Pepa.Probes directory to the standard used
+throughout. That is have a Syntax.hs and Parser.hs module. The rest can stay the same
+though we may consider moving AddProbes to Apply.
+
+From background-static Wed Aug 27 14:17:23 BST 2008
+Message-Id: <riot.20080827141723.1@riot.invalid>
+Date: Wed Aug 27 14:17:23 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 14:17:23 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Move IpcWeb into the Ipc directory instead of the web directory.
+
+Move IpcWeb into the Ipc directory instead of the web directory.
+
+From background-static Wed Aug 27 13:11:00 BST 2008
+Message-Id: <riot.20080827131100.1@riot.invalid>
+Date: Wed Aug 27 13:11:00 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 13:11:00 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Consider using only action identifiers within cooperations rather than fully parsed
+
+Consider using only action identifiers within cooperations rather than fully parsed
+actions. I don't think we ever actually use the fully parsed nature of it and doing
+so would be questionable anyway. Of course we must consider where it is used first
+but I think we could have just names. If we do so then we should take the opportunity
+to allow the special '*' case to cooperate over all shared names. (P <*> Q).
+
+From background-static Wed Aug 27 12:31:03 BST 2008
+Message-Id: <riot.20080827123103.2@riot.invalid>
+Date: Wed Aug 27 12:31:03 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:31:03 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Can we make a normal form of pepa model by taking two independent processes as one?
+
+Can we make a normal form of pepa model by taking two independent processes as one?
+For example:
+P1 = (a, r) . (b, r) . P1
+   + (c, r) . (b, r) . P1
+   ;
+Can be optimised as:
+P1 = (a, r) . P2
+   + (c, r) . P2
+   ;
+P2 = (b, r) . P1 ;
+My question is can we extend-and-formalise this notion?
+
+From background-static Wed Aug 27 12:32:26 BST 2008
+Message-Id: <riot.20080827123226.3@riot.invalid>
+Date: Wed Aug 27 12:32:26 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:32:26 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Would be nice to get gnuplot working to produce pdfs.
+
+Would be nice to get gnuplot working to produce pdfs.
+
+From background-static Wed Aug 27 12:32:44 BST 2008
+Message-Id: <riot.20080827123244.4@riot.invalid>
+Date: Wed Aug 27 12:32:44 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:32:44 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Some more good XSP examples.
+
+Some more good XSP examples.
+
+From background-static Wed Aug 27 12:33:12 BST 2008
+Message-Id: <riot.20080827123312.5@riot.invalid>
+Date: Wed Aug 27 12:33:12 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:33:12 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Update grammar for srmc in Hinf to reflect that namespaces need only begin with a capital letter
+
+Update grammar for srmc in Hinf to reflect that namespaces need only begin with a capital letter
+
+From background-static Wed Aug 27 12:34:24 BST 2008
+Message-Id: <riot.20080827123424.6@riot.invalid>
+Date: Wed Aug 27 12:34:24 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:34:24 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Sort out a way to do updates to the srmc web page downloads section automatically
+
+Sort out a way to do updates to the srmc web page downloads section automatically
+(or at least easily and write down the instructions).
+
+From background-static Wed Aug 27 12:36:01 BST 2008
+Message-Id: <riot.20080827123601.7@riot.invalid>
+Date: Wed Aug 27 12:36:01 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:36:01 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Hydra has "\invariant" we could use this to specify that the number of
+
+Hydra has "\invariant" we could use this to specify that the number of
+components is constant. We may even group the components into derivatives
+and state that this must remain at one (or length of process array).
+
+From background-static Wed Aug 27 12:36:19 BST 2008
+Message-Id: <riot.20080827123619.8@riot.invalid>
+Date: Wed Aug 27 12:36:19 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:36:19 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Update the name supply so that it only generates a new name when it must.
+
+Update the name supply so that it only generates a new name when it must.
+
+From background-static Wed Aug 27 12:37:47 BST 2008
+Message-Id: <riot.20080827123747.9@riot.invalid>
+Date: Wed Aug 27 12:37:47 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 15:19:04 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Sort out a really good test suite. Both for unit testing as we do with --compare-pepato
+
+Sort out a really good test suite. Both for unit testing as we do with --compare-pepato
+but also for comparing with known results (or basically regression testing) and finally
+some quickcheck properties. This should be a major effort to produce something very
+good and usable.
+Note also that we should incorporate Haskell Program Coverage into the test suite.
+
+From background-static Wed Aug 27 12:38:15 BST 2008
+Message-Id: <riot.20080827123815.10@riot.invalid>
+Date: Wed Aug 27 12:38:15 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:38:15 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Work on producing far nicer parser error messages. I know this
+
+Work on producing far nicer parser error messages. I know this
+is not a very concrete todo but still.
+
+From background-static Wed Aug 27 12:39:31 BST 2008
+Message-Id: <riot.20080827123931.11@riot.invalid>
+Date: Wed Aug 27 12:39:31 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:39:31 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: I would still (as of august 2008) like to do a fairly major
+
+I would still (as of august 2008) like to do a fairly major
+clean-up/refactor of smc and smcgraph. I may incorporate this into
+getting it to work with the odes.
+
+From background-static Wed Aug 27 12:40:06 BST 2008
+Message-Id: <riot.20080827124006.12@riot.invalid>
+Date: Wed Aug 27 12:40:06 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:40:06 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Fix self-loop detection, the problem seems to be with parallel definitions.
+
+Fix self-loop detection, the problem seems to be with parallel definitions.
+
+From background-static Wed Aug 27 12:40:42 BST 2008
+Message-Id: <riot.20080827124042.13@riot.invalid>
+Date: Wed Aug 27 12:40:42 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:40:42 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Static analysis of probes, in particular the names each one uses.
+
+Static analysis of probes, in particular the names each one uses.
+And of course for XSP the process and rate names which are used.
+
+From background-static Wed Aug 27 12:41:42 BST 2008
+Message-Id: <riot.20080827124142.14@riot.invalid>
+Date: Wed Aug 27 12:41:42 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:41:42 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Re-categorise all the options in Cli.hs/miscelleaneous excepting of
+
+Re-categorise all the options in Cli.hs/miscelleaneous excepting of
+course any that truly are miscelleaneous.
+
+From background-static Wed Aug 27 12:42:14 BST 2008
+Message-Id: <riot.20080827124214.15@riot.invalid>
+Date: Wed Aug 27 12:42:14 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Nov  3 12:24:58 GMT 2008
+Content-Type: text/plain; charset=utf-8
+Subject: *DONE* We can redo --flat-mod quite easily with the new state space generator.
+
+*DONE* We can redo --flat-mod quite easily with the new state space generator.
+
+From background-static Wed Aug 27 12:43:03 BST 2008
+Message-Id: <riot.20080827124303.16@riot.invalid>
+Date: Wed Aug 27 12:43:03 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:43:03 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Re-doing the whole Hydra compilation will be a little more work, the main problem is
+
+Re-doing the whole Hydra compilation will be a little more work, the main problem is
+avoiding printing out those large rate expressions. We basically need to output a function
+to compute the rates for each state.
+
+From background-static Wed Aug 27 12:54:00 BST 2008
+Message-Id: <riot.20080827125400.17@riot.invalid>
+Date: Wed Aug 27 12:54:00 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Sep 29 11:44:04 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: *done* The implementation of probe -> nfa is not complete for conditional actions eg {P1 ==0}a, b.
+
+*done* The implementation of probe -> nfa is not complete for conditional actions eg {P1 ==0}a, b.
+We need a "add condition" to the front of an Nfa.
+
+From background-static Wed Aug 27 12:56:04 BST 2008
+Message-Id: <riot.20080827125604.18@riot.invalid>
+Date: Wed Aug 27 12:56:04 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:56:04 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Get pepaprobe to work again. I'm not sure if I should just ditch the whole
+
+Get pepaprobe to work again. I'm not sure if I should just ditch the whole
+'NonStandard' command-line options. Or probably better is that I just
+change the functions in Ipc/Ipc.hs to work with "CliOpt a" so that they
+can work with any command-line options given to them.
+
+From background-static Wed Aug 27 12:56:22 BST 2008
+Message-Id: <riot.20080827125622.19@riot.invalid>
+Date: Wed Aug 27 12:56:22 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Sep 29 11:43:44 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: prioritise needs to work with the new state space generator.
+
+prioritise needs to work with the new state space generator.
+
+From background-static Wed Aug 27 12:56:36 BST 2008
+Message-Id: <riot.20080827125636.20@riot.invalid>
+Date: Wed Aug 27 12:56:36 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Mon Sep 29 11:43:49 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: prioritise should take an (optional) number.
+
+prioritise should take an (optional) number.
+
+From background-static Wed Aug 27 12:57:08 BST 2008
+Message-Id: <riot.20080827125708.21@riot.invalid>
+Date: Wed Aug 27 12:57:08 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:57:08 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: How does (a,a,a)/b:start parse?
+
+How does (a,a,a)/b:start parse?
+
+From background-static Wed Aug 27 12:58:31 BST 2008
+Message-Id: <riot.20080827125831.22@riot.invalid>
+Date: Wed Aug 27 12:58:31 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 12:58:31 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Parameterised action names so that we can have a different action for each client (for example).
+
+Parameterised action names so that we can have a different action for each client (for example).
+Something like:
+
+Server = (req[N], infty) . Server
+       + (rec[N], r) . Server
+       ;
+Client[N] = (req[N], r) . (rec[N], infty) . Client[N];
+
+From background-static Wed Aug 27 13:00:18 BST 2008
+Message-Id: <riot.20080827130018.23@riot.invalid>
+Date: Wed Aug 27 13:00:18 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 13:00:18 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Typing 'performability' which answers the question:
+
+Typing 'performability' which answers the question:
+Is a particular activity ever performed?
+Without generating the whole state space?
+One method, solve the equations of the actions of the transitions for a 
+solution in which the given action is done. Note: this may actually involve
+generating (something which is equivalent to) the whole state space.
+
+From background-static Wed Aug 27 13:00:53 BST 2008
+Message-Id: <riot.20080827130053.24@riot.invalid>
+Date: Wed Aug 27 13:00:53 BST 2008
+Status: RO
+X-Riot-Version: 1ds-20080618
+From: Riot
+X-Riot-Edited: Wed Aug 27 13:00:53 BST 2008
+Content-Type: text/plain; charset=utf-8
+Subject: Try using pepanets for epidemiology modelling. Of course we'll have to actually
+
+Try using pepanets for epidemiology modelling. Of course we'll have to actually
+implement pepanets first.
+

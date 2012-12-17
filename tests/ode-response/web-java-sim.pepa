@@ -1,0 +1,27 @@
+r_browse     = 0.9 ;
+r_buy        = 0.1 ;
+r_getPage    = 5.0 ;
+r_getConfirm = 5.0 ;
+
+r_sendPage    = 35.0 ;
+r_sendConfirm = 3 ;
+
+users           = 1000 ;
+servers         = 10 ;
+
+TaggedUser = (browse, r_browse) . TaggedBrowsing
+           + (buy, r_buy) . TaggedBuying ;
+TaggedBrowsing (getPage, r_getPage) . TaggedUser ;
+TaggedBuying = (getConfirm, r_getConfirm) . TaggedDone ;
+TaggedDone = Stop ;
+
+User = (browse, r_browse) . Browsing
+     + (buy, r_buy) . Buying;
+Browsing = (getPage, r_getPage) . User;
+Buying = (getConfirm, r_getConfirm) . User ;
+
+Server      = (getPage, r_sendPage) . Server
+            + (getConfirm, r_sendConfirm) . Server
+            ;
+
+Server[servers] <getPage, getConfirm> (User[users] || TaggedUser)

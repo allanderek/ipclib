@@ -1,0 +1,8 @@
+// File: tests/good/test11.pepa
+// Using real number constants for rates
+
+P1 = (a, 1.75).P2;
+P2 = (b, 3.325).P1;
+
+P1 <> P2
+

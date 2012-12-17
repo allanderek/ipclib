@@ -1,0 +1,13 @@
+%%
+%% The idea of this file is to demonstrate how 'crosstalk' can
+%% effect the throughput of a model when aggregation is used.
+
+% File: aggregation.pepa
+
+r = 0.24;
+r2 = 0.24;
+
+P1 = (request, r2).P2;
+P2 = (response, r).P1;
+
+P1[2]

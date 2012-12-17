@@ -1,0 +1,47 @@
+AddMilk: 1.49655791679138e-3
+Enjoy: 8.979347500748279e-2
+Kettle: 1.0
+MakeTea: 8.979347500748278e-3
+PourWater: 8.97934750074828e-4
+Stir: 8.979347500748278e-4
+TeaDrinker: 0.8979347500748279
+
+boil_kettle: 8.979347500748278e-3
+drink: 8.97934750074828e-3
+milk: 8.97934750074828e-3
+pour: 8.97934750074828e-3
+stir: 8.979347500748278e-3
+thirst: 8.97934750074828e-3
+
+1
+    Kettle = 1
+    TeaDrinker = 1
+    Probability: 0.8979347500748279
+
+2
+    Kettle = 1
+    MakeTea = 1
+    Probability: 8.979347500748278e-3
+
+3
+    Kettle = 1
+    PourWater = 1
+    Probability: 8.97934750074828e-4
+
+4
+    AddMilk = 1
+    Kettle = 1
+    Probability: 1.49655791679138e-3
+
+5
+    Kettle = 1
+    Stir = 1
+    Probability: 8.979347500748278e-4
+
+6
+    Enjoy = 1
+    Kettle = 1
+    Probability: 8.979347500748279e-2
+
+
+

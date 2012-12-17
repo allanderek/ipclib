@@ -1,0 +1,12 @@
+% The point of this file is that the process identifier
+% P is mentioned in more than one array of processes.
+
+r=1.0;
+s=0.5;
+
+P  = (a, r).Q + (c, s).S ;
+Q  = (b, s).P + (c, s).S ;
+
+S  = (d, r).P ;
+
+P[3] <a> P[2]

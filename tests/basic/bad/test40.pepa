@@ -1,0 +1,5 @@
+% File: tests/bad/test40.pepa
+% Transient component (P)
+P = (a, r).P2;
+P2 = (b, s).P2;
+(P <> P)

@@ -1,0 +1,10 @@
+// File: tests/good/test21.pepa
+// Binding names to floating-point constants for rates
+r1 = 0.12;
+r2 = 0.24;
+
+P1 = (a, r1).P2;
+P2 = (a, r2).P1;
+
+(P1 <> P1)
+

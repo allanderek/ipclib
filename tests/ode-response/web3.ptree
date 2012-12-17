@@ -1,0 +1,5 @@
+OdeResponse [ stop-time = 150 
+            , ProbeUser = 0
+            , RunningBrowsing = 1000
+            ] 
+            ModelFile "web3.pepa"

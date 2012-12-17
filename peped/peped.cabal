@@ -1,0 +1,12 @@
+Name:            peped
+Version:         0.01
+License:         GPL
+Author:          Allan Clark
+Homepage:        http://homepages.inf.ed.ac.uk/s9810217/software
+Build-depends:   base, parsec, ipclib, Hiil
+Synopsis:        A prototype syntax-directed editor
+-- Ghc-options:     -Wall
+
+Executable:      peped
+Main-is:         Peped.hs
+Ghc-options:     -Wall

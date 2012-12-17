@@ -1,0 +1,12 @@
+// File: tests/good/test04.pepa
+// Syntax analysis: choice is supported
+
+r = 1.0;
+s = 10.0;
+
+P1 = (a, r).P2 + (c, r).P3;
+P2 = (b, r).P1; 
+P3 = (d, s).P1;
+
+P1 <> P1 
+

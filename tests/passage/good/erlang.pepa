@@ -1,0 +1,27 @@
+// The purpose of this file is to show an erlang
+// probability distribution of a sequence of activities
+// all occurring with the same rate.
+// To get an erlang with k=1 distribution (just the exponential distribution)
+// try the following command
+// ipc --probe "t:start, t1:stop" --run-hydra
+// for other value of k simply replace t1 with tk up to 12.
+// Also add in the --pdf option to return the pdf of the function rather than
+// the default cdf.
+
+r = 1.0 ;
+
+A = (t  , r) . B ;
+B = (t1 , r) . C ;
+C = (t2 , r) . D ;
+D = (t3 , r) . E ;
+E = (t4 , r) . F ;
+F = (t5 , r) . G ;
+G = (t6 , r) . H ;
+H = (t7 , r) . I ;
+I = (t8 , r) . J ;
+J = (t9 , r) . K ;
+K = (t10, r) . L ;
+L = (t11, r) . M ;
+M = (t12, r) . A ; // Loops back to A.
+
+A // System equation is simply one process.

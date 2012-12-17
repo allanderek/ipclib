@@ -1,0 +1,143 @@
+// Modelling a european wide virtual university service.
+
+///////////////////////////////////////////////////////////
+// The servers
+
+UEDIN::{
+   lambda = 1.65   ;
+   mu     = 0.0275 ;
+   gamma  = 0.125  ;
+   delta  = 3.215  ;
+   avail  = { 0.6, 0.7, 0.8, 0.9, 1.0 } ;
+
+   UPLOAD::{
+      Idle   = (upload, avail * lambda) . Idle
+             + (fail, mu) . Broken 
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+
+   DOWNLOAD::{
+      Idle   = (download, avail * delta) . Idle
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+} ; 
+
+// LMU doesn't model server down time
+LMU::{
+   lambda = 0.965 ;
+   delta  = 2.576 ;
+   avail  = { 0.5, 0.6, 0.7, 0.8, 0.9 } ;
+
+   UPLOAD::{
+      Idle = (upload, avail * lambda) . Idle ;
+   } ;
+   DOWNLOAD::{
+      Idle = (download, avail * delta) . Idle ;
+   } ;
+} ;
+
+UNIBO::{
+   lambda  = 1.65   ;
+   mu      = 0.0275 ;
+   gamma   = 0.125  ;
+   delta   = 3.215  ;
+   slambda = 1.25   ;
+   sdelta  = 2.255  ;
+   avail   = { 0.8, 0.9, 1.0 } ;
+
+   UPLOAD::{
+      Idle   = (upload, avail * lambda) . Idle
+             + (supload, avail * slambda) . Idle // Should be conditional
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+   DOWNLOAD::{
+      Idle   = (download, avail * delta) . Idle
+             + (sdownload, avail * sdelta) . Idle // Should be conditional
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+} ;
+
+
+UNIPI::{
+   lambda  = 1.65   ;
+   mu      = 0.0275 ;
+   gamma   = 0.125  ;
+   delta   = 3.215  ;
+   slambda = 1.25   ;
+   sdelta  = 2.255  ;
+   avail   = { 0.8, 0.9, 1.0 } ;
+
+   UPLOAD::{
+      Idle   = (upload, avail * lambda) . Idle
+             + (supload, avail * slambda) . Idle // Should be conditional
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+   DOWNLOAD::{
+      Idle   = (download, avail * delta) . Idle
+             + (sdownload, avail * sdelta) . Idle // Should be conditional
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+} ;
+
+///////////////////////////////////////////////////////////
+// The clients
+HARRY::{
+   upload_rate     = 1.0 ;
+   disconnect_rate = 1.0 ;
+
+   Idle       = (start, upload_rate) . Download ;
+   Download   = (download, infty) .
+                (download, infty) .
+                (download, infty) . Upload 
+              ;
+   Upload     = (upload, infty) . 
+                (upload, infty) . Disconnect 
+              ;
+   Disconnect = (finish, disconnect_rate) . Idle ;
+} ;
+
+SALLY::{
+   upload_rate     = 1.0 ;
+   disconnect_rate = 1.0 ;
+
+   Idle       = (start, upload_rate) . Download ;
+   Download   = (download, infty) .
+                (download, infty) .
+                (download, infty) . Upload 
+              ;
+   Upload     = (upload, infty) . 
+                (upload, infty) . Disconnect
+              + (supload, infty) . 
+                (supload, infty) . Disconnect
+              ;
+   Disconnect = (finish, disconnect_rate) . Idle ;
+} ;
+
+Client = { HARRY::Idle, SALLY::Idle } ;
+
+Upload   = { UEDIN::UPLOAD::Idle
+           , LMU::UPLOAD::Idle
+           , UNIBO::UPLOAD::Idle
+           } ;
+Download = { UEDIN::DOWNLOAD::Idle
+           , LMU::DOWNLOAD::Idle
+           , UNIBO::DOWNLOAD::Idle
+           } ;
+
+// Servers = Upload <> Download ;
+
+// Main system equation
+Upload <> Download
+<download, upload, supload, sdownload>
+Client

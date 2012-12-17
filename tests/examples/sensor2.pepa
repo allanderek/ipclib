@@ -1,0 +1,63 @@
+// The Rate definitions
+rmon      = 1.0 ;
+rwait     = 1.0 ;
+// rmonA     = 1.0 ;
+rthink    = 1.0 ;
+// rmsgOut   = 1.0 ;
+rtimeout  = 1.0 ;
+rbackoff  = 1.0 ;
+rack      = 1.0 ;
+// rnetDelay = 1.0 ;
+// rmsgLose  = 1.0 ; 
+
+rmonx     = 1.0 ;
+rmsgsend  = 1.0 ;
+rgiveup   = 1.0 ;
+rnetdelay = 1.0 ;
+rmsglose  = 1.0 ;
+
+r_monA     = 1.0 ;
+r_msgOut   = 1.0 ;
+r_timeout  = 1.0 ;
+r_backoff  = 1.0 ;
+r_giveup   = 1.0 ;
+r_ack      = 1.0 ;
+r_internal = 1.0 ;
+r_think    = 1.0 ;
+
+SensorBotSender = (monitor,rmon).(delay, rwait) . SensorBotSender
+  + (monitorActive,r_monA).SensorBotSending 
+  + (doSend,infty).SensorBotSending;
+SensorBotSending = (messageOut,r_msgOut).SensorBotSend;
+SensorBotSend = (ackIn,infty).SensorBotSend 
+  + (timeout,r_timeout).SensorBotRetry;
+SensorBotRetry = (backoff,r_backoff).SensorBotSending 
+  + (giveup,r_giveup).SensorBotSend;
+
+SensorBotReceiver = (msgIn,infty).SensorBotRelay 
+  + (msgIn,infty).SensorBotProcess;
+SensorBotProcess = (ackOut,r_ack).(doSend,r_internal).SensorBotReceiver;
+SensorBotRelay = (ackOut,r_ack).(think,r_think).SensorBotReceiver;
+
+SensorBot = (SensorBotSend <doSend> SensorBotReceiver)/{doSend};
+
+
+UnreliableSensorChannel 
+= (msgOut,infty).UnreliableSensorChannelMsg
+ +  (ackOut,infty).UnreliableSensorChannelAck;
+UnreliableSensorChannelMsg
+= (msgIn,rnetdelay).UnreliableSensorChannel
+ +  (msgLose,rmsglose).UnreliableSensorChannel;
+UnreliableSensorChannelAck
+= (ackIn,rnetdelay).UnreliableSensorChannel
+ +  (msgLose,rmsglose).UnreliableSensorChannel;
+
+
+UnreliableSensorNetwork
+= UnreliableSensorChannel[4];
+
+SensorNet = SensorBot[4] <ackIn,ackOut,msgIn,msgOut> UnreliableSensorNetwork;
+
+SensorNet
+
+

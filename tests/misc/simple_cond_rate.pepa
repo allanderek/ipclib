@@ -1,0 +1,12 @@
+% This should pass type checking and uses
+% a conditional rate.
+
+r1 = 1.0;
+r2 = 2.0;
+
+P1 = (a, r1).P2 ;
+P2 = (b, r2).P3 ;
+P3 = (c, if P1 then r1 else r2).P1 ;
+%P3 = (stop, r2).P1 ;
+
+( P1 <> P1 )

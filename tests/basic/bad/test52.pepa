@@ -1,0 +1,4 @@
+% File: tests/bad/test52.pepa
+% Syntax error, missing equals in definition
+P  (a, r).P;
+(P <> P)

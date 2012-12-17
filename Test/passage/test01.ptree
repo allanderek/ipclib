@@ -1,0 +1,13 @@
+// The simplest test possible
+// Okay so there are some limitations in the ptree format which
+// make this a little more difficult than it should be.
+// First of all I would like to conveniently output both the cdf and pdf
+// Second I would like to just specify the output format, that is .csv and
+// have the name of the file automatically generated.
+Plot Lines [ output = "test01-cdf.csv" ]
+     Cdf
+     Passage ModelProbe (a:start, b:stop)
+             Model ( r = 1.0 ;
+                     P = (a, r) . (b, r) . P ;
+                     P
+                   )

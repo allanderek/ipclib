@@ -1,0 +1,4 @@
+% File: tests/bad/test21.pepa
+% Using non-well-formed real number constants for rates (no trailing digits)
+P = (a, 1.).P;
+(P <> P)

@@ -1,0 +1,26 @@
+( "small.pdf"
+, "Comparison of passage-time results based on start conditions"
+, [ [ ( "model file"      , "small_xsp.pepa" )
+    , ( "probe definition", "a:start, c:stop" )
+    , ( "title"           , "whenever" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "small_xsp.pepa" )
+    , ( "probe definition", "{Q2 == 1}a:start, c:stop" )
+    , ( "title"           , "Ready" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  , [ ( "model file"      , "small_xsp.pepa" )
+    , ( "probe definition", "{Q2 == 0}a:start, c:stop" )
+    , ( "title"           , "Not Ready" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  ]
+)
+

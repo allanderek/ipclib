@@ -1,0 +1,26 @@
+% Bio-PEPA model of intracellular calcium oscillations
+
+% calcium transport Cyt<->Ext, calcium active transport Cyt<->SR, calcium passive transport SR->Cyt, channel activation/inactivation
+
+%biopepa.independent.replications: 1
+%biopepa.show.all.replications: true
+%biopepa.simulation.stoptime: 100
+%stochkit.opt.progress.interval: 100
+
+a1f = [ v0 + v1 * b ] ;
+a1b = [ k * Ca_at_Cyt ] ;
+a2f = [ v_m2 * Ca_at_Cyt * Ca_at_Cyt / (k2 * k2 + Ca_at_Cyt * Ca_at_Cyt) ] ;
+a2b = [ b * (((a/d)*Ca_at_Cyt*Ca_at_Cyt*Ca_at_Cyt*Ca_at_Cyt)* R_Ac_at_Cyt)/(1 + (a/d)*Ca_at_Cyt*Ca_at_Cyt*Ca_at_Cyt*Ca_at_Cyt) * v_m3 * Ca_at_SR * Ca_at_SR / (k_CaSR * k_CaSR + Ca_at_SR * Ca_at_SR)] ;
+a3  = [ kf * Ca_at_SR ] ;
+a4f = [ kd * Ca_at_Cyt * Ca_at_Cyt * Ca_at_Cyt * Ca_at_Cyt * R_Ac_at_Cyt ] ;
+a4b = [ kr * R_In_at_Cyt ] ;
+
+
+Ca_at_Ext   = (a1f,1)(.) + (a1b,1)(.) ;
+Ca_at_Cyt   = (a1f,1)>> +  (a1b,1)<< + (a2f,1)<< +  (a2b,1)>> + (a3,1)>> + (a4f,1)(+) ;
+Ca_at_SR    = (a2f,1)>> +  (a2b,1)<< + (a3,1)<< ;
+R_Ac_at_Cyt = (a2f,1)(+) +  (a2b,1)(+) + (a4f,1)<< + (a4b,1)>> ;
+R_In_at_Cyt = (a4f,1)>> + (a4b,1)<< ;
+
+%(Ca_at_Ext <> (Ca_at_Cyt <> (Ca_at_SR <> (R_Ac_at_Cyt <> R_In_at_Cyt))))
+(Ca_at_Ext <> (Ca_at_Cyt <> Ca_at_SR))

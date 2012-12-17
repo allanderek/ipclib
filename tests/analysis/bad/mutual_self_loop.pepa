@@ -1,0 +1,10 @@
+% This model should fail because it contains a self-loop
+% although we synchronise on the action 'a', that action
+% just brings both components back their original states.
+
+r1 = 1.0 ;
+
+P  = (a, r1) . P ;
+Q  = (a, r1) . Q ;
+
+( P <a> Q )

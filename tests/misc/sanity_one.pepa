@@ -1,0 +1,22 @@
+% File: tests/misc/sanity.pepa
+% Okay, one problem when asking a question such as when we see
+% an 'a' action how long until we see a 'b' action, is that it
+% can be *anyone* who performs the 'b' action.
+
+% So here, we have a process that very regularly starts a 'computation'
+% but takes a long time to complete it. We want to see if our results
+% are overly good, because we often see an 'end' action shortly after
+% a 'start' action, because we see someone completing a computation.
+
+% This file goes with sanity.pepa and shows what the probability is
+% when there is just one process, which does not have the problem
+% that anyone else can 'complete' your computation.
+
+r  = 10.0 ;
+r2 = 0.1 ;
+
+P1 = (start, r ).P2 ; 
+P2 = (run  , r2).P3 ;
+P3 = (end  , r ).P1 ;
+
+P1

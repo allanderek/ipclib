@@ -1,0 +1,5 @@
+% File: tests/bad/test08.pepa
+% Unguarded recursive use of a component (P)
+% This test currently exposes a bug in ipc whereby it goes into an infinite loop
+%P = (a, r).P + P;
+%(P <> P)

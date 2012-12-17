@@ -1,0 +1,7 @@
+% File: tests/bad/test02.pepa
+% Redundant synchronisation (on b)
+r = 1.0 ;
+
+P = (a, r).(a, r).P ;
+Q = (a, infty).Q;
+(P <a, b> Q)

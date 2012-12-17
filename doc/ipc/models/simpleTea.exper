@@ -1,0 +1,12 @@
+( "simpleTea.pdf"
+, "Passage time results for the thirst to stir passage"
+, [ [ ( "model file"      , "simpleTea.pepa" )
+    , ( "probe definition", "thirst:start, stir:stop" )
+    , ( "title"           , "" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  ]
+)
+

@@ -1,0 +1,13 @@
+r_thirst = 0.01 ; r_boil =  1.0 ; r_pour   = 10.0 ;
+r_milk   = 6.0 ; r_stir = 10.0  ; r_drink = 0.1   ;
+
+TeaDrinker = (thirst     , r_thirst) . MakeTea    ;
+MakeTea    = (boil_kettle, infty)    . PourWater  ;
+PourWater  = (pour       , r_pour)   . AddMilk    ;
+AddMilk    = (milk       , r_milk)   . Stir       ;
+Stir       = (stir       , r_stir)   . Enjoy      ;
+Enjoy      = (drink      , r_drink)  . TeaDrinker ;
+
+Kettle     = (boil_kettle, r_boil) . Kettle ;
+
+TeaDrinker <boil_kettle> Kettle

@@ -1,0 +1,37 @@
+% This is the attempt to mimic the barman.pepa file without using
+% functional rates, the hope is that we can show that functional rates
+% are useful from a maintenance perspective as well as an efficiency
+% perspective.
+
+% A drinker is defined as the same as the with functional rates :
+
+r_drink  = 1.0 ;
+r_thirst = 1.0 ;
+
+Relaxing = (thirst, r_thirst).Thirsty ;
+Thirsty  = (serve, infty).Drinking ;
+Drinking = (drink, r_drink).Relaxing ;
+
+
+% The implementation of the barman must now take care to note how many
+% drinkers there are waiting to be served. To do this we must synchronise
+% not only on the serve action but also on the thirst action.
+% Here we impose the restriction that only 5 people can stand at the
+% bar waiting to be served, we assume this to mean that anyone else will
+% see the bar is busy and remain seated.
+
+extra_effort = 1.2 ;
+r_serve      = 5.0 ;
+
+Serve0 = (thirst, infty).Serve1 ;
+Serve1 = (thirst, infty).Serve2 +
+	 (serve, extra_effort * r_serve).Serve0 ;
+Serve2 = (thirst, infty).Serve3 +
+	 (serve, extra_effort * 2 * r_serve).Serve1 ;
+Serve3 = (thirst, infty).Serve4 +
+	 (serve, extra_effort * 3 * r_serve).Serve2 ;
+Serve4 = (thirst, infty).Serve5 +
+         (serve, extra_effort * 4 * r_serve).Serve3 ;
+Serve5 = (serve, extra_effort * 5 * r_serve).Serve4 ;
+
+Serve0 < serve, thirst > Relaxing[50]

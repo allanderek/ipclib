@@ -1,0 +1,81 @@
+// Modelling a european wide virtual university service.
+
+///////////////////////////////////////////////////////////
+// The servers
+
+servers      = 6 ;
+http_servers = {1,2,3,4,5 } ;
+ftp_servers  = servers - http_servers ;
+
+UEDIN::{
+   lambda = 1.65   ;
+   mu     = 0.0275 ;
+   gamma  = 0.125  ;
+   delta  = 3.215  ;
+   avail  = 0.6 ; // { 0.6, 0.7, 0.8, 0.9, 1.0 } ;
+
+   FTP::{
+      Idle   = (upload, avail * lambda) . Idle
+             + (fail, mu) . Broken 
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+
+   HTTP::{
+      Idle   = (download, avail * delta) . Idle
+             + (fail, mu) . Broken
+             ;
+      Broken = (repair, gamma) . Idle ;
+   } ;
+} ; 
+
+// LMU doesn't model server down time
+LMU::{
+   lambda = 0.965 ;
+   delta  = 2.576 ;
+   avail  = { 0.5, 0.6, 0.7, 0.8, 0.9 } ;
+
+   FTP::{
+      Idle = (upload, avail * lambda) . Idle ;
+   } ;
+   HTTP::{
+      Idle = (download, avail * delta) . Idle ;
+   } ;
+} ;
+
+
+
+///////////////////////////////////////////////////////////
+// The clients
+HARRY::{
+   upload_rate     = 1.0 ;
+   disconnect_rate = 1.0 ;
+
+   Idle       = (begin, upload_rate) . Download ;
+   Download   = (download, infty) .
+                (download, infty) .
+                (download, infty) . Upload 
+              ;
+   Upload     = (upload, infty) . 
+                (upload, infty) . Disconnect 
+              ;
+   Disconnect = (finish, disconnect_rate) . Idle ;
+} ;
+
+Client = { HARRY::Idle } ;
+
+Ftp      = { UEDIN::FTP::Idle
+           , LMU::FTP::Idle
+           } ;
+Http     = { UEDIN::HTTP::Idle
+           , LMU::HTTP::Idle
+           } ;
+
+
+Servers = Ftp[ftp_servers] <> Http[http_servers] ;
+// Main system equation
+
+
+Servers
+<download, upload, supload, sdownload>
+Client

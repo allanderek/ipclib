@@ -1,0 +1,9 @@
+// File: tests/good/test09.pepa
+// Binds to a co-operation
+
+r = 1.0;
+
+P  = (a, r).(b,r).P ;
+P2 = P <> P   ;
+
+P2

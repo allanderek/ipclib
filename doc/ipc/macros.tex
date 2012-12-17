@@ -1,0 +1,88 @@
+\usepackage{amssymb,amsbsy,verbatim,fancybox, ../common/pepa}
+\usepackage{graphicx}
+%% \usepackage{lhs2TeX}
+
+\newcommand{\adcComment}[1]{\textbf{#1}}
+\newcommand{\adcCommentl}[1]{\textbf{#1}\\}
+\newcommand{\rewordthis}[1]{\textsl{#1}\\}
+\newcommand{\adcTodo}{\adcComment{TODO}}
+
+\newcommand{\ipc}{\textsf{ipc}}
+\newcommand{\srmc}{\textsf{srmc}}
+\newcommand{\smc}{\textsf{smc}}
+\newcommand{\hydra}{\textrm{Hydra}}
+\newcommand{\Condor}{\textrm{Condor}}
+\newcommand{\hydrus}{\textsf{hydrus}}
+\newcommand{\collate}{\textsf{collate}}
+\newcommand{\puffball}{\textsf{puffball}}
+\newcommand{\gnuplot}{\textsf{gnuplot}}
+\newcommand{\pepa}{\textrm{PEPA}}
+\newcommand{\sectref}[1]{Sect.~\ref{#1}}
+\newcommand{\figref}[1]{Fig.~\ref{#1}}
+
+% The if commands for distinguishing between the developer and user manuals
+\newif\ifDeveloperVersion
+
+\newcommand{\indexipcflag}[1]{\index{\ipc command-line flag!\texttt{#1}}}
+\newcommand{\ipcflag}[1]{\indexipcflag{#1}\texttt{--\ignorespaces#1}}
+\newcommand{\solver}[1]{\index{\ipc command-line flag!\texttt{--solver}!\texttt{#1}}\texttt{#1}}
+\newcommand{\figSpec}[2]{
+  \begin{figure}[t]
+    \begin{center}
+      \includegraphics[width=0.6\textwidth]{figs/#1}
+      \caption[ ] {\label{fig:#1} #2}
+    \end{center}
+  \end{figure}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Url definitions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% For now just until I work out how to check
+% whether or not we are using hevea
+
+\newif\ifusingHevea
+\usingHeveafalse
+
+
+\ifusingHevea
+\else
+\newcommand{\ahrefurl}[1]{#1}
+\fi
+
+
+\newcommand{\ipcstartpage}{
+\ahrefurl{\url{http://homepages.inf.ed.ac.uk/s9810217/software/ipc}}}
+\newcommand{\usingpuffballurl}{
+\ahrefurl{\url{http://homepages.inf.ed.ac.uk/s9810217/software/puffball/usingpuffball.html}}\xspace}
+\newcommand{\ipcsrctarballurl}{
+\ahrefurl{\url{http://homepages.inf.ed.ac.uk/s9810217/software/ipc/ipc_src.tar.gz}}\xspace}
+\newcommand{\puffballsrctarballurl}{
+\ahrefurl{\url{http://homepages.inf.ed.ac.uk/s9810217/software/puffball/puffball_dist.tar.gz}}\xspace}
+\newcommand{\hydrusscripturl}{
+\ahrefurl{\url{http://homepages.inf.ed.ac.uk/s9810217/software/ipc/condor_example/hydrus.sh}}\xspace}
+\newcommand{\collatescripturl}{
+\ahrefurl{\url{http://homepages.inf.ed.ac.uk/s9810217/software/ipc/condor_example/collate.ml}}\xspace}
+\newcommand{\Condorexampletarballurl}{
+\ahrefurl{\url{http://homepages.inf.ed.ac.uk/s9810217/software/ipc/condor_example.tar.gz}}\xspace}
+\newcommand{\airbagpepamodelurl}{
+\ahrefurl{\url{http://homepages.inf.ed.ac.uk/s9810217/software/ipc/condor_example/airbag.pepa}}\xspace}
+\newcommand{\HaskellWebSite}{
+\ahrefurl{\url{http://www.haskell.org}}}
+\newcommand{\CygwinWebSite}{
+\ahrefurl{\url{http://www.cygwin.org}}}
+%%%% End of Url definitions %%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\QUESTION}[1]{\textbf{\ (>> \uppercase{#1} ??)\ }}
+\newcommand{\CHECKTHIS}{\textbf{\ (<<< CHECK~THIS !!!)\ }}
+\newcommand{\TODO}[1]{\textbf{\ (>> \uppercase{TODO: } #1 ??)\ }}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% A command-line sequence
+\newenvironment{commandline}{\begingroup\texttt{}{}\endgroup}
+
+%

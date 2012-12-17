@@ -1,0 +1,10 @@
+Passage [start] [stop] [ start-time = 0.0
+                       , stop-time  = 6.0
+                       , time-step  = 0.4
+                       ]
+  ModelProbe (request:start, response:stop)
+             Model ( r = 1.0 ;
+                     Client = (request, r) . (response, infty) . Client ;
+                     Service = (request, infty) . (response, r) . Service ;
+                     Service <request, response> Client
+                   )

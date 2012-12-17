@@ -1,0 +1,18 @@
+// This is the model with the (absorbing) probe already added to it
+// AND already partially evaluated.
+
+think_r = 1.0 ;
+use_r   = 1.2 ;
+reset_r = 1.9 ;
+
+m = 120 ;
+n = 200 ;
+
+Waiting = (use, use_r) . P1 ;
+P1 = (think, think_r) . P2 ;
+P2 = (use, use_r) . P1 ;
+
+R1 = (use, use_r) . R2 ;
+R2 = (reset, reset_r) . R1 ;
+
+R1[120] <use> Waiting[200]

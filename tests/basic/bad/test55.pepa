@@ -1,0 +1,5 @@
+% File: tests/bad/test55.pepa
+% Syntax error, missing operator between parentheses
+P = (a, r).P;
+((P <> P) (P <> P))
+

@@ -1,0 +1,12 @@
+( "tiny.pdf"
+, ""
+, [ [ ( "model file"      , "tiny.pepa" )
+    , ( "probe definition", "start:start, stop:stop" )
+    , ( "title"           , "start-stop" )
+    , ( "start time"      , "0.0" )
+    , ( "stop time"       , "10.0" )
+    , ( "time step"       , "0.1" )
+    ]
+  ]
+)
+

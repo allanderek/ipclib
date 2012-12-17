@@ -1,0 +1,8 @@
+// File: tests/good/test10.pepa
+// Using integer constants for rates
+
+P1 = (a, 1).P2;
+P2 = (b, 3).P1;
+
+P1 <> P2
+

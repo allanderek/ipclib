@@ -1,0 +1,19 @@
+Plot Lines [ names  = E_high, E:S_high, P_high, S_high
+             output = "mm-step100.pdf"
+           ]
+ Transient [ start-time = 0.0
+             stop-time  = 10.0
+             time-step  = 0.1 
+           ] 
+ ModelTranslate BioPepaFile 
+                [ step-size = 100
+                  rate-params = [ k1  = 1.0
+                                  km1 = 1.0
+                                  k2  = 1.0
+                                ] 
+                  max-concentrations = [ E_high = 100
+                                         S_high = 100
+                                       ]
+                  rate-calc = simple
+                ]
+                "MM.biopepa"

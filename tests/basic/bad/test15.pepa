@@ -1,0 +1,4 @@
+% File: tests/bad/test15.pepa
+% Missing rate definition
+P = (a, r).P;
+(P <> P)

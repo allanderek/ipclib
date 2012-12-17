@@ -1,0 +1,4 @@
+% File: tests/bad/test62.pepa
+% Illegal character in input file, ^Z at end of file
+P = (a, r).P;
+(P <> P)

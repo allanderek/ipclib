@@ -1,0 +1,128 @@
+%% The Secure WebService example from the Fluid Flow Approximation paper 
+
+%% Second party client rates
+r_sp_cmp = 1.0000;
+r_sp_encb = 1.0001;
+r_sp_req = 1.0002;
+r_sp_decb = 1.0003;
+
+%% First party client rates
+r_fp_cmp = 1.0004;
+r_fp_inv = 1.0005;
+
+%% Broker rates
+r_b_dec_sp = 1.0006;
+r_b_encws = 1.0007;
+r_b_req = 1.0008;
+r_b_dec_ws = 1.0009;
+r_b_enc_sp = 1.0010;
+r_b_resp = 1.0011;
+
+%% Web Service client rates
+r_ws_dec_b = 1.0012;
+r_ws_exec_local = 1.0013;
+r_ws_exec = 1.0014;
+r_ws_enc_b = 1.0015;
+r_ws_resp_b = 1.0016;
+r_ws_res = 1.0017;
+
+%% A second party client cycles through a lifetime of composing service 
+%% requests, encrypting these and sending them to its broker.  It then 
+%% waits for a response from the broker.  The rate at which the first 
+%% three activities happen is under the control of the client.  The rate
+%% at which responses are produced is determined by the interaction of the 
+%% broker and the service endpoint.  As usual with PEPA models this component
+%% contains some individual activities which it itself performs (the composition
+%% and encryption) and some activities which are performed in co-operation with
+%% another component (the request and response are in co-operation with the 
+%% broker).
+
+%% Component definition: Second Party Client
+SecondPartyClient_idle = (compose_sp, r_sp_cmp).SecondPartyClient_enc;
+SecondPartyClient_enc = (encrypt_b, r_sp_encb).SecondPartyClient_sending;
+SecondPartyClient_sending = (request_b, r_sp_req).SecondPartyClient_waiting;
+SecondPartyClient_waiting = (response_b, infty).SecondPartyClient_dec;
+SecondPartyClient_dec = (decrypt_b, r_sp_decb).SecondPartyClient_idle;
+%% End component definition: Second Party Client
+
+%% The broker is inactive until it receives a request.  It then decrypts the 
+%% request before re-encrypting it for the Web service (to ensure end-to-end
+%% security).  It forwards the request to the Web service and then waits for
+%% a response.  The corresponding decryption and re-encrytion are performed 
+%% before returning the response to the client.
+
+%% Component definition: Broker
+Broker_idle = (request_b, infty).Broker_decodingInput;
+Broker_decodingInput = (decrypt_sp, r_b_dec_sp).Broker_encodingInput;
+Broker_encodingInput = (encrypt_ws, r_b_encws).Broker_sending;
+Broker_sending = (request_ws, r_b_req).Broker_waiting;
+Broker_waiting = (response_ws, infty).Broker_decodingResponse;
+Broker_decodingResponse = (decrypt_ws, r_b_dec_ws).Broker_encodingResponse;
+Broker_encodingResponse = (encrypt_sp, r_b_enc_sp).Broker_replying;
+Broker_replying = (response_b, r_b_resp).Broker_idle;
+%% End component definition: Broker
+
+%% The lifetime of a first party client mirrors that of a second party client
+%% except that encryption need not be used when all of the communication is 
+%% conducted across a secure intranet.  The method of invoking the Web service
+%% may also be different because the service make be invoked by a remote
+%% method invocation to the host machine instead of via an HTTP request.  Thus
+%% the first party client experiences the Web service as a blocking remote method
+%% invocation.
+
+%% Component definition: First Party Client
+FirstPartyClient_idle = (compose_fp, r_fp_cmp).FirstPartyClient_calling;
+FirstPartyClient_calling = (invoke_ws, r_fp_inv).FirstPartyClient_blocked;
+FirstPartyClient_blocked = (result_ws, infty).FirstPartyClient_idle;
+%% End component definition: First Party Client
+
+%% We model a thread of execution on the Web service.  There are two ways in 
+%% which the service is executed, leading to a choice in the process algebra
+%% model taking the service process into one or other of its two modes of
+%% execution.  In either case, the duration of the execution of the service 
+%% itself is unchanged.  The difference is only in whether encryption is needed
+%% and whether the result is delivered as an HTTP response or as a direct value.
+
+%% Component definition: Web Service
+WebService_idle = (request_ws, infty).WebService_decoding
+                + (invoke_ws, infty).WebService_method;
+
+WebService_decoding = (decryptRequest_ws, r_ws_dec_b).WebService_execution;
+WebService_execution = (execute_ws_local, r_ws_exec_local).WebService_securing;
+WebService_securing = (encryptResponse_ws, r_ws_enc_b).WebService_responding;
+WebService_responding = (response_ws, r_ws_resp_b).WebService_idle;
+
+WebService_method = (execute_ws, r_ws_exec).WebService_returning;
+WebService_returning = (result_ws, r_ws_res).WebService_idle;
+%% End component definition: Web Service
+
+(
+   (
+      (SecondPartyClient_idle 
+    <> SecondPartyClient_idle
+    <> SecondPartyClient_idle
+    <> SecondPartyClient_idle
+      )
+         <request_b, response_b> 
+      (Broker_idle
+    <> Broker_idle
+    <> Broker_idle
+    <> Broker_idle
+      ) 
+   )
+     <request_ws, response_ws>
+   (
+      (WebService_idle
+    <> WebService_idle
+    <> WebService_idle
+    <> WebService_idle
+      )
+         <invoke_ws, result_ws> 
+      (FirstPartyClient_idle
+    <> FirstPartyClient_idle
+    <> FirstPartyClient_idle
+    <> FirstPartyClient_idle
+      )
+   )
+)
+

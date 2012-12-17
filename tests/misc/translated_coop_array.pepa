@@ -1,0 +1,17 @@
+r=1.0;
+s=0.5;
+
+% This is the original model in comments
+% P  = (a, r).Q ;
+% Q = (b, s).P  ;
+
+% P[3][b] <a> P[2][b]
+
+P_1  = (a, r).Q_1 ;
+Q_1 = (b, s).P_1  ;
+
+P_2  = (a, r).Q_2 ;
+Q_2 = (b, s).P_2  ;
+
+
+P_1[3][b] <a> P_2[2][b]

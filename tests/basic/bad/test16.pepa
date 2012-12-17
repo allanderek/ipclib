@@ -1,0 +1,5 @@
+% File: tests/bad/test16.pepa
+% Rate r has an illegal value (of 0)
+r = 0;
+P = (a, r).P;
+(P <> P)

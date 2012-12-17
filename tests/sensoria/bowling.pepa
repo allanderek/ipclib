@@ -1,0 +1,68 @@
+r_roll       = 1.1 ;
+
+sample_rate  = 1.0 ;
+forward_rate = 1.1 ;
+
+Coach      = (detectGender, 1.0) . CoachSend ;
+CoachSend  = (send, 1.0) . Coach ;
+
+Player     = (send, infty) . Player_0 ;
+
+Player_0   = (sample, sample_rate) . Player_0
+           + (forward, forward_rate) . Player_1
+           ;
+Player_1   = (sample, sample_rate) . Player_1
+           + (forward, forward_rate) . Player_2
+           ;
+Player_2   = (sample, sample_rate) . Player_2
+           + (forward, forward_rate) . Player_3
+           ;
+Player_3   = (sample, sample_rate) . Player_3
+           + (forward, forward_rate) . Player_4
+           ;
+Player_4   = (sample, sample_rate) . Player_4
+           + (forward, forward_rate) . Player_5
+           ;
+Player_5   = (roll_0, if Sampled < 4 
+                      then r_roll * 2
+                      else r_roll / 2) . Finished_0
+           + (roll_1, if Sampled >= 3 && Sampled <= 5
+                      then r_roll * 2
+                      else r_roll / 2 ) . Finished_1
+           + (roll_2, if Sampled >= 4 && Sampled <= 6
+                      then r_roll * 2
+                      else r_roll / 2 ) . Finished_2
+           + (roll_3, if Sampled >= 5 && Sampled <= 7
+                      then r_roll * 2
+                      else r_roll / 2 ) . Finished_3
+           + (roll_4, if Sampled >= 6 && Sampled <= 8
+                      then r_roll * 2
+                      else r_roll / 2 ) . Finished_4
+           + (roll_5, if Sampled >= 7 && Sampled <= 9
+                      then r_roll * 2
+                      else r_roll / 2 ) . Finished_5
+           + (roll_6, if Sampled >= 8 && Sampled <= 10
+                      then r_roll * 2
+                      else r_roll / 2 ) . Finished_6
+
+           ;
+
+% These are different merely to allow the passage-end 
+% calculations to differentiate the target states
+Finished_0 = (restart, 1.0) . Player ;
+Finished_1 = (restart, 1.0) . Player ;
+Finished_2 = (restart, 1.0) . Player ;
+Finished_3 = (restart, 1.0) . Player ;
+Finished_4 = (restart, 1.0) . Player ;
+Finished_5 = (restart, 1.0) . Player ;
+Finished_6 = (restart, 1.0) . Player ;
+
+SampleSlot = (sample, infty) . Sampled
+           + (restart, infty) . SampleSlot 
+           ;
+Sampled    = (restart, infty). SampleSlot ;
+Samples    = SampleSlot[10][restart] ;
+
+
+%Coach <send> (Player <sample, forward, restart> (Samples <restart> Forwards))
+Coach <send> (Player <sample, restart> (Samples))

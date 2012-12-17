@@ -1,0 +1,25 @@
+r_browse     = 0.9 ;
+r_buy        = 0.1 ;
+
+// The rates at which the server can serve up requests
+// in the original model.
+r_sendPage    = 10 * 35.0 ;
+r_sendConfirm = 10 * 3 ;
+
+browsingSteady = 54 ;
+buyingSteady   = 644 ;
+
+// These ones are calculated from the steady-state of the fluid model.
+r_getPage    = r_sendPage / browsingSteady ;
+r_getConfirm = r_sendConfirm / buyingSteady ;
+
+
+
+UserStart = (begin, 1.0) . Browsing ; // In the ode model we start with a 'browse'
+User      = (browse, r_browse) . Browsing
+          + (buy, r_buy) . Buying ;
+Browsing  = (getPage, r_getPage) . User ;
+Buying    = (getConfirm, r_getConfirm) . UserStart ;
+
+
+UserStart

@@ -1,0 +1,79 @@
+% Airbag PEPA model for computing response time between airbag
+% deployment and dispatch of rescue service.  Process this with
+% ipc -s airbag -t finished
+
+% This one allows us to ask the question of what happens
+% in the case that two cars crash into each other.
+
+% We want to evaluate this example over a longer time: up to 15 minutes.
+
+r_deploy    =      1.0 ;  % An airbag deploys at an arbitrary rate
+r_transmit  =      6.0 ;  % the car can transmit location data in 10 seconds
+r_register  =      1.0 ;  % it takes one minute to register the incoming data
+r_call      =      1.0 ;  % it takes one minute to call the driver's phone
+r_answer    =      1.0 ;  % give the driver one minute to answer the phone
+p_no_answer =      0.7 ;  % 70 per cent chance that the driver will not answer
+r_dispatch  =      1.0 ;  % take one minute to decide to dispatch medical help
+
+p_chance1   =      0.3 ;
+p_chance2   =      0.5 ;
+
+% Sometimes an airbag deploys
+Car = (airbag3, p_chance1 * r_deploy) . CarThree
+    + (airbag2, p_chance2 * r_deploy) . CarTwo
+    + (airbag1, r_deploy)             . CarOne
+    ;
+
+% There is some chance that it will deploy at the same time as
+% 1, 2 or 3 other cars
+%% CarChoice = threeOn . CarThree
+%%           + twoOn . CarTwo
+%%           + justOne . CarOne
+%%           ;
+
+% CarThree must be rescued before Car Two
+CarThree       = (reportToService, r_transmit) . CarThreeCall ;
+CarThreeCall   = (callDriversPhone, infty) . CarThreeAnswer   ;
+CarThreeAnswer = (timeoutDriversPhone, p_no_answer * r_answer) . CarThreeRescue
+               + (driverAnswersPhone, (1.0 - p_no_answer) * r_answer) . CarTwo
+               ;
+CarThreeRescue = (rescue, infty) . CarTwo ;
+
+% Car Two must be rescued before Car One
+CarTwo       = (reportToService, r_transmit) . CarTwoCall ;
+CarTwoCall   = (callDriversPhone, infty) . CarTwoAnswer   ;
+CarTwoAnswer = (timeoutDriversPhone, p_no_answer * r_answer) . CarTwoRescue
+               + (driverAnswersPhone, (1.0 - p_no_answer) * r_answer) . CarOne
+               ;
+CarTwoRescue = (rescue, infty) . CarOne ;
+
+
+% Finally the last (and possibly first) car to be rescued.
+CarOne       = (reportToService, r_transmit) . CarOneCall ;
+CarOneCall   = (callDriversPhone, infty) . CarOneAnswer   ;
+CarOneAnswer = (timeoutDriversPhone, p_no_answer * r_answer) . CarOneRescue
+               + (driverAnswersPhone, (1.0 - p_no_answer) * r_answer) . CarDone
+               ;
+CarOneRescue = (rescue, infty) . CarDone ;
+
+CarDone      = finished . Car ;
+
+
+% The service just continually answers any calls.
+Service        = (reportToService    , infty)  . ServiceProcess     ;
+ServiceProcess = (processReport      , r_register) . ServiceRespond ;
+ServiceRespond = (callDriversPhone   , r_call) . ServiceWait        ;
+ServiceWait    = (timeoutDriversPhone, infty)  . ServiceRescue
+               + (driverAnswersPhone , infty)  . Service            ;
+ServiceRescue  = (rescue             , r_dispatch) . Service        ;
+
+% The main system equation
+Car
+        < reportToService
+        , callDriversPhone
+        , timeoutDriversPhone
+        , driverAnswersPhone
+        , rescue
+        >
+Service
+

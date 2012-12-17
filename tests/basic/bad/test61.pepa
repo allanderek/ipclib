@@ -1,0 +1,5 @@
+% File: tests/bad/test61.pepa
+% Illegal character in input file, question mark at start of line 4
+P = (a, r).P;
+?
+(P <> P)

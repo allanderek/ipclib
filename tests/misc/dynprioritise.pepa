@@ -1,0 +1,23 @@
+%% This file is a preliminary attempt to use pepa priorities
+%% To begin with I will use an ordinary pepa model and then
+%% modify the resulting .mod file.
+
+r  = 0.5 ;
+r2 = 1.0 ;
+P  = (a, r) . P1
+   + (b, r) . P1
+   ;
+P1 = (c, r2) . P ;
+
+// Can cooperate over either a or b
+Q  = (a, infty) . Q
+   + (b, infty) . Q
+   + (fail, r) . Q2
+   ;
+
+// Can only perform an a activity
+Q2 = (a, infty) . Q2
+   + (fix, r) . Q
+   ;
+
+P < a, b > Q

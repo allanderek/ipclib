@@ -1,0 +1,3 @@
+--probe "Car1 airbag:start, finished:stop"
+--nomaster
+tests/misc/airbag.pepa 

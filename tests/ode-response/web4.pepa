@@ -1,0 +1,30 @@
+
+r_browse     = 0.9 ;
+r_buy        = 0.1 ;
+r_getPage    = 5.0 ;
+r_getConfirm = 5.0 ;
+
+r_sendPage    = 35.0 ;
+r_sendConfirm = 3 ;
+
+users           = 1000 ;
+servers         = 10 ;
+
+// The probe has already run (or never will in this particular component)
+RanUser   = (browse, r_browse) . RanBrowsing
+            + (buy, r_buy) . RanBuying 
+            ;
+RanBuying      = (getConfirm, r_getConfirm) . RanUser ;
+RanBrowsing    = (getPage, r_getPage) . RanUser ;
+
+RunningBrowsing = (getPage, r_getPage) . RunningUser ;
+RunningUser     = (browse, r_browse) . RunningBrowsing
+                + (buy, r_buy) . RunningBuying
+                ;
+RunningBuying   = (getConfirm, r_getConfirm) . RanUser ;
+
+Server      = (getPage, r_sendPage) . Server
+            + (getConfirm, r_sendConfirm) . Server
+            ;
+
+Server[servers] <getPage, getConfirm> (RunningBrowsing[users])

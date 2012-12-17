@@ -1,0 +1,46 @@
+% Airbag PEPA model for computing response time between airbag
+% deployment and dispatch of rescue service.  Process this with
+% ipc -s airbag -t finished
+
+% All timings are expressed in minutes. Thus a rate 1.0 means that
+% something happens once a minute (on average).  A rate of 6.0 means
+% that the associated activity happens six times a minute on average,
+% or that its average duration is ten seconds.  All rates included in
+% the present example are conjectured.
+
+% We want to evaluate this example over a longer time: up to 15 minutes.
+
+r1 =   0.1 ;  % an airbag deploys occasionally.
+r2 =   6.0 ;  % the car can transmit location data in 10 seconds
+r3 =   1.0 ;  % it takes one minute to register the incoming data
+r4 =   1.0 ;  % it takes one minute to call the driver's phone
+r5 =   1.0 ;  % give the driver one minute to answer the phone
+p  =   0.7 ;  % 70 per cent chance that the driver will not answer
+r6 =   1.0 ;  % take one minute to decide to dispatch medical help
+
+Car1 = (airbag             , r1) . Car2             ;
+Car2 = (reportToService    , r2) . Car3             ;
+Car3 = (processReport      , r3) . Car4             ;
+Car4 = (callDriversPhone   , infty) . Car5          ;
+Car5 = (timeoutDriversPhone, p * r5) . Car6
+     + (driverAnswersPhone , (1.0 - p) * r5) . Car7 ;
+
+% A bit poor that we have to perform the rescue?
+Car6 = (rescue             , infty) . Car7          ;
+Car7 = finished . Car1                              ;
+
+Service        = (reportToService    , infty) . ServiceRespond ;
+ServiceRespond = (callDriversPhone   , r4)    . ServiceWait    ;
+ServiceWait    = (timeoutDriversPhone, infty) . ServiceRescue
+               + (driverAnswersPhone , infty) . Service        ;
+ServiceRescue  = (rescue             , r6)    . Service        ;
+
+% The main system equation
+Car1 < reportToService
+        , callDriversPhone
+        , timeoutDriversPhone
+        , driverAnswersPhone
+        , rescue
+        >
+Service
+

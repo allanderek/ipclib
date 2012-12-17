@@ -1,0 +1,32 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Srmc definitions
+
+\newcommand{\srmcModel}[2]{
+\noindent
+\begin{tabular}{c}
+\begin{tabular}{lcl}
+#1
+\end{tabular}
+\\
+\texttt{#2}
+\end{tabular}
+}
+
+
+\newcommand{\srmcTopline}[2]{
+\texttt{#1} & \texttt{=} & \texttt{#2}
+}
+\newcommand{\srmcChoiceRight}[1]{
+& \texttt{+} & \texttt{#1}
+}
+\newcommand{\srmcFinishDef}{
+& \texttt{;} &
+}
+
+\newcommand{\markUpCodeFrag}[1]{
+\textcolor{red}{\underline{#1}}
+}
+
+\newcommand{\srmcPassive}{\_}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

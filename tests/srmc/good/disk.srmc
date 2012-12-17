@@ -1,0 +1,74 @@
+// Disk example from the paper "Scalable Analysis of Scalable Systems"
+
+// We first describe a disk which has occasional failures and has just
+// two states, failed and working.  When failed the disk must be 
+// repaired before more data can be read or written.  Reads and writes
+// are thought to be nearly equally likely: the probability that the
+// I/O operation is a read is p_r.  Failures occur somewhere between
+// once every thousand disk operations (p_f=0.001) and once every two
+// hundred (p_f=0.005).  We will consider three sample values in this
+// range.  Rates lambda and mu dictate the rates at which repairs and
+// reads and writes take place.
+
+Main::{
+  lambda = 0.3; mu = 0.3; // rates
+  p_r = 0.4 ; // { 0.4, 0.5, 0.6 }; // probability of a read
+  p_f = 0.1 ; // { 0.001, 0.003, 0.005 }; // probability of failure
+
+  Disk::{
+    Failed = (repair, lambda).Working;
+    Working = (read, (1 - p_f) * p_r * mu).Working 
+            + (write, (1 - p_f) * (1 - p_r) * mu).Working 
+            + (fail, p_f * mu).Failed;
+  };
+};
+
+// The spare disk is slower than the main disk.  Failures occur more
+// frequently and they take longer to repair.  In addition the spare
+// disk has a sleep mode which it enters to save power.  
+
+Spare::{
+  lambda = 0.1; mu = 0.3; // lower rates for the slower device
+  p_r = 0.5 ; // { 0.4, 0.5, 0.6 }; // same probability of a read
+  p_f = 0.1 ; // { 0.01, 0.03, 0.05 }; // higher probability of failure
+  gamma = 0.1; delta = 0.1; // rates for sleep and wake
+
+  Disk::{
+    Failed = (repair, lambda).Working;
+    Working = (read, (1 - p_f) * p_r * mu).Working 
+            + (write, (1 - p_f) * (1 - p_r) * mu).Working 
+            + (fail, p_f * mu).Failed
+            + (sleep, gamma).Offline;
+    Offline = (wake, delta).Working;
+  };
+};
+
+// The disk which is in use in the system is either the main disk or
+// the spare disk.  To describe this in SRMC we consider a set of
+// components and define the disk to be one of these, initially in its
+// working state.
+
+Disk ::= { Main::Disk, Spare::Disk };
+
+// A thread of control divides its time between computation and disk
+// access, initially reading before computing, and writing its results
+// on completion.
+
+Thread::{
+   rho = { 0.333, 0.444, 0.555 } ;
+   State::{
+      Idle = (read, _).Computing;
+      Computing = (calculate, rho) . (write, _).Idle;
+   };
+};
+
+// A process executes a thread.
+
+Process ::= { Thread::State } ;
+
+// The top-level composition of components in our example here
+// introduces the computational process which reads and writes.
+
+System = Process::Idle <read, write> Disk::Working ;
+
+System
