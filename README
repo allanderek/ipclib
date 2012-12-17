@@ -1,0 +1,10 @@
+This is the source code for the International PEPA Compiler (library).
+This was initially started at Imperial College by Jeremy Bradley and named
+the Imperial PEPA Compiler. After development was mostly done at Edinburgh
+it was re-named the International PEPA Compiler. Some refactoring allowed
+most of the functionality to be available as a library.
+
+To install it you will need to set up the Haskell compiler (ghc) and the
+distribution mechanism known as "cabal".
+
+Note there is further documentation in the 'doc' directory.
